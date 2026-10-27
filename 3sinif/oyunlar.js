@@ -77,7 +77,7 @@ window.OYUN = (function () {
       const m = $(`<div class="maskot"><div class="yuz">🦉</div><div class="balon"><span class="soru-metni"></span> <button class="ses-dugme" title="Dinle">🔊</button></div></div>`);
       m.querySelector(".soru-metni").textContent = g.soru;
       ekran.appendChild(m);
-      const oku = (zorla) => { if (g.ses && g.sesOnce) { APP.sesDur(); APP.konusEn(g.ses, zorla); } else { APP.konus(g.soru + (g.tip === "dy" ? ". " + g.ifade : ""), () => { if (g.ses) APP.konusEn(g.ses, zorla); }, zorla); } };
+      const oku = (zorla) => { if (g.ses && g.sesOnce) { APP.sesDur(); APP.konusEn(g.ses, zorla); } else { APP.konus((g.okunacak || g.soru) + (g.tip === "dy" ? ". " + g.ifade : ""), () => { if (g.ses) APP.konusEn(g.ses, zorla); }, zorla); } };
       m.querySelector(".ses-dugme").onclick = () => oku(true);
       const govde = document.createElement("div");
       ekran.appendChild(govde);
@@ -105,11 +105,14 @@ window.OYUN = (function () {
 
   // ---------- Görev çizicileri ----------
   const CIZ = {};
+  // 1. sınıf: kartlara dokununca okunur (window.SINIF.dokununcaOku)
+  const okut = (metin) => { if (window.SINIF && window.SINIF.dokununcaOku && metin && !/^\p{Extended_Pictographic}/u.test(metin)) APP.konus(metin, null, true); };
 
   CIZ.secim = (g, el, bitir) => {
     const sira = karistir(g.secenekler.map((s, k) => [s, k]));
     const kisa = !g.em && g.secenekler.every((s) => String(s).length <= 7) && !g.balonYok;
-    const balon = kisa && Math.random() < 0.4;
+    const secOku = window.SINIF && window.SINIF.dokununcaOku && !g.em && !g.sesYok;
+    const balon = kisa && Math.random() < 0.4 && !secOku;
     const kutu = $(`<div class="${balon ? "balonlar" : "secenekler"}"></div>`);
     if (!balon && g.secenekler.some((s) => String(s).length > 22)) kutu.style.gridTemplateColumns = "1fr";
     sira.forEach(([s, k], n) => {
@@ -117,6 +120,7 @@ window.OYUN = (function () {
       b.className = balon ? "blon" : "sec" + (g.em ? " em" : "");
       if (balon) b.style.background = BALON_RENK[(n + Math.floor(Math.random() * 6)) % 6];
       b.textContent = s;
+      if (secOku) { const k2 = document.createElement("span"); k2.textContent = "🔊"; k2.className = "mini-ses"; k2.onclick = (e) => { e.stopPropagation(); okut(String(s)); }; b.appendChild(k2); b.style.position = "relative"; }
       b.onclick = () => {
         const ok = k === g.dogru;
         if (balon) { if (ok) b.classList.add("patla"); else b.style.opacity = ".4"; }
@@ -141,7 +145,7 @@ window.OYUN = (function () {
     const cip = $(`<div class="cipler"></div>`);
     g.ogeler.forEach(([m, gi]) => {
       const b = document.createElement("button"); b.className = "parca"; b.textContent = m; b.dataset.g = gi;
-      b.onclick = () => { if (b.classList.contains("tamam")) return; cip.querySelectorAll(".secili").forEach((x) => x.classList.remove("secili")); b.classList.add("secili"); secili = b; };
+      b.onclick = () => { if (b.classList.contains("tamam")) return; cip.querySelectorAll(".secili").forEach((x) => x.classList.remove("secili")); b.classList.add("secili"); secili = b; okut(m); };
       cip.appendChild(b);
     });
     const sep = $(`<div class="sepetler"></div>`);
@@ -169,6 +173,7 @@ window.OYUN = (function () {
     karistir(g.ciftler.map((c, i) => [c[1], i])).forEach(([m, i]) => k.children[1].appendChild(yap(m, i, 1)));
     k.querySelectorAll(".parca").forEach((b) => b.onclick = () => {
       if (b.classList.contains("tamam")) return;
+      okut(b.textContent);
       if (!sol || sol.dataset.t === b.dataset.t) { k.querySelectorAll(".secili").forEach((x) => x.classList.remove("secili")); b.classList.add("secili"); sol = b; return; }
       if (sol.dataset.i === b.dataset.i) {
         [sol, b].forEach((x) => { x.classList.remove("secili"); x.classList.add("tamam"); }); sol = null; APP.efekt("tik");
@@ -186,7 +191,7 @@ window.OYUN = (function () {
     const guncelle = () => { const tam = cevap.children.length === g.parcalar.length; kontrol.disabled = !tam; kontrol.style.opacity = tam ? 1 : .5; };
     parcalar.forEach(([p]) => {
       const b = document.createElement("button"); b.className = "parca"; b.textContent = p;
-      b.onclick = () => { (b.parentNode === cip ? cevap : cip).appendChild(b); APP.efekt("tik"); guncelle(); };
+      b.onclick = () => { (b.parentNode === cip ? cevap : cip).appendChild(b); APP.efekt("tik"); guncelle(); if (b.parentNode === cevap) okut(p); };
       cip.appendChild(b);
     });
     kontrol.onclick = () => {
@@ -294,7 +299,7 @@ window.OYUN = (function () {
     for (let d = 0; d < 400 && out.length < n; d++) {
       const u = uretecler[d % uretecler.length];
       const g = u(); if (!g) continue;
-      const a = g.tip + "|" + g.soru + "|" + (g.ifade || "") + "|" + JSON.stringify(g.secenekler ? g.secenekler[0] : g.cevap ?? g.parcalar ?? g.ogeler ?? g.ciftler ?? g.tutar ?? [g.saat, g.dakika, g.boya, g.sol]);
+      const a = g.tip + "|" + g.soru + "|" + (g.ifade || "") + "|" + (g.gorsel || "") + "|" + JSON.stringify(g.secenekler ? g.secenekler[0] : g.cevap ?? g.parcalar ?? g.ogeler ?? g.ciftler ?? g.tutar ?? [g.saat, g.dakika, g.boya, g.sol]);
       if (anahtar.has(a)) continue;
       anahtar.add(a); out.push(g);
     }

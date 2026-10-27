@@ -1,0 +1,25 @@
+// MEB 2026-2027 3. sınıf ders kitapları (tymm.meb.gov.tr → EBA PDF). İnternet gerektirir.
+window.KITAPLAR = [
+  { ders: "matematik", ad: "Matematik Ders Kitabı — 1. Kitap", url: "https://meb.ai/lFLkBe", tur: "Ders kitabı" },
+  { ders: "matematik", ad: "Matematik Ders Kitabı — 2. Kitap", url: "https://meb.ai/Ux6k4N3", tur: "Ders kitabı" },
+  { ders: "matematik", ad: "Matematik Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/ortaokul-matematik-dersi-3sinif-farklilastirma-etkinlikleri_20260909_065556_458.pdf", tur: "Etkinlik kitabı" },
+  { ders: "turkce", ad: "Türkçe Ders Kitabı — 1. Kitap", url: "https://meb.ai/Ue2CBkM", tur: "Ders kitabı" },
+  { ders: "turkce", ad: "Türkçe Ders Kitabı — 2. Kitap", url: "https://meb.ai/jwCDS1", tur: "Ders kitabı" },
+  { ders: "turkce", ad: "Türkçe Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/ilkokul-turkce-dersi-3sinif-farklilastirma-etkinlikleri_20260909_065011_189.pdf", tur: "Etkinlik kitabı" },
+  { ders: "hayat", ad: "Hayat Bilgisi Ders Kitabı — 1. Kitap", url: "https://meb.ai/nGGJ0s", tur: "Ders kitabı" },
+  { ders: "hayat", ad: "Hayat Bilgisi Ders Kitabı — 2. Kitap", url: "https://meb.ai/UpNUfOf", tur: "Ders kitabı" },
+  { ders: "hayat", ad: "Hayat Bilgisi Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/hayat-bilgisi-dersi-3sinif-farklilastirma-etkinlikleri_20260909_071412_426.pdf", tur: "Etkinlik kitabı" },
+  { ders: "fen", ad: "Fen Bilimleri Ders Kitabı — 1. Kitap", url: "https://meb.ai/kegFRj", tur: "Ders kitabı" },
+  { ders: "fen", ad: "Fen Bilimleri Ders Kitabı — 2. Kitap", url: "https://meb.ai/xYFZct", tur: "Ders kitabı" },
+  { ders: "fen", ad: "Fen Bilimleri Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/fen-bilimleri-dersi-3sinif-farklilastirma-etkinlikleri_20260909_071638_427.pdf", tur: "Etkinlik kitabı" },
+  { ders: "ingilizce", ad: "İngilizce Ders Kitabı (Pupil's Book)", url: "https://meb.ai/xOG3e6", tur: "Ders kitabı" },
+  { ders: "ingilizce", ad: "İngilizce Çalışma Kitabı (Workbook)", url: "https://meb.ai/SKR3OC", tur: "Çalışma kitabı" },
+  { ders: "ingilizce", ad: "İngilizce Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/ingilizce-dersi-3sinif-farklilastirma-etkinlikleri_20260909_070901_305.pdf", tur: "Etkinlik kitabı" },
+  { ders: "ingilizce", ad: "Hikâye 1: The Republic Day Show", url: "https://meb.ai/W1lMwo", tur: "İngilizce hikâye" },
+  { ders: "ingilizce", ad: "Hikâye 2: Seasons in the Classroom", url: "https://meb.ai/UtWX5p3", tur: "İngilizce hikâye" },
+  { ders: "ingilizce", ad: "Hikâye 3: What Are You Wearing Today?", url: "https://meb.ai/57egnz", tur: "İngilizce hikâye" },
+  { ders: "ingilizce", ad: "Hikâye 4: The Happy Eid al-Adha", url: "https://meb.ai/nd29OY", tur: "İngilizce hikâye" },
+  { ders: "ingilizce", ad: "Hikâye 5: What a Nice Gift!", url: "https://meb.ai/bMX2cB", tur: "İngilizce hikâye" },
+  { ders: "ingilizce", ad: "Hikâye 6: A Surprise Party", url: "https://meb.ai/UeOG89t", tur: "İngilizce hikâye" },
+  { ders: "diger", ad: "Beden Eğitimi, Oyun ve Müzik Ders Kitabı", url: "https://meb.ai/ICKdxj", tur: "Ders kitabı" }
+];

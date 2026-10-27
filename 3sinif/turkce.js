@@ -149,7 +149,7 @@
   // ---------- Özel / cins ad ----------
   const OZ = { "Özel ad": ["Ankara", "Ayşe", "Türkiye", "Karadeniz", "Pamuk (kedi)", "Fırat", "Ağrı Dağı", "Mehmet", "Konya", "Tekir (kedi)", "Zeynep", "İzmir"], "Cins ad": ["kedi", "şehir", "deniz", "ülke", "dağ", "çocuk", "nehir", "öğretmen", "masa", "ağaç", "kitap", "kuş"] };
   const ozelCins = tiplerden([
-    [5, bankadan({ gruplar: OZ, gruplaSoru: "Sözcükleri özel ad ve cins ad olarak ayır.", grupSor: (g) => g === "Özel ad" ? "Hangisi özel addır?" : "Hangisi cins addır?" })],
+    [5, bankadan({ gruplar: OZ, gruplaSoru: "Sözcükleri özel ad ve cins ad olarak ayır.", buyukYok: true, grupSor: (g) => g === "Özel ad" ? "Hangisi özel addır?" : "Hangisi cins addır?" })],
     [2, () => { const t = pick([["şehir", "İstanbul"], ["ülke", "Türkiye"], ["kız adı", "Elif"], ["deniz", "Akdeniz"], ["nehir", "Kızılırmak"], ["göl", "Van Gölü"]]); return secim(`"${t[0]}" sözcüğüne örnek olabilecek özel ad hangisidir?`, t[1], ["kalem", "bahçe", "ağaç", "masa"], "Özel adlar tek bir varlığa verilen adlardır ve büyük harfle başlar."); }],
     [2, () => pick([() => dy("Özel adlar büyük harfle başlar.", true), () => dy("Cins adlar, aynı türden varlıkların ortak adıdır.", true), () => dy("\"kitap\" sözcüğü özel addır.", false, "\"kitap\" cins addır."), () => dy("\"Ankara\" sözcüğü cins addır.", false, "\"Ankara\" özel addır.")])()],
     [2, () => { const w = pick(["kitap", "kalem", "çiçek", "ağaç", "kuş", "elma", "ev", "araba", "defter", "çocuk"]); const ek = /[eiöü][^aeıioöuü]*$/.test(w) ? "ler" : "lar"; return secim(`"${w}" sözcüğünün çoğul hâli hangisidir?`, w + ek, [w + (ek === "ler" ? "lar" : "ler"), w + "i"], "Çoğul eki -ler / -lar'dır. Kalın ünlüden sonra -lar, ince ünlüden sonra -ler gelir."); }]

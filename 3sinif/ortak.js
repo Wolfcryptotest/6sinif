@@ -54,7 +54,7 @@ window.O = (function () {
       t.push([2, () => {
         const g = pick(adlar), d = pick(k.gruplar[g]);
         const diger = adlar.filter((x) => x !== g).flatMap((x) => k.gruplar[x]);
-        return secim(k.grupSor ? k.grupSor(g) : `Hangisi "${g}" grubundadır?`, buyuk(d), diger.map(buyuk), `${buyuk(d)} → ${g}`);
+        const bf = k.buyukYok ? (x) => x : buyuk; return secim(k.grupSor ? k.grupSor(g) : `Hangisi "${g}" grubundadır?`, bf(d), diger.map(bf), `${bf(d)} → ${g}`);
       }]);
     }
     if (k.ciftler) {

@@ -1,10 +1,11 @@
 // 3. Sınıf Oyunla Öğren — uygulama mantığı
 (function () {
-  const SIRA = ["matematik", "turkce", "hayat", "fen", "ingilizce"].filter((d) => window.DERS[d]);
+  const S = Object.assign({ no: 3, anahtar: "3sinif", dersler: ["matematik", "turkce", "hayat", "fen", "ingilizce"], turGorev: 8, temaGorev: 10, okumaHedef: "70-100" }, window.SINIF || {});
+  const SIRA = S.dersler.filter((d) => window.DERS[d]);
   const ekran = document.getElementById("ekran");
   const esc = OYUN.esc;
   const $ = (h) => { const d = document.createElement("div"); d.innerHTML = h.trim(); return d.firstElementChild; };
-  const ANAHTAR = "3sinif";
+  const ANAHTAR = S.anahtar;
 
   // ---------- Kayıt ----------
   let K;
@@ -91,7 +92,7 @@
   function ciz() {
     const [f, b] = yigin[yigin.length - 1];
     document.getElementById("geri").hidden = yigin.length <= 1;
-    document.getElementById("baslik").textContent = b || "🦉 Oyunla Öğren 3";
+    document.getElementById("baslik").textContent = b || "🦉 Oyunla Öğren " + S.no;
     ekran.innerHTML = ""; ekran.style.removeProperty("--renk"); window.scrollTo(0, 0); f(); ustBar();
   }
   document.getElementById("geri").onclick = geri;
@@ -143,12 +144,14 @@
       <button><span>📚</span>Hikâye Kitaplığı</button>
       <button><span>🏆</span>Çıkartma Albümüm</button>
       <button><span>🔁</span>Hatalarım (${K.hatalar.length})</button>
+      <button><span>📕</span>MEB Kitaplarım</button>
       <button><span>👨‍👩‍👧</span>Veli Köşesi</button></div>`);
     const b = kc.querySelectorAll("button");
     b[0].onclick = () => git(kitaplik, "📚 Hikâye Kitaplığı");
     b[1].onclick = () => git(album, "🏆 Çıkartma Albümüm");
     b[2].onclick = () => git(hatalarim, "🔁 Hatalarım");
-    b[3].onclick = () => git(veliKapi, "👨‍👩‍👧 Veli Köşesi");
+    b[3].onclick = () => git(() => mebKitaplari(), "📕 MEB Kitaplarım");
+    b[4].onclick = () => git(veliKapi, "👨‍👩‍👧 Veli Köşesi");
     ekran.appendChild(kc);
   }
   function onerilenKonu() {
@@ -160,6 +163,7 @@
   function dersSayfa(id) {
     const D = DERS[id];
     ekran.style.setProperty("--renk", D.renk);
+    if ((window.KITAPLAR || []).some((k) => k.ders === id)) { const kb = $(`<button class="buyukbtn ikincil" style="margin-top:0">📕 MEB ${esc(D.ad)} kitapları</button>`); kb.onclick = () => git(() => mebKitaplari(id), "📕 " + D.ad + " Kitapları"); ekran.appendChild(kb); }
     let yeniBulundu = false;
     D.temalar.forEach((t, ti) => {
       const kutu = $(`<div class="tema"><h3><span>${ti + 1}. ${esc(t.ad)}</span><button class="tema-btn">🏁 Tema Yarışı</button></h3><div class="yol"></div></div>`);
@@ -182,13 +186,18 @@
     ekran.appendChild($(`<div style="text-align:center"><div style="font-size:80px;line-height:1.1">${k.ikon || D.ikon}</div><h2 style="margin:4px 0">${esc(k.ad)}</h2>${yildizYaz(s.en || 0, 30)}<div class="not">${s.oyna ? `${s.oyna} kez oynadın` : "Henüz oynamadın"}</div></div>`));
     const b1 = $(`<button class="buyukbtn ikincil">📖 Öğren (Bilgin anlatsın)</button>`);
     b1.onclick = () => git(() => ogren(id, k), "📖 " + k.ad);
-    const b2 = $(`<button class="buyukbtn">🎮 Oyna (8 görev)</button>`);
+    const b2 = $(`<button class="buyukbtn">🎮 Oyna (${S.turGorev} görev)</button>`);
     b2.onclick = () => git(() => oyna(id, k), "🎮 " + k.ad);
     ekran.appendChild(b1); ekran.appendChild(b2);
     if (k.video) {
-      const b3 = $(`<button class="buyukbtn ikincil">🎬 Video izle</button>`);
-      b3.onclick = () => git(() => { ekran.innerHTML = `<div style="position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#000"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0" src="https://www.youtube-nocookie.com/embed/${k.video}?rel=0" allowfullscreen allow="autoplay; encrypted-media"></iframe></div><p class="not">Video internet gerektirir.</p>`; }, "🎬 " + k.ad);
-      ekran.appendChild(b3);
+      const liste = Array.isArray(k.video) ? k.video : [["Video izle", k.video]];
+      const sat = $(`<div class="satir"></div>`);
+      liste.forEach(([etiket, vid]) => {
+        const b3 = $(`<button class="buyukbtn ikincil">🎬 ${esc(etiket)}</button>`);
+        b3.onclick = () => git(() => { ekran.innerHTML = `<div style="position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#000"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0" src="https://www.youtube-nocookie.com/embed/${vid}?rel=0" allowfullscreen allow="autoplay; encrypted-media"></iframe></div><p class="not">Video internet gerektirir.</p>`; }, "🎬 " + k.ad);
+        sat.appendChild(b3);
+      });
+      ekran.appendChild(sat);
     }
   }
 
@@ -219,13 +228,13 @@
   // ---------- Oyun ----------
   function oyna(id, k) {
     const D = DERS[id];
-    const gorevler = OYUN.hazirla([k.uret], 8);
+    const gorevler = OYUN.hazirla([k.uret], S.turGorev);
     gorevler.forEach((g) => g.konu = k.id);
     OYUN.tur({ gorevler, renk: D.renk, bitti: (s) => sonuc(s, { id, k, tekrar: () => { yigin.pop(); git(() => oyna(id, k), "🎮 " + k.ad); } }) });
   }
   function temaYarisi(id, t) {
     const D = DERS[id];
-    const gorevler = OYUN.hazirla(t.konular.map((k) => () => { const g = k.uret(); if (g) g.konu = k.id; return g; }), 10);
+    const gorevler = OYUN.hazirla(t.konular.map((k) => () => { const g = k.uret(); if (g) g.konu = k.id; return g; }), S.temaGorev);
     OYUN.tur({ gorevler, renk: D.renk, bitti: (s) => sonuc(s, { id, tema: t, tekrar: () => { yigin.pop(); git(() => temaYarisi(id, t), "🏁 " + t.ad); } }) });
   }
   function hatalarim() {
@@ -364,6 +373,24 @@
     ekran.appendChild(k);
   }
 
+  // ---------- MEB ders kitapları ----------
+  function mebKitaplari(filtre) {
+    maskot(filtre ? "Okuldaki ders kitabının aynısı burada! Kitaba dokun, açılsın." : "Okulda okuduğun MEB ders kitaplarının hepsi burada. Kitaba dokununca açılır.");
+    const gruplar = filtre ? [filtre] : SIRA.concat(["diger"]);
+    gruplar.forEach((d) => {
+      const liste = KITAPLAR.filter((k) => k.ders === d); if (!liste.length) return;
+      const D = DERS[d] || { ad: "Diğer Dersler", ikon: "🎵", renk: "#7a6f8f" };
+      if (!filtre) ekran.appendChild($(`<h2 style="margin-top:18px">${D.ikon} ${esc(D.ad)}</h2>`));
+      const k = $(`<div class="kitaplik"></div>`);
+      liste.forEach((kt) => {
+        const ik = kt.tur === "Ders kitabı" ? "📕" : kt.tur === "İngilizce hikâye" ? "📗" : kt.tur === "Çalışma kitabı" ? "📒" : "📘";
+        k.appendChild($(`<a class="kitap meb" style="--renk:${D.renk}" href="${kt.url}" target="_blank" rel="noopener"><span class="r">${ik}</span><span><b>${esc(kt.ad)}</b><small class="not">${esc(kt.tur)} · PDF</small></span></a>`));
+      });
+      ekran.appendChild(k);
+    });
+    ekran.appendChild($(`<p class="not" style="margin-top:16px">Kitaplar MEB'in resmî sitesinden (tymm.meb.gov.tr / EBA) açılır, internet gerekir. Kitap PDF olarak yeni sekmede açılır; tabletteki geri tuşuyla uygulamaya dönebilirsin.</p>`));
+  }
+
   // ---------- Çıkartma albümü ----------
   const CIKARTMALAR = [["🐶", "Köpek"], ["🐱", "Kedi"], ["🐰", "Tavşan"], ["🦊", "Tilki"], ["🐼", "Panda"], ["🐨", "Koala"], ["🦁", "Aslan"], ["🐯", "Kaplan"], ["🐸", "Kurbağa"], ["🐵", "Maymun"],
     ["🐧", "Penguen"], ["🦋", "Kelebek"], ["🐢", "Kaplumbağa"], ["🐬", "Yunus"], ["🦒", "Zürafa"], ["🐘", "Fil"], ["🦓", "Zebra"], ["🦉", "Baykuş"], ["🦄", "Tek Boynuzlu At"], ["🐲", "Ejderha"],
@@ -416,7 +443,7 @@
     ekran.appendChild($(`<div class="panel"><h3>🎯 Tekrar edilmesi gereken konular</h3>${zayif.length ? zayif.map((x) => `• ${DERS[x.d].ikon} ${esc(x.k.ad)} — %${Math.round(100 * K.konu[x.k.id].d / K.konu[x.k.id].t)}`).join("<br>") : "Şimdilik yok 👍 (doğru oranı %60'ın altındaki konular burada görünür)"}</div>`));
     // okuma hızı
     const ok = K.okuma.slice(-10);
-    ekran.appendChild($(`<div class="panel"><h3>⏱ Okuma hızı (dakikada kelime)</h3>${ok.length ? ok.map((o) => `${o.t}: <b>${o.hiz}</b> — ${esc(HIKAYELER[o.h] ? HIKAYELER[o.h].baslik : "")}`).join("<br>") : "Henüz ölçüm yok. Hikâye okurken \"Ben okuyacağım (süre tut)\" butonunu kullanın."}<div class="not" style="margin-top:6px">3. sınıf sonu için hedeflenen okuma hızı genellikle dakikada 70-100 kelime civarındadır.</div></div>`));
+    ekran.appendChild($(`<div class="panel"><h3>⏱ Okuma hızı (dakikada kelime)</h3>${ok.length ? ok.map((o) => `${o.t}: <b>${o.hiz}</b> — ${esc(HIKAYELER[o.h] ? HIKAYELER[o.h].baslik : "")}`).join("<br>") : "Henüz ölçüm yok. Hikâye okurken \"Ben okuyacağım (süre tut)\" butonunu kullanın."}<div class="not" style="margin-top:6px">${S.no}. sınıf sonu için hedeflenen okuma hızı genellikle dakikada ${S.okumaHedef} kelime civarındadır.</div></div>`));
     // ayarlar
     const ay = $(`<div class="panel"><h3>⚙️ Ayarlar</h3>
       <div class="satir"><input class="ad" value="${esc(K.ad)}"><button class="buyukbtn ikincil" style="flex:0 0 auto;margin:0;padding:10px 18px;font-size:18px">Adı kaydet</button></div>
@@ -430,7 +457,7 @@
     bt[1].onclick = () => { K.ses = !K.ses; kaydet(); bt[1].textContent = K.ses ? "🔊 Sesli okuma: AÇIK" : "🔇 Sesli okuma: KAPALI"; };
     bt[2].onclick = () => {
       const blob = new Blob([JSON.stringify(K)], { type: "application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `3sinif-yedek-${tarih()}.json`; a.click();
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${S.anahtar}-yedek-${tarih()}.json`; a.click();
     };
     const dosya = ay.querySelector("input[type=file]");
     bt[3].onclick = () => dosya.click();

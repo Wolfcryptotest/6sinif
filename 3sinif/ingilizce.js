@@ -31,7 +31,7 @@
   }
 
   DERS.ingilizce = {
-    ad: "İngilizce", ikon: "🇬🇧", renk: "#9b5de5",
+    ad: "İngilizce", ikon: "🔤", renk: "#9b5de5",
     temalar: [
       { id: "et1", ad: "School Life (Okul Hayatı)", konular: [
         konu("e1", "Hello! (Selamlaşma)", "👋", [["👋", "İngilizcede selamlaşmayı öğreniyoruz. Kelimelere dokun, dinle ve tekrar et."]], {
