@@ -1,7 +1,7 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders3-";
-const SURUM = ONEK + "2a1e2afde4";
+const SURUM = ONEK + "2a1e2afde4b";
 const DOSYALAR = ["./", "app.js", "apple-touch-icon.png", "ayar.js", "fen.js", "hayat.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce.js", "kitaplar.js", "manifest.webmanifest", "matematik.js", "ortak.js", "oyunlar.js", "turkce.js", "videolar.js"];
 
 self.addEventListener("install", (e) => {
@@ -13,9 +13,11 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return; // YouTube vb. dış istekler internetten
+  if (!e.request.url.startsWith(self.registration.scope)) return; // aynı sitedeki diğer sınıflara karışma
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
-      const kopya = r.clone(); caches.open(SURUM).then((ca) => ca.put(e.request, kopya)); return r;
-    }).catch(() => caches.match("./")))
+    caches.open(SURUM).then((ca) => ca.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
+      if (r.ok) ca.put(e.request, r.clone()); // hatalı yanıtlar (404) önbelleğe alınmaz
+      return r;
+    }).catch(() => ca.match("./"))))
   );
 });
