@@ -8,10 +8,10 @@
 
   // ================= BOYA KALEM (Sanat) =================
   const RENK_KARE = [["kırmızı", "🟥"], ["mavi", "🟦"], ["sarı", "🟨"], ["yeşil", "🟩"], ["turuncu", "🟧"], ["mor", "🟪"], ["kahverengi", "🟫"], ["siyah", "⬛"], ["beyaz", "⬜"]];
-  const RENK_NESNE = { kırmızı: ["🍎", "🍓", "🍒", "🚒", "❤️"], sarı: ["🍌", "🌻", "🐥", "🌞", "🧀"], yeşil: ["🥦", "🐸", "🌲", "🥒", "🍀"], mavi: ["🐳", "🫐", "💧", "🧢"], turuncu: ["🍊", "🥕", "🎃", "🦊"], mor: ["🍇", "🍆", "🔮"], kahverengi: ["🐻", "🌰", "🪵", "🍫"] };
+  const RENK_NESNE = { kırmızı: ["🍎", "🍓", "🍒", "🚒", "❤️"], sarı: ["🍌", "🌻", "🐥", "🌞", "🧀"], yeşil: ["🥦", "🐸", "🌲", "🥒", "🍀"], mavi: ["🐳", "💧", "🧢"], turuncu: ["🍊", "🥕", "🎃", "🦊"], mor: ["🍇", "🍆", "🔮"], kahverengi: ["🐻", "🌰", "🍫"] };
   const BOYA = [["güneş", "sarı"], ["elma", "kırmızı"], ["yaprak", "yeşil"], ["kalp", "kırmızı"], ["yıldız", "sarı"], ["balon", "mavi"], ["top", "turuncu"], ["çiçek", "mor"], ["ev", "kahverengi"], ["araba", "mavi"]];
   const BASSON = [["🐝", "🌼"], ["🚗", "🏠"], ["🐭", "🧀"], ["🐶", "🦴"], ["🐰", "🥕"], ["🐞", "🍃"], ["🚀", "🌙"], ["🐟", "🪸"]];
-  const KARISIM = [["sarı", "mavi", "🟩", "yeşil"], ["kırmızı", "sarı", "🟧", "turuncu"], ["kırmızı", "mavi", "🟪", "mor"], ["kırmızı", "beyaz", "🩷", "pembe"], ["mavi", "beyaz", "🩵", "açık mavi"], ["siyah", "beyaz", "🩶", "gri"]];
+  const KARISIM = [["sarı", "mavi", "🟩", "yeşil"], ["kırmızı", "sarı", "🟧", "turuncu"], ["kırmızı", "mavi", "🟪", "mor"], ["kırmızı", "beyaz", "💗", "pembe"]];
 
   DERS.sanat = {
     ad: "Boya Kalem", ikon: "🎨", renk: "#9b5de5",
@@ -32,7 +32,7 @@
 
   // ================= MÜZİK KUTUSU =================
   const HAYVAN_SES = [["🐄", "Möö möö"], ["🐶", "Hav hav"], ["🐱", "Miyav miyav"], ["🐑", "Mee mee"], ["🐓", "Ü ürü üüü"], ["🦆", "Vak vak"], ["🐸", "Vırak vırak"], ["🐝", "Vızzz"], ["🐍", "Tıss tıss"], ["🦉", "Hu hu"], ["🐴", "İhi hii"]];
-  const CALGI = [["🥁", "davul", "vurarak"], ["🎸", "gitar", "telleri tıngırdatarak"], ["🎹", "piyano", "tuşlarına basarak"], ["🎺", "trompet", "üfleyerek"], ["🎻", "keman", "yayla"], ["🪈", "flüt", "üfleyerek"], ["🪇", "marakas", "sallayarak"]];
+  const CALGI = [["🥁", "davul", "vurarak"], ["🎸", "gitar", "telleri tıngırdatarak"], ["🎹", "piyano", "tuşlarına basarak"], ["🎺", "trompet", "üfleyerek"], ["🎻", "keman", "yayla"], ["🎷", "saksafon", "üfleyerek"]];
   const DAVUL = ["", "🥁", "🥁🥁", "🥁🥁🥁", "🥁🥁🥁🥁", "🥁🥁🥁🥁🥁", "🥁🥁🥁🥁🥁🥁"];
   DERS.muzik = {
     ad: "Müzik Kutusu", ikon: "🎵", renk: "#00b4d8",
@@ -66,8 +66,8 @@
           [3, () => { const v = pick(VUCUT.slice(0, Y5() ? 10 : 6)); return em(secim(`${v[1].charAt(0).toLocaleUpperCase("tr") + v[1].slice(1)} hangisi? Sen de kendininkini göster!`, v[0], VUCUT.filter((x) => x !== v).map((x) => x[0]), `${v[0]} ${v[1]}`, { okunacak: `${v[1].charAt(0).toLocaleUpperCase("tr") + v[1].slice(1)} hangisi?` })); }],
           [1, () => { const h = pick([["👆", "Burnunu göster!", 6], ["👂", "Kulaklarını tut!", 6], ["🙌", "Ellerini başının üstüne koy!", 6], ["🦶", "Ayaklarını yere vur!", 6]]); return { tip: "hareket", soru: h[1], resim: h[0], sure: h[2], cozum: "" }; }]
         ])),
-      konu("hk3", "Ne Önce, Ne Sonra?", "🔢", [["🧼", "El yıkarken: ıslat, sabunla, durula, kurula."], ["🪥", "Diş fırçalarken: macun sür, fırçala, çalkala."], ["🌱", "Bitki büyürken: tohum, filiz, çiçek."]],
-        () => { const kisa = !Y5(); const SIRA = [["Islat 💧", "Sabunla 🧼", "Durula 🚿", "Kurula 🧻"], ["Diş macunu sür 🪥", "Fırçala 😁", "Ağzını çalkala 💧", "Fırçayı yıka 🚿"], ["Uyan 🌅", "Yüzünü yıka 🧼", "Giyin 👕", "Kahvaltı yap 🍳"], ["Tohum ek 🌱", "Sula 💧", "Filizlensin 🌿", "Çiçek açsın 🌸"], ["Pijamanı giy 👕", "Dişini fırçala 🪥", "Masal dinle 📖", "Uyu 😴"], ["Çorabını giy 🧦", "Ayakkabını giy 👟", "Bağcığını bağla 🎀", "Dışarı çık 🚪"], ["Oyuncaklarla oyna 🧸", "Oyuncakları topla 🧺", "Kutuya koy 📦", "Ellerini yıka 🧼"]]; const sec_ = pick(SIRA); const p = kisa ? sec_.slice(0, 3) : sec_; return sirala("Doğru sıraya diz: önce ne yaparız?", p, p.join(" → "), " → "); }),
+      konu("hk3", "Ne Önce, Ne Sonra?", "🔢", [["🧼", "El yıkarken: ıslat, sabunla, durula, kurula."], ["🦷", "Diş fırçalarken: macun sür, fırçala, çalkala."], ["🌱", "Bitki büyürken: tohum, filiz, çiçek."]],
+        () => { const kisa = !Y5(); const SIRA = [["Islat 💧", "Sabunla 🧼", "Durula 🚿", "Kurula 🧻"], ["Diş macunu sür 🦷", "Fırçala 😁", "Ağzını çalkala 💧", "Fırçayı yıka 🚿"], ["Uyan 🌅", "Yüzünü yıka 🧼", "Giyin 👕", "Kahvaltı yap 🍳"], ["Tohum ek 🌱", "Sula 💧", "Filizlensin 🌿", "Çiçek açsın 🌸"], ["Pijamanı giy 👕", "Dişini fırçala 🦷", "Masal dinle 📖", "Uyu 😴"], ["Çorabını giy 🧦", "Ayakkabını giy 👟", "Bağcığını bağla 🎀", "Dışarı çık 🚪"], ["Oyuncaklarla oyna 🧸", "Oyuncakları topla 🧺", "Kutuya koy 📦", "Ellerini yıka 🧼"]]; const sec_ = pick(SIRA); const p = kisa ? sec_.slice(0, 3) : sec_; return sirala("Doğru sıraya diz: önce ne yaparız?", p, p.join(" → "), " → "); }),
       konu("hk4", "Sağlıklı mı?", "💪", [["🥦", "Sebze, meyve, süt ve su bizi güçlü yapar."], ["🏃", "Hareket etmek ve uyumak da sağlıktır."], ["🍭", "Şekeri az yeriz."]],
         () => grupla("Sağlıklı olanları ve az yememiz gerekenleri ayır.", ["💪 Sağlıklı", "🙅 Az olmalı"], karistir([...sec(["🥦", "🍎", "🥕", "🥛", "💧", "🍌", "🥚"], Y5() ? 3 : 2).map((x) => [x, 0]), ...sec(["🍭", "🍬", "🍟", "🥤", "🍩", "🍫"], 2).map((x) => [x, 1])])))
     ] }]
@@ -75,12 +75,12 @@
 
   // ================= HELLO! (İngilizce) =================
   const EN = {
-    renk: [["red", "kırmızı", "🟥"], ["blue", "mavi", "🟦"], ["yellow", "sarı", "🟨"], ["green", "yeşil", "🟩"], ["orange", "turuncu", "🟧"], ["purple", "mor", "🟪"], ["black", "siyah", "⬛"], ["white", "beyaz", "⬜"], ["brown", "kahverengi", "🟫"], ["pink", "pembe", "🩷"]],
+    renk: [["red", "kırmızı", "🟥"], ["blue", "mavi", "🟦"], ["yellow", "sarı", "🟨"], ["green", "yeşil", "🟩"], ["orange", "turuncu", "🟧"], ["purple", "mor", "🟪"], ["black", "siyah", "⬛"], ["white", "beyaz", "⬜"], ["brown", "kahverengi", "🟫"], ["pink", "pembe", "💗"]],
     sayi: [["one", "bir", "1️⃣"], ["two", "iki", "2️⃣"], ["three", "üç", "3️⃣"], ["four", "dört", "4️⃣"], ["five", "beş", "5️⃣"], ["six", "altı", "6️⃣"], ["seven", "yedi", "7️⃣"], ["eight", "sekiz", "8️⃣"], ["nine", "dokuz", "9️⃣"], ["ten", "on", "🔟"]],
     hayvan: [["cat", "kedi", "🐱"], ["dog", "köpek", "🐶"], ["bird", "kuş", "🐦"], ["fish", "balık", "🐟"], ["rabbit", "tavşan", "🐰"], ["cow", "inek", "🐄"], ["duck", "ördek", "🦆"], ["horse", "at", "🐴"], ["lion", "aslan", "🦁"], ["elephant", "fil", "🐘"], ["monkey", "maymun", "🐒"], ["bear", "ayı", "🐻"], ["frog", "kurbağa", "🐸"], ["bee", "arı", "🐝"]],
     meyve: [["apple", "elma", "🍎"], ["banana", "muz", "🍌"], ["orange", "portakal", "🍊"], ["strawberry", "çilek", "🍓"], ["grapes", "üzüm", "🍇"], ["watermelon", "karpuz", "🍉"], ["pear", "armut", "🍐"], ["cherry", "kiraz", "🍒"], ["lemon", "limon", "🍋"], ["carrot", "havuç", "🥕"], ["milk", "süt", "🥛"], ["bread", "ekmek", "🍞"], ["cake", "pasta", "🍰"], ["water", "su", "💧"]],
     selam: [["hello", "merhaba", "👋"], ["good morning", "günaydın", "🌅"], ["good night", "iyi geceler", "🌙"], ["goodbye", "hoşça kal", "🚶"], ["thank you", "teşekkür ederim", "🙏"], ["yes", "evet", "👍"], ["no", "hayır", "👎"], ["happy", "mutlu", "😀"], ["sad", "üzgün", "😢"], ["I love you", "seni seviyorum", "❤️"]],
-    oyuncak: [["ball", "top", "⚽"], ["car", "araba", "🚗"], ["teddy bear", "oyuncak ayı", "🧸"], ["balloon", "balon", "🎈"], ["kite", "uçurtma", "🪁"], ["doll", "oyuncak bebek", "🪆"], ["train", "tren", "🚂"], ["plane", "uçak", "✈️"], ["book", "kitap", "📖"], ["sun", "güneş", "☀️"], ["moon", "ay", "🌙"], ["star", "yıldız", "⭐"]]
+    oyuncak: [["ball", "top", "⚽"], ["car", "araba", "🚗"], ["teddy bear", "oyuncak ayı", "🧸"], ["balloon", "balon", "🎈"], ["kite", "uçurtma", "🪁"], ["doll", "oyuncak bebek", "🎎"], ["train", "tren", "🚂"], ["plane", "uçak", "✈️"], ["book", "kitap", "📖"], ["sun", "güneş", "☀️"], ["moon", "ay", "🌙"], ["star", "yıldız", "⭐"]]
   };
   function enUret(liste) {
     const al = () => liste.slice(0, Y5() ? liste.length : Math.min(liste.length, 6));

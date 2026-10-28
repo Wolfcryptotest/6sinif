@@ -13,9 +13,9 @@
   const HECE = [["🍎", ["el", "ma"]], ["🍌", ["muz"]], ["🐱", ["ke", "di"]], ["🐶", ["kö", "pek"]], ["🐦", ["kuş"]], ["🐟", ["ba", "lık"]], ["🐰", ["tav", "şan"]], ["🐻", ["a", "yı"]], ["🐘", ["fil"]], ["🦁", ["as", "lan"]], ["🚗", ["a", "ra", "ba"]], ["🚌", ["o", "to", "büs"]], ["🚲", ["bi", "sik", "let"]], ["⚽", ["top"]], ["🎈", ["ba", "lon"]], ["☂️", ["şem", "si", "ye"]], ["🍓", ["çi", "lek"]], ["🍅", ["do", "ma", "tes"]], ["🥕", ["ha", "vuç"]], ["🦋", ["ke", "le", "bek"]], ["🐢", ["kap", "lum", "ba", "ğa"]], ["🐸", ["kur", "ba", "ğa"]], ["🌳", ["a", "ğaç"]], ["🌸", ["çi", "çek"]], ["☀️", ["gü", "neş"]], ["⭐", ["yıl", "dız"]], ["🏠", ["ev"]], ["🍦", ["don", "dur", "ma"]], ["✏️", ["ka", "lem"]], ["🥁", ["da", "vul"]], ["🧀", ["pey", "nir"]], ["🍞", ["ek", "mek"]], ["🐄", ["i", "nek"]], ["🐔", ["ta", "vuk"]], ["🪑", ["san", "dal", "ye"]], ["🕰️", ["sa", "at"]], ["🦆", ["ör", "dek"]], ["🐝", ["a", "rı"]]];
   const ALKIS = ["", "👏", "👏👏", "👏👏👏", "👏👏👏👏"];
   const ILK = { a: [["🐝", "arı"], ["🚗", "araba"], ["🐻", "ayı"], ["🌳", "ağaç"], ["🦁", "aslan"], ["🌙", "ay"]], e: [["🍎", "elma"], ["🏠", "ev"], ["🍞", "ekmek"], ["✋", "el"]], o: [["🚌", "otobüs"], ["🧸", "oyuncak"], ["🏫", "okul"]], m: [["🍌", "muz"], ["🐒", "maymun"], ["🍄", "mantar"], ["🕌", "minare"]], k: [["🐱", "kedi"], ["🐦", "kuş"], ["✏️", "kalem"], ["🦋", "kelebek"], ["📖", "kitap"]], b: [["🐟", "balık"], ["🎈", "balon"], ["🍯", "bal"], ["☁️", "bulut"], ["🚲", "bisiklet"]], t: [["⚽", "top"], ["🐰", "tavşan"], ["🐔", "tavuk"], ["🚂", "tren"]], d: [["🥁", "davul"], ["🍅", "domates"], ["🍦", "dondurma"], ["🌊", "deniz"]], s: [["🕰️", "saat"], ["🥛", "süt"], ["🪑", "sandalye"], ["💧", "su"]], p: [["🧀", "peynir"], ["🍰", "pasta"], ["🐧", "penguen"], ["🥔", "patates"]], y: [["⭐", "yıldız"], ["🥚", "yumurta"], ["🐍", "yılan"], ["🍃", "yaprak"]], ç: [["🍓", "çilek"], ["🌸", "çiçek"], ["🧦", "çorap"], ["🎒", "çanta"]], ş: [["☂️", "şemsiye"], ["🧢", "şapka"], ["🍬", "şeker"]], g: [["☀️", "güneş"], ["👁️", "göz"], ["⛵", "gemi"], ["🌈", "gökkuşağı"]] };
-  const UYAK = [["🐘", "fil", "👅", "dil"], ["👑", "taç", "💇", "saç"], ["🌙", "ay", "🍵", "çay"], ["🍰", "pasta", "🤒", "hasta"], ["🌸", "çiçek", "🐞", "böcek"], ["🐭", "fare", "🟥", "kare"], ["🍲", "tencere", "🪟", "pencere"], ["🐱", "kedi", "7️⃣", "yedi"], ["🪣", "kova", "🪺", "yuva"]];
-  const ZIT = [["büyük", "🐘", "küçük", "🐭"], ["sıcak", "🔥", "soğuk", "🧊"], ["mutlu", "😀", "üzgün", "😢"], ["uzun", "🦒", "kısa", "🐛"], ["hızlı", "🐆", "yavaş", "🐌"], ["dolu", "🥛", "boş", "🫙"], ["gece", "🌙", "gündüz", "☀️"], ["temiz", "🧼", "kirli", "💩"], ["yaşlı", "👴", "bebek", "👶"], ["açık", "🔓", "kapalı", "🔒"]];
-  const EYLEM = [["🏃", "koşuyor"], ["😴", "uyuyor"], ["🏊", "yüzüyor"], ["🎤", "şarkı söylüyor"], ["📖", "kitap okuyor"], ["🍽️", "yemek yiyor"], ["💃", "dans ediyor"], ["😭", "ağlıyor"], ["😂", "gülüyor"], ["🚴", "bisiklete biniyor"], ["🎨", "resim yapıyor"], ["🧗", "tırmanıyor"], ["🛁", "banyo yapıyor"], ["🪥", "dişini fırçalıyor"]];
+  const UYAK = [["🐘", "fil", "👅", "dil"], ["👑", "taç", "💇", "saç"], ["🌙", "ay", "🍵", "çay"], ["🍰", "pasta", "🤒", "hasta"], ["🌸", "çiçek", "🐞", "böcek"], ["🐭", "fare", "🟥", "kare"], ["🐦", "kuş", "🚿", "duş"], ["🐱", "kedi", "7️⃣", "yedi"], ["🐝", "arı", "🟨", "sarı"]];
+  const ZIT = [["büyük", "🐘", "küçük", "🐭"], ["sıcak", "🔥", "soğuk", "🧊"], ["mutlu", "😀", "üzgün", "😢"], ["uzun", "🦒", "kısa", "🐛"], ["hızlı", "🐆", "yavaş", "🐌"], ["dolu", "🥛", "boş", "🍽️"], ["gece", "🌙", "gündüz", "☀️"], ["temiz", "🧼", "kirli", "💩"], ["yaşlı", "👴", "bebek", "👶"], ["açık", "🔓", "kapalı", "🔒"]];
+  const EYLEM = [["🏃", "koşuyor"], ["😴", "uyuyor"], ["🏊", "yüzüyor"], ["🎤", "şarkı söylüyor"], ["📖", "kitap okuyor"], ["🍽️", "yemek yiyor"], ["💃", "dans ediyor"], ["😭", "ağlıyor"], ["😂", "gülüyor"], ["🚴", "bisiklete biniyor"], ["🎨", "resim yapıyor"], ["🧗", "tırmanıyor"], ["🛁", "banyo yapıyor"]];
 
   DERS.dil = {
     ad: "Ses Ormanı", ikon: "🗣️", renk: "#2bb673",
@@ -40,7 +40,7 @@
   const tek = (e, n) => e.repeat(n);
   const satir = (e, n) => buyuk(n > 5 ? tek(e, 5) + "<br>" + tek(e, n - 5) : tek(e, n), n > 5 ? 54 : 66);
   const SEKILLER = [["⚪", "daire"], ["🟥", "kare"], ["🔺", "üçgen"], ["▬", "dikdörtgen"], ["⭐", "yıldız"], ["❤️", "kalp"]];
-  const SEKIL_NESNE = { daire: ["⚽", "🍪", "🕰️", "🍩", "🌕"], kare: ["🧇", "🔲", "🎁"], üçgen: ["🍕", "⛺", "🔺"], dikdörtgen: ["🚪", "📱", "📖", "🪟"] };
+  const SEKIL_NESNE = { daire: ["⚽", "🍪", "🕰️", "🍩", "🌕"], kare: ["🧇", "🔲", "🎁"], üçgen: ["🍕", "⛺", "🔺"], dikdörtgen: ["🚪", "📱", "📖", "📺"] };
   const BOY = [["🐘", 6], ["🦒", 6], ["🐄", 5], ["🐴", 5], ["🐶", 3], ["🐱", 2], ["🐭", 1], ["🐜", 0]];
   const KONUM = [["üstünde", (a, b) => `<div style="display:flex;flex-direction:column;align-items:center;font-size:84px;line-height:1">${a}<span>${b}</span></div>`], ["altında", (a, b) => `<div style="display:flex;flex-direction:column;align-items:center;font-size:84px;line-height:1">${b}<span>${a}</span></div>`], ["yanında", (a, b) => `<div style="display:flex;justify-content:center;gap:6px;font-size:84px">${b}${a}</div>`], ["önünde", (a, b) => `<div style="position:relative;width:200px;height:120px;margin:auto;font-size:96px"><span style="position:absolute;left:30px;top:0;opacity:.9">${b}</span><span style="position:absolute;left:90px;top:22px;font-size:72px">${a}</span></div>`]];
 
@@ -99,24 +99,24 @@
         () => { const m = pick(MEVSIM.slice(0, Y5() ? 4 : 2)); const d = pick(m[2]); const diger = MEVSIM.filter((x) => x !== m).flatMap((x) => x[2]); return em(secim(`Hangisi ${m[0]} mevsimine ait?`, d, diger, `${m[1]} ${m[0]}: ${d}`)); }),
       konu("kk4", "Duyularımız", "👂", [["👁️", "Gözlerimizle görürüz."], ["👂", "Kulaklarımızla duyarız."], ["👃", "Burnumuzla koklarız."], ["👅", "Dilimizle tadına bakarız."], ["✋", "Ellerimizle dokunuruz."]],
         () => { const q = pick(DUYU_S); return em(secim(q[0], q[1], DUYU.map((x) => x[0]).filter((x) => x !== q[1]), "")); }),
-      konu("kk5", "Yüzer mi, Batar mı?", "🛟", [["🛟", "Hafif şeyler suyun üstünde yüzer."], ["🪨", "Taş gibi ağır şeyler suya batar."], ["🍃", "Yaprak yüzer, anahtar batar."]],
-        () => grupla("Suya atınca ne olur? Yüzenleri ve batanları ayır.", ["🛟 Yüzer", "⚓ Batar"], karistir([...sec(["🍃", "🦆", "🏐", "🪵", "🍎", "🎈"], 2).map((x) => [x, 0]), ...sec(["🪨", "🔑", "🪙", "🥄", "⚓", "🔨"], 2).map((x) => [x, 1])]))),
-      konu("kk6", "Canlı mı, Cansız mı?", "🌱", [["🌱", "Canlılar büyür, beslenir ve nefes alır."], ["🪨", "Taş, masa, araba cansızdır."], ["🐦", "Kuş, ağaç ve insan canlıdır."]],
+      konu("kk5", "Yüzer mi, Batar mı?", "⛵", [["⛵", "Hafif şeyler suyun üstünde yüzer."], ["🧱", "Taş gibi ağır şeyler suya batar."], ["🍃", "Yaprak yüzer, anahtar batar."]],
+        () => grupla("Suya atınca ne olur? Yüzenleri ve batanları ayır.", ["⛵ Yüzer", "⚓ Batar"], karistir([...sec(["🍃", "🦆", "🏐", "🍎", "🎈"], 2).map((x) => [x, 0]), ...sec(["🧱", "🔑", "⚙️", "🥄", "⚓", "🔨"], 2).map((x) => [x, 1])]))),
+      konu("kk6", "Canlı mı, Cansız mı?", "🌱", [["🌱", "Canlılar büyür, beslenir ve nefes alır."], ["🧱", "Taş, masa, araba cansızdır."], ["🐦", "Kuş, ağaç ve insan canlıdır."]],
         tiplerden([
-          [2, () => grupla("Canlıları ve cansızları ayır.", ["🌱 Canlı", "🪨 Cansız"], karistir([...sec(["🐦", "🌳", "🐱", "🌸", "👶", "🐟", "🐝"], 2).map((x) => [x, 0]), ...sec(["🪨", "🚗", "🪑", "⚽", "🔑", "📖", "🧸"], 2).map((x) => [x, 1])]))],
-          [2, () => em(secim("Hangisi canlı?", pick(["🐦", "🌳", "🐱", "🌸", "🐟", "🐝"]), ["🪨", "🚗", "🪑", "⚽", "🧸", "📖"], ""))]
+          [2, () => grupla("Canlıları ve cansızları ayır.", ["🌱 Canlı", "🧱 Cansız"], karistir([...sec(["🐦", "🌳", "🐱", "🌸", "👶", "🐟", "🐝"], 2).map((x) => [x, 0]), ...sec(["🧱", "🚗", "🪑", "⚽", "🔑", "📖", "🧸"], 2).map((x) => [x, 1])]))],
+          [2, () => em(secim("Hangisi canlı?", pick(["🐦", "🌳", "🐱", "🌸", "🐟", "🐝"]), ["🧱", "🚗", "🪑", "⚽", "🧸", "📖"], ""))]
         ])),
       konu("kk7", "Gece ve Gündüz", "🌙", [["☀️", "Gündüz güneş parlar."], ["🌙", "Gece ay ve yıldızlar görünür."], ["😴", "Geceleri uyuyup dinleniriz."]],
         () => { const gece = Math.random() < 0.5; return em(secim(gece ? "Hangisini gece görürüz?" : "Hangisini gündüz görürüz?", gece ? pick(["🌙", "⭐", "🦉"]) : pick(["☀️", "🌤️", "🐓"]), gece ? ["☀️", "🌤️", "🐓", "🌈"] : ["🌙", "⭐", "🦉", "🌌"], "")); }),
       konu("kk8", "Hava Durumu", "☔", [["☀️", "Güneşli"], ["🌧️", "Yağmurlu"], ["❄️", "Karlı"], ["🌬️", "Rüzgârlı"]],
-        () => { const q = pick([["Yağmur yağıyor. Ne alalım?", "☂️", ["🕶️", "🩳"]], ["Kar yağıyor. Ne giyelim?", "🧤", ["🩳", "🩴"]], ["Hava çok güneşli. Ne takalım?", "🧢", ["🧤", "🧣"]], ["Rüzgâr esiyor. Ne uçuralım?", "🪁", ["🚗", "📖"]], ["Kar yağdı. Ne yapalım?", "⛄", ["🏊", "🏖️"]], ["Hava sıcak. Ne yiyelim?", "🍦", ["🍲", "☕"]]]); return em(secim(q[0], q[1], [...q[2], "🧸"], "")); })
+        () => { const q = pick([["Yağmur yağıyor. Ne alalım?", "☂️", ["🕶️", "🩳"]], ["Kar yağıyor. Ne giyelim?", "🧤", ["🩳", "🥾"]], ["Hava çok güneşli. Ne takalım?", "🧢", ["🧤", "🧣"]], ["Rüzgâr esiyor. Ne uçuralım?", "🪁", ["🚗", "📖"]], ["Kar yağdı. Ne yapalım?", "⛄", ["🏊", "🏖️"]], ["Hava sıcak. Ne yiyelim?", "🍦", ["🍲", "☕"]]]); return em(secim(q[0], q[1], [...q[2], "🧸"], "")); })
     ] }]
   };
 
   // ================= BEN VE ÇEVREM (Sosyal) =================
   const DUYGU = [["😀", "mutlu"], ["😢", "üzgün"], ["😠", "kızgın"], ["😨", "korkmuş"], ["😲", "şaşırmış"], ["😴", "uykulu"]];
   const DURUM = [["Doğum günün kutlanıyor. Nasıl hissedersin?", "😀"], ["Dondurman yere düştü. Nasıl hissedersin?", "😢"], ["Arkadaşın oyuncağını izinsiz aldı. Nasıl hissedersin?", "😠"], ["Karanlıkta bir ses duydun. Nasıl hissedersin?", "😨"], ["Kapıyı açtın, sürpriz parti var! Nasıl hissedersin?", "😲"], ["Bütün gün oynadın, gece oldu. Nasıl hissedersin?", "😴"], ["Annen sana sarıldı. Nasıl hissedersin?", "😀"]];
-  const MESLEK = [["🧑‍⚕️", "doktor", "Hastaları kim iyileştirir?", "💉"], ["🧑‍🚒", "itfaiyeci", "Yangını kim söndürür?", "🚒"], ["👮", "polis", "Bizi kim korur?", "🚓"], ["🧑‍🍳", "aşçı", "Yemeği kim pişirir?", "🍳"], ["🧑‍🌾", "çiftçi", "Tarlada sebzeleri kim yetiştirir?", "🚜"], ["🧑‍🏫", "öğretmen", "Okulda bize kim ders anlatır?", "📚"], ["🧑‍✈️", "pilot", "Uçağı kim uçurur?", "✈️"], ["🧑‍🔧", "tamirci", "Bozulan arabayı kim tamir eder?", "🔧"]];
+  const MESLEK = [["👨‍⚕️", "doktor", "Hastaları kim iyileştirir?", "💉"], ["👨‍🚒", "itfaiyeci", "Yangını kim söndürür?", "🚒"], ["👮", "polis", "Bizi kim korur?", "🚓"], ["👨‍🍳", "aşçı", "Yemeği kim pişirir?", "🍳"], ["👨‍🌾", "çiftçi", "Tarlada sebzeleri kim yetiştirir?", "🚜"], ["👩‍🏫", "öğretmen", "Okulda bize kim ders anlatır?", "📚"], ["👨‍✈️", "pilot", "Uçağı kim uçurur?", "✈️"], ["👨‍🔧", "tamirci", "Bozulan arabayı kim tamir eder?", "🔧"]];
   DERS.cevre = {
     ad: "Ben ve Çevrem", ikon: "🤝", renk: "#ef476f",
     temalar: [{ id: "ct1", ad: "Ben ve Çevrem (Sosyal)", konular: [
@@ -129,19 +129,19 @@
         tiplerden([
           [2, () => { const q = pick([["Kırmızı ışık yanıyor. Ne yaparız?", "✋", ["🏃", "🚶"]], ["Yeşil ışık yandı. Ne yaparız?", "🚶", ["✋", "😴"]]]); return em(secim(q[0], q[1], q[2], "")); }],
           [2, () => em(secim("Hangi ışıkta dururuz?", "🔴", ["🟢", "🟡"], "Kırmızı ışıkta dururuz."))],
-          [1, () => em(secim("Arabada nereye otururuz?", "💺", ["🚘", "🛞"], "Arabada çocuk koltuğuna oturur, kemerimizi takarız."))],
+          [1, () => em(secim("Arabada nereye otururuz?", "💺", ["🚘", "🚦"], "Arabada çocuk koltuğuna oturur, kemerimizi takarız."))],
           [2, () => dy(pick(["Karşıdan karşıya büyüklerimizle el ele geçeriz.", "Arabaya binince emniyet kemerimizi takarız.", "Yaya geçidinden geçeriz."]), true)],
           [2, () => dy(pick(["Kırmızı ışıkta koşarak karşıya geçeriz.", "Yolun ortasında top oynarız.", "Park etmiş arabaların arasından aniden çıkarız."]), false)]
         ])),
-      konu("ck3", "Meslekler", "🧑‍⚕️", [["🧑‍⚕️", "Doktor hastaları iyileştirir."], ["🧑‍🚒", "İtfaiyeci yangını söndürür."], ["🧑‍🌾", "Çiftçi sebze ve meyve yetiştirir."], ["🧑‍🏫", "Öğretmen bize yeni şeyler öğretir."]],
+      konu("ck3", "Meslekler", "👨‍⚕️", [["👨‍⚕️", "Doktor hastaları iyileştirir."], ["👨‍🚒", "İtfaiyeci yangını söndürür."], ["👨‍🌾", "Çiftçi sebze ve meyve yetiştirir."], ["👩‍🏫", "Öğretmen bize yeni şeyler öğretir."]],
         tiplerden([
           [3, () => { const m = pick(MESLEK); return em(secim(m[2], m[0], MESLEK.filter((x) => x !== m).map((x) => x[0]), `${m[0]} ${m[1]}`)); }],
           [2, () => eslestir("Her mesleği aracıyla eşleştir.", sec(MESLEK, Y5() ? 4 : 3).map((x) => [x[0], x[3]]))]
         ])),
-      konu("ck4", "Sağlıklı Yaşam", "🥦", [["🥦", "Sebze ve meyve bizi güçlü yapar."], ["🧼", "Yemekten önce ve tuvaletten sonra ellerimizi yıkarız."], ["🪥", "Sabah ve akşam dişlerimizi fırçalarız."], ["😴", "Erken yatar, iyi uyuruz."]],
+      konu("ck4", "Sağlıklı Yaşam", "🥦", [["🥦", "Sebze ve meyve bizi güçlü yapar."], ["🧼", "Yemekten önce ve tuvaletten sonra ellerimizi yıkarız."], ["🦷", "Sabah ve akşam dişlerimizi fırçalarız."], ["😴", "Erken yatar, iyi uyuruz."]],
         tiplerden([
           [3, () => em(secim("Hangisi daha sağlıklı?", pick(["🥦", "🍎", "🥕", "🍌", "🥛", "🥚", "🍊"]), ["🍬", "🍟", "🍭", "🥤", "🍩"], ""))],
-          [2, () => { const q = pick([["Yemekten önce ne yaparız?", "🧼"], ["Yatmadan önce dişlerimizi neyle fırçalarız?", "🪥"], ["Hapşırınca ağzımızı neyle kapatırız?", "🤧"], ["Akşam olunca ne yaparız?", "😴"]]); return em(secim(q[0], q[1], ["🍭", "📺", "🎮", "🏀"], "")); }]
+          [2, () => { const q = pick([["Yemekten önce ne yaparız?", "🧼"], ["Yatmadan önce neyimizi fırçalarız?", "🦷"], ["Hapşırınca ağzımızı neyle kapatırız?", "🤧"], ["Akşam olunca ne yaparız?", "😴"]]); return em(secim(q[0], q[1], ["🍭", "📺", "🎮", "🏀"], "")); }]
         ])),
       konu("ck5", "Nezaket", "🙏", [["🙏", "Teşekkür ederim, lütfen, özür dilerim: sihirli sözcükler."], ["🤝", "Oyuncaklarımızı paylaşırız."], ["👋", "Büyüklerimizi selamlarız."]],
         tiplerden([
