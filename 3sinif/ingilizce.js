@@ -149,4 +149,5 @@
       ] }
     ]
   };
+  DERS.ingilizce.konuYap = konu;
 })();
