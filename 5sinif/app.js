@@ -507,7 +507,7 @@ function test(kaynak, ad, tekrarModu, konuId) {
     }
     kaydet();
     $("alt").innerHTML = `
-      <div class="cozum"><b>${ok ? "✅ Doğru!" : "❌ Yanlış"}</b><br>${esc(s.cozum)}
+      <div class="cozum"><b>${ok ? "✅ Doğru!" : "❌ Senin cevabın yanlış"}</b>${ok ? "" : `<div class="ek-satir">Senin cevabın: <b>${"ABCD"[p]}) ${esc(s.secenekler[j])}</b><br>✅ Doğru cevap: <b>${"ABCD"[sira.indexOf(s.dogru)]}) ${esc(s.secenekler[s.dogru])}</b></div>`}<div style="margin-top:6px">${esc(s.cozum)}</div>
         ${s.ses ? `<div class="ek-satir"><button class="ses-btn" id="sesli">🔊 Dinle</button> <span class="ing">${esc(s.ses)}</span></div>` : ""}
         ${s.ceviri ? `<div class="ek-satir"><b>Türkçesi:</b> ${esc(s.ceviri)}</div>` : ""}
         ${s.sozluk && s.sozluk.length ? `<div class="ek-satir"><b>📘 Kelimeler:</b> ${s.sozluk.map(([e, t]) => `<span class="kelime-cip"><b>${esc(e)}</b> = ${esc(t)}</span>`).join(" ")}</div>` : ""}
