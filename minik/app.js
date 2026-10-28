@@ -126,7 +126,7 @@
 
   function yasSec() {
     maskot(`${K.ad}, kaç yaşındasın? Parmaklarınla göster, sonra dokun!`, true);
-    const k = $(`<div class="dersler"><button class="ders" style="--renk:#ff8a00"><span class="ikon">🖐️</span><div><b>4 yaşındayım</b></div></button><button class="ders" style="--renk:#2bb673"><span class="ikon">🖐️☝️</span><div><b>5 yaşındayım</b></div></button></div>`);
+    const k = $(`<div class="dersler"><button class="ders" style="--renk:#ff8a00"><span class="ikon" style="font-size:44px">✌️✌️ <b style="font-size:56px">4</b></span><div><b>4 yaşındayım</b></div></button><button class="ders" style="--renk:#2bb673"><span class="ikon" style="font-size:44px">🖐️ <b style="font-size:56px">5</b></span><div><b>5 yaşındayım</b></div></button></div>`);
     k.querySelectorAll("button").forEach((b, i) => b.onclick = () => { K.yas = 4 + i; window.YAS = K.yas; kaydet(); anaya(); });
     ekran.appendChild(k);
   }
