@@ -111,4 +111,5 @@
       ] }
     ]
   };
+  DERS.ingilizce.konuYap = konu;
 })();
