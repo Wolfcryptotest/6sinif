@@ -2,6 +2,7 @@
 (function () {
   const S = Object.assign({ no: 3, anahtar: "3sinif", dersler: ["matematik", "turkce", "hayat", "fen", "ingilizce"], turGorev: 8, temaGorev: 10, okumaHedef: "70-100" }, window.SINIF || {});
   const SIRA = S.dersler.filter((d) => window.DERS[d]);
+  if (window.SES) SES.baslat(S.anahtar, S.no <= 1 ? 0.9 : 1);
   const ekran = document.getElementById("ekran");
   const esc = OYUN.esc;
   const $ = (h) => { const d = document.createElement("div"); d.innerHTML = h.trim(); return d.firstElementChild; };
@@ -10,7 +11,7 @@
   // ---------- Kayıt ----------
   let K;
   try { K = JSON.parse(localStorage.getItem(ANAHTAR)) || {}; } catch (e) { K = {}; }
-  K = Object.assign({ ad: "", yildiz: 0, konu: {}, gunluk: {}, hikaye: {}, hatalar: [], ses: true, okuma: [], hedefOdul: {} }, K);
+  K = Object.assign({ ad: "", yildiz: 0, konu: {}, gunluk: {}, hikaye: {}, hatalar: [], ses: true, okuma: [], hedefOdul: {}, kelime: {} }, K);
   const kaydet = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(K)); } catch (e) {} ustBar(); };
   const tarih = (d) => { d = d || new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   const gun = (t) => { t = t || tarih(); return K.gunluk[t] || (K.gunluk[t] = { tur: 0, soru: 0, dogru: 0, hikaye: false }); };
@@ -45,9 +46,13 @@
   if (ss) { sesleriBul(); ss.onvoiceschanged = sesleriBul; }
   function soyle(metin, dil, ses, hiz, sonra) {
     if (!ss) { if (sonra) sonra(); return; }
+    const m = document.querySelector(".maskot");
+    if (window.SES) { // en doğal ses + kullanıcının hız ayarı
+      SES.konus(metin.replace(/[🔊⭐🎉➜✔]/g, ""), dil.slice(0, 2), { hiz, ekle: true, basla: () => m && m.classList.add("konusuyor"), sonra: () => { m && m.classList.remove("konusuyor"); if (sonra) sonra(); } });
+      return;
+    }
     const u = new SpeechSynthesisUtterance(metin.replace(/[🔊⭐🎉➜✔]/g, ""));
     u.lang = dil; if (ses) u.voice = ses; u.rate = hiz;
-    const m = document.querySelector(".maskot");
     u.onstart = () => m && m.classList.add("konusuyor");
     u.onend = () => { m && m.classList.remove("konusuyor"); if (sonra) sonra(); };
     ss.speak(u);
@@ -145,14 +150,17 @@
       <button><span>🏆</span>Çıkartma Albümüm</button>
       <button><span>🔁</span>Hatalarım (${K.hatalar.length})</button>
       <button><span>📕</span>MEB Kitaplarım</button>
-      <button><span>👨‍👩‍👧</span>Veli Köşesi</button></div>`);
+      <button><span>👨‍👩‍👧</span>Veli Köşesi</button>
+      ${DERS.ingilizce && SIRA.includes("ingilizce") ? `<button><span>🧠</span>Kelime Tekrarı (${kelimeVakti().length})</button>` : ""}</div>`);
     const b = kc.querySelectorAll("button");
     b[0].onclick = () => git(kitaplik, "📚 Hikâye Kitaplığı");
     b[1].onclick = () => git(album, "🏆 Çıkartma Albümüm");
     b[2].onclick = () => git(hatalarim, "🔁 Hatalarım");
     b[3].onclick = () => git(() => mebKitaplari(), "📕 MEB Kitaplarım");
     b[4].onclick = () => git(veliKapi, "👨‍👩‍👧 Veli Köşesi");
+    if (b[5]) b[5].onclick = () => git(kelimeTekrar, "🧠 Kelime Tekrarı");
     ekran.appendChild(kc);
+    if (window.SES) { const rk = $(`<div></div>`); ekran.appendChild(rk); SES.rehberGoster(rk); } // kaliteli ses yoksa bir kez rehber
   }
   function onerilenKonu() {
     const hepsi = tumKonular();
@@ -267,6 +275,7 @@
     if (b.k) {
       const ks = K.konu[b.k.id] || (K.konu[b.k.id] = { en: 0, oyna: 0, d: 0, t: 0 });
       ks.oyna++; ks.d += s.dogru; ks.t += s.toplam; ks.en = Math.max(ks.en, yildiz);
+      if (b.id === "ingilizce" && b.k.kelimeler) kelimeEkle(b.k.kelimeler);
     }
     const oncekiYildiz = K.yildiz;
     K.yildiz += yildiz;
@@ -294,41 +303,101 @@
     }
   }
 
+  // ---------- Kelime Tekrarı (aralıklı tekrar: oynanan İngilizce konuların kelimeleri unutulmasın) ----------
+  const ARALIK = [0, 1, 3, 7, 14, 30];
+  function kelimeEkle(liste) {
+    const bugun = gunNo();
+    for (const w of liste) if (w && w[0] && !K.kelime[w[0]]) K.kelime[w[0]] = { tr: w[1], e: w[2] || "", k: 0, g: bugun, d: 0, y: 0 };
+  }
+  const kelimeVakti = () => Object.entries(K.kelime || {}).filter(([, v]) => v.g <= gunNo()).sort((a, b) => a[1].k - b[1].k || a[1].g - b[1].g);
+  function kelimeGorev(en, v, hepsi) {
+    const diger = hepsi.filter(([x, w]) => x !== en && w.tr !== v.tr);
+    const tip = Math.random();
+    let g;
+    if (v.e && tip < 0.4) g = O.secim("🔊 Dinle! Duyduğun kelimenin resmi hangisi?", v.e, diger.map(([, w]) => w.e).filter((e) => e && e !== v.e), `${en} = ${v.tr}`, { em: true, ses: en, sesOnce: true, cevapSes: en });
+    else if (tip < 0.7) g = O.secim(`🔊 Dinle! "${en}" ne demek?`, v.tr, diger.map(([, w]) => w.tr), `${en} = ${v.tr}`, { ses: en, sesOnce: true, cevapSes: en });
+    else g = O.secim(`"${v.tr}" İngilizcede nasıl söylenir?`, en, diger.map(([x]) => x), `${v.tr} = ${en}`, { cevapSes: en });
+    if (!g) g = O.secim(`"${en}" ne demek?`, v.tr, ["merhaba", "kırmızı", "kedi", "okul", "elma"].filter((x) => x !== v.tr), `${en} = ${v.tr}`, { cevapSes: en });
+    if (g) g.kelime = en;
+    return g;
+  }
+  function kelimeTekrar() {
+    const hepsi = Object.entries(K.kelime || {});
+    if (!hepsi.length) { maskot(`${K.ad}, İngilizce konularını oynadıkça kelimeler buraya gelir. Sonra unutmamak için tekrar ederiz!`, true); return; }
+    const vakit = kelimeVakti();
+    const ogrenilen = hepsi.filter(([, v]) => v.k >= 4).length;
+    maskot(vakit.length ? `${vakit.length} kelimenin tekrar zamanı geldi. Dinle ve doğru olanı bul!` : `Bugünkü tekrarların bitti ${K.ad}! Yarın yine gel.`, true);
+    const ust = $(`<div class="gorev"><h3>🧠 Kelime Kutum</h3><div class="not">Toplam ${hepsi.length} kelime · İyi öğrenilen ${ogrenilen} · Bugün tekrar ${vakit.length}</div></div>`);
+    ekran.appendChild(ust);
+    if (vakit.length) {
+      const b = $(`<button class="buyukbtn" style="--renk:#9b5de5">🧠 Tekrara Başla (${Math.min(8, vakit.length)} kelime)</button>`);
+      b.onclick = () => {
+        yigin.pop(); git(() => {
+          const sec = vakit.slice(0, 8);
+          const gorevler = sec.map(([en, v]) => kelimeGorev(en, v, hepsi)).filter(Boolean);
+          OYUN.tur({ gorevler, renk: "#9b5de5", bitti: (s) => {
+            const yanlis = new Set(s.yanlislar.map((g) => g.kelime));
+            const bugun = gunNo();
+            for (const g of gorevler) {
+              const v = K.kelime[g.kelime]; if (!v) continue;
+              if (yanlis.has(g.kelime)) { v.k = 0; v.y++; v.g = bugun + 1; } else { v.k = Math.min(5, v.k + 1); v.d++; v.g = bugun + ARALIK[v.k]; }
+            }
+            sonuc(s, { hata: true, tekrar: () => { yigin.pop(); git(kelimeTekrar, "🧠 Kelime Tekrarı"); } });
+          } });
+        }, "🧠 Kelime Tekrarı");
+      };
+      ekran.appendChild(b);
+    }
+    const kutu = ["🌱", "🌿", "🌳", "⭐", "🏅", "👑"];
+    const l = $(`<details class="gorev"><summary style="font-weight:900;font-size:20px;cursor:pointer">📋 Kelimelerim (${hepsi.length}) — aç, dokun, dinle</summary><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px"></div></details>`);
+    const sat = l.querySelector("div");
+    hepsi.sort((a, b) => a[0].localeCompare(b[0])).forEach(([en, v]) => {
+      const x = $(`<button style="font-size:15px;padding:8px;border-radius:12px;border:2px solid #e5dcff;background:#fff;text-align:left;line-height:1.3">${v.e ? v.e + " " : ""}<b>${esc(en)}</b> ${kutu[v.k]}<br><small>${esc(v.tr)}</small></button>`);
+      x.onclick = () => APP.konusEn(en, true);
+      sat.appendChild(x);
+    });
+    ekran.appendChild(l);
+  }
+
   // ---------- Günlük Hikâye ----------
   function gunNo() { const d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 0, 1)) / 864e5); }
   function bugununHikayesi() { return HIKAYELER[((gunNo() % HIKAYELER.length) + HIKAYELER.length) % HIKAYELER.length]; }
   function hikayeSayfa(idx) {
+    // Sayfa sayfa okuma: her "metin" ögesi bir sayfadır (h.sayfalar varsa o kullanılır)
     const h = HIKAYELER[idx], bugun = h === bugununHikayesi();
-    let bas = null, okuyorMu = false;
-    const kelime = h.metin.join(" ").split(/\s+/).length;
-    const m = maskot(bugun ? "Günün hikâyesi hazır! İster kendin oku, ister ben okuyayım." : "Hadi bu hikâyeyi okuyalım!");
-    const kart = $(`<div class="hikaye"><div class="resim">${h.resim}</div><h2>${esc(h.baslik)}</h2>${h.metin.map((p) => `<p>${esc(p)}</p>`).join("")}<div class="not">${kelime} kelime</div></div>`);
-    const ust = $(`<div class="satir" style="margin-bottom:12px"></div>`);
-    const sure = $(`<button class="buyukbtn ikincil">⏱ Ben okuyacağım (süre tut)</button>`);
-    const oku = $(`<button class="buyukbtn ikincil">🔊 Bana oku</button>`);
-    sure.onclick = () => { bas = Date.now(); sure.textContent = "⏱ Süre tutuluyor… Okuyunca aşağıdaki butona bas"; sure.disabled = true; APP.sesDur(); };
-    oku.onclick = () => {
-      if (okuyorMu) { APP.sesDur(); okuyorMu = false; oku.textContent = "🔊 Bana oku"; kart.querySelectorAll("p").forEach((p) => p.classList.remove("okunan")); return; }
-      okuyorMu = true; bas = null; oku.textContent = "⏹ Durdur"; const ps = kart.querySelectorAll("p");
-      const sira = (n) => {
-        ps.forEach((p) => p.classList.remove("okunan"));
-        if (n >= ps.length || !okuyorMu) { okuyorMu = false; oku.textContent = "🔊 Bana oku"; return; }
-        ps[n].classList.add("okunan"); ps[n].scrollIntoView({ behavior: "smooth", block: "center" });
-        APP.konus(h.metin[n], () => sira(n + 1), true);
+    const sayfalar = h.sayfalar || h.metin;
+    const kelime = sayfalar.join(" ").split(/\s+/).length;
+    const bas = Date.now(); let dinledi = false, okuyorMu = false, n = 0;
+    maskot(bugun ? "Günün hikâyesi hazır! Kendin oku ya da 🔊 ile ben okuyayım." : "Hadi bu hikâyeyi okuyalım!");
+    const kap = $(`<div></div>`); ekran.appendChild(kap);
+    const ciz = () => {
+      kap.innerHTML = "";
+      const kart = $(`<div class="hikaye">${n === 0 ? `<div class="resim">${h.resim || "📖"}</div><h2>${esc(h.baslik)}</h2>` : `<div class="not" style="text-align:center">${esc(h.baslik)}</div>`}<p>${esc(sayfalar[n])}</p>
+        <div class="not" style="text-align:center">Sayfa ${n + 1} / ${sayfalar.length}</div>
+        <div style="height:10px;border-radius:9px;background:#f3e3c4;overflow:hidden"><div style="height:100%;width:${((n + 1) / sayfalar.length) * 100}%;background:#f4a261"></div></div></div>`);
+      const oku = $(`<button class="buyukbtn ikincil">${okuyorMu ? "⏹ Durdur" : "🔊 Bu sayfayı bana oku"}</button>`);
+      oku.onclick = () => { if (okuyorMu) { okuyorMu = false; APP.sesDur(); ciz(); return; } sesliOku(); };
+      const alt = $(`<div class="satir"></div>`);
+      const geri = $(`<button class="buyukbtn ikincil" ${n === 0 ? "disabled" : ""}>⬅ Önceki</button>`);
+      const ileri = $(`<button class="buyukbtn" style="--renk:#f4a261">${n === sayfalar.length - 1 ? "✅ Okudum, sorulara geç!" : "Sonraki sayfa ➜"}</button>`);
+      geri.onclick = () => { if (n > 0) { okuyorMu = false; APP.sesDur(); n--; ciz(); } };
+      ileri.onclick = () => {
+        okuyorMu = false; APP.sesDur();
+        if (n < sayfalar.length - 1) { n++; ciz(); window.scrollTo(0, 0); return; }
+        let hiz = null;
+        if (!dinledi) { const dk = (Date.now() - bas) / 60000; if (dk > 0.1) { hiz = Math.round(kelime / dk); if (hiz > 250 || hiz < 10) hiz = null; } if (hiz) { K.okuma.push({ t: tarih(), h: idx, hiz }); if (K.okuma.length > 60) K.okuma.shift(); kaydet(); } }
+        yigin.pop(); git(() => hikayeSorulari(idx, hiz), "📚 " + h.baslik);
       };
-      sira(0);
+      kap.appendChild(oku); kap.appendChild(kart); alt.appendChild(geri); alt.appendChild(ileri); kap.appendChild(alt);
+      kap.appendChild($(`<div class="not">⏱ Kendin okursan okuma hızın ölçülür. ${kelime} kelime.</div>`));
     };
-    ust.appendChild(sure); ust.appendChild(oku);
-    ekran.appendChild(ust); ekran.appendChild(kart);
-    const bitti = $(`<button class="buyukbtn" style="--renk:#f4a261">✅ Okudum, sorulara geç!</button>`);
-    bitti.onclick = () => {
-      okuyorMu = false; APP.sesDur();
-      let hiz = null;
-      if (bas) { const dk = (Date.now() - bas) / 60000; if (dk > 0.1) { hiz = Math.round(kelime / dk); if (hiz > 250) hiz = null; } if (hiz) { K.okuma.push({ t: tarih(), h: idx, hiz }); if (K.okuma.length > 60) K.okuma.shift(); kaydet(); } }
-      yigin.pop(); git(() => hikayeSorulari(idx, hiz), "📚 " + h.baslik);
-    };
-    ekran.appendChild(bitti);
-    void m;
+    function sesliOku() { // bu sayfayı okur, bitince sonraki sayfaya geçip devam eder
+      okuyorMu = true; dinledi = true; ciz();
+      const p = kap.querySelector(".hikaye p"); p.classList.add("okunan");
+      const bu = n;
+      APP.konus(sayfalar[n], () => { if (!okuyorMu || bu !== n) return; if (n < sayfalar.length - 1) { n++; sesliOku(); } else { okuyorMu = false; ciz(); } }, true);
+    }
+    ciz();
   }
   function hikayeSorulari(idx, hiz) {
     const h = HIKAYELER[idx];
@@ -443,16 +512,18 @@
     ekran.appendChild($(`<div class="panel"><h3>🎯 Tekrar edilmesi gereken konular</h3>${zayif.length ? zayif.map((x) => `• ${DERS[x.d].ikon} ${esc(x.k.ad)} — %${Math.round(100 * K.konu[x.k.id].d / K.konu[x.k.id].t)}`).join("<br>") : "Şimdilik yok 👍 (doğru oranı %60'ın altındaki konular burada görünür)"}</div>`));
     // okuma hızı
     const ok = K.okuma.slice(-10);
-    ekran.appendChild($(`<div class="panel"><h3>⏱ Okuma hızı (dakikada kelime)</h3>${ok.length ? ok.map((o) => `${o.t}: <b>${o.hiz}</b> — ${esc(HIKAYELER[o.h] ? HIKAYELER[o.h].baslik : "")}`).join("<br>") : "Henüz ölçüm yok. Hikâye okurken \"Ben okuyacağım (süre tut)\" butonunu kullanın."}<div class="not" style="margin-top:6px">${S.no}. sınıf sonu için hedeflenen okuma hızı genellikle dakikada ${S.okumaHedef} kelime civarındadır.</div></div>`));
+    ekran.appendChild($(`<div class="panel"><h3>⏱ Okuma hızı (dakikada kelime)</h3>${ok.length ? ok.map((o) => `${o.t}: <b>${o.hiz}</b> — ${esc(HIKAYELER[o.h] ? HIKAYELER[o.h].baslik : "")}`).join("<br>") : "Henüz ölçüm yok. Çocuk hikâyeyi 🔊 kullanmadan kendisi okuyunca ölçülür."}<div class="not" style="margin-top:6px">${S.no}. sınıf sonu için hedeflenen okuma hızı genellikle dakikada ${S.okumaHedef} kelime civarındadır.</div></div>`));
     // ayarlar
     const ay = $(`<div class="panel"><h3>⚙️ Ayarlar</h3>
       <div class="satir"><input class="ad" value="${esc(K.ad)}"><button class="buyukbtn ikincil" style="flex:0 0 auto;margin:0;padding:10px 18px;font-size:18px">Adı kaydet</button></div>
       <button class="buyukbtn ikincil" style="font-size:19px">${K.ses ? "🔊 Sesli okuma: AÇIK" : "🔇 Sesli okuma: KAPALI"}</button>
+      ${window.SES ? `<details class="ses-detay" style="margin:10px 0"><summary style="font-size:19px;cursor:pointer;padding:8px 0">🗣️ Ses ve konuşma hızı</summary>${SES.ayarHTML()}</details>` : ""}
       <div class="satir"><button class="buyukbtn ikincil" style="font-size:19px">💾 İlerlemeyi yedekle</button><button class="buyukbtn ikincil" style="font-size:19px">📂 Yedekten yükle</button></div>
       <input type="file" accept=".json,application/json" hidden>
       <button class="buyukbtn ikincil" style="font-size:19px;color:var(--kirmizi)">🗑 Tüm ilerlemeyi sıfırla</button>
       <div class="not">İlerleme bu cihazın tarayıcısında saklanır. Cihaz değiştirirken yedek dosyasını kullanın.</div></div>`);
-    const bt = ay.querySelectorAll("button");
+    if (window.SES) { SES.ayarBagla(ay); SES.rehberGoster(ay); }
+    const bt = ay.querySelectorAll(":scope > button, :scope > .satir > button");
     bt[0].onclick = () => { const v = ay.querySelector("input.ad").value.trim(); if (v) { K.ad = v; kaydet(); bt[0].textContent = "Kaydedildi ✅"; } };
     bt[1].onclick = () => { K.ses = !K.ses; kaydet(); bt[1].textContent = K.ses ? "🔊 Sesli okuma: AÇIK" : "🔇 Sesli okuma: KAPALI"; };
     bt[2].onclick = () => {
