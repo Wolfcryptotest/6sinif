@@ -1,7 +1,7 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders7-";
-const SURUM = ONEK + "f24d0c1767c";
+const SURUM = ONEK + "7dd712ae71c";
 const DOSYALAR = ["./", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "hikaye.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "kelime-bankasi.js", "kelime-hatirla.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js"];
 
 self.addEventListener("install", (e) => {
