@@ -1,9 +1,8 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
-// Aynı sitedeki 1., 3. ve 4. sınıf uygulamalarının önbelleklerine dokunmaz (yalnızca "ders-" önekli eski sürümleri siler).
 const ONEK = "ders-";
-const SURUM = ONEK + "bcf0719439";
-const DOSYALAR = ["./", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js"];
+const SURUM = ONEK + "ad659d4c9dc";
+const DOSYALAR = ["./", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "hikaye.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "kelime-bankasi.js", "kelime-hatirla.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));
@@ -14,9 +13,13 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return; // YouTube vb. dış istekler internetten
+  const kapsam = self.registration.scope;
+  if (!e.request.url.startsWith(kapsam)) return; // kapsam dışı
+  if (/^\d+sinif\//.test(e.request.url.slice(kapsam.length))) return; // aynı sitedeki diğer sınıflara karışma
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
-      const kopya = r.clone(); caches.open(SURUM).then((ca) => ca.put(e.request, kopya)); return r;
-    }).catch(() => caches.match("./")))
+    caches.open(SURUM).then((ca) => ca.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
+      if (r.ok) ca.put(e.request, r.clone()); // hatalı yanıtlar (404) önbelleğe alınmaz
+      return r;
+    }).catch(() => ca.match("./"))))
   );
 });

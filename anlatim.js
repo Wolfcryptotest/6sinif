@@ -75,6 +75,7 @@ window.ANLATIM.t1k1 = [
   }
 
   function turkceSes() {
+    if (window.SES) return SES.sesSec("tr");
     const sesler = window.speechSynthesis ? speechSynthesis.getVoices() : [];
     return sesler.find((v) => /^tr(-|_|$)/i.test(v.lang) && /google/i.test(v.name)) || sesler.find((v) => /^tr(-|_|$)/i.test(v.lang)) || null;
   }
@@ -109,7 +110,7 @@ window.ANLATIM.t1k1 = [
       const devam = () => { if (benim === oturum) bitince(); };
       if (!sesVar || !sesAcik) { zaman = setTimeout(devam, (900 + metin.length * 55) / hiz); return; }
       const u = new SpeechSynthesisUtterance(metin);
-      u.lang = "tr-TR"; u.rate = 0.95 * hiz; const v = turkceSes(); if (v) u.voice = v;
+      u.lang = "tr-TR"; u.rate = 0.95 * hiz * (window.SES ? SES.ayar.hiz || 1 : 1); const v = turkceSes(); if (v) { u.voice = v; u.lang = v.lang; }
       let bitti = false; const tek = () => { if (!bitti) { bitti = true; clearTimeout(yedek); devam(); } };
       u.onend = tek; u.onerror = tek;
       const yedek = setTimeout(tek, (4000 + metin.length * 110) / hiz); // bazı cihazlarda onend gelmeyebilir

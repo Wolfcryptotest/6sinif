@@ -9,6 +9,7 @@ const DERSLER = [
 ];
 
 const $ = (id) => document.getElementById(id);
+if (window.SES) SES.baslat("6sinif", 1);
 const ekran = $("ekran");
 const gecmis = [];
 
@@ -148,6 +149,7 @@ function anaSayfa() {
   });
   $("tekrar").onclick = () => yanlisSay ? git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") : alert("Harika! Tekrar edilecek yanlışın yok.");
   $("panel").onclick = () => git(ilerlemePaneli, "İlerleme Paneli");
+  if (window.hikayeAnaKart) window.hikayeAnaKart(); // Günün Hikâyesi kartı (hikaye.js)
 }
 
 // --- İlerleme paneli ---
@@ -210,6 +212,7 @@ function ilerlemePaneli() {
       <div><h2>💪 Tekrar Etmesi Gerekenler</h2>${konuListe(zor, "En az 5 soru çözülen konularda başarı %80'in altına düşerse burada görünür.")}</div>
       <div><h2>⭐ En İyi Olduğu Konular</h2>${konuListe(iyi, "En az 5 soru çözülen ve %80'in üzerinde başarı olan konular burada görünür.")}</div>
     </div>
+    ${window.SES ? `<h2>🗣️ Ses ve Konuşma Hızı</h2><div class="grafik-kart" id="sesAyar">${SES.ayarHTML()}</div>` : ""}
     <h2>🎯 Günlük Hedef Ayarı</h2>
     <div class="grafik-kart">
       ${secim("Soru hedefi", "soru", [10, 20, 30, 50])}
@@ -217,6 +220,7 @@ function ilerlemePaneli() {
     </div>`;
   ekran.querySelectorAll(".konu-satir").forEach((b) => (b.onclick = () => { const k = konuDers[b.dataset.id].konu; git(() => konuSayfa(k), k.ad); }));
   ekran.querySelectorAll(".cip").forEach((b) => (b.onclick = () => { kayit.hedef[b.dataset.alan] = +b.dataset.v; kaydet(); git(ilerlemePaneli, "İlerleme Paneli", false); }));
+  if (window.SES && $("sesAyar")) { SES.ayarBagla($("sesAyar")); SES.rehberGoster($("sesAyar")); }
 }
 
 function uniteler(dersKey) {
@@ -290,6 +294,7 @@ function konuSayfa(k) {
 // ================= İngilizce: sesli okuma ve kelime oyunu =================
 function seslendir(metin) {
   try {
+    if (window.SES) { SES.konus(metin, "en", { hiz: 0.85 }); return; }
     if (!window.speechSynthesis) return;
     const u = new SpeechSynthesisUtterance(metin);
     u.lang = "en-US"; u.rate = 0.85;
