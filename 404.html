@@ -9,6 +9,7 @@
   var m = y.match(/\/6sinif\/(\d)\s*sinif/) || y.match(/\/6sinif\/(\d)\/?$/);
   var hedef = null;
   if (m && "13457".indexOf(m[1]) >= 0) hedef = "/6sinif/" + m[1] + "sinif/";
+  else if (/\/6sinif\/(minik|kres|anaokul|okul ?oncesi|4-5|0sinif)/.test(y)) hedef = "/6sinif/minik/";
   else if (/^\/6sinif\/?(6sinif)?\/?$/.test(y)) hedef = "/6sinif/";
   if (hedef && hedef !== location.pathname) location.replace(hedef);
 })();
@@ -18,6 +19,7 @@ h1{margin:0 0 6px}p{color:#666;margin:0 0 20px}
 a{display:flex;align-items:center;gap:14px;width:min(420px,100%);box-sizing:border-box;margin:8px 0;padding:18px 20px;border-radius:18px;color:#fff;text-decoration:none;font-size:22px;font-weight:700;box-shadow:0 4px 0 rgba(0,0,0,.15)}
 a span{font-size:34px}</style></head><body>
 <h1>🦉 Oyunla Öğren</h1><p>Bu adres bulunamadı. Sınıfını seç:</p>
+<a href="/6sinif/minik/" style="background:#ff8a00"><span>👶</span>Minik (4-5 yaş)</a>
 <a href="/6sinif/1sinif/" style="background:#2fb36b"><span>🐣</span>1. Sınıf</a>
 <a href="/6sinif/3sinif/" style="background:#f2a900"><span>🚀</span>3. Sınıf</a>
 <a href="/6sinif/4sinif/" style="background:#3d8bff"><span>🔭</span>4. Sınıf</a>
