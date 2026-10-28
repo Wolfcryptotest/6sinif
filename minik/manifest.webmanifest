@@ -1,0 +1,17 @@
+{
+  "name": "Oyunla Öğren Minik",
+  "short_name": "Minik",
+  "description": "4-5 yaş için sesli eğitici oyunlar, masallar ve okula hazırlık",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff8e7",
+  "theme_color": "#ff8a00",
+  "lang": "tr",
+  "icons": [
+    { "src": "ikon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "ikon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "ikon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

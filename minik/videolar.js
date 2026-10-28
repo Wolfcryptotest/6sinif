@@ -1,0 +1,1 @@
+window.VIDEO = window.VIDEO || {};
