@@ -1,0 +1,17 @@
+{
+  "name": "2. Sınıf Oyunla Öğren",
+  "short_name": "Oyunla Öğren 2",
+  "description": "2. sınıf için oyunlarla ders tekrarı, günlük hikâye ve çıkartma albümü",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff8e7",
+  "theme_color": "#ffb703",
+  "lang": "tr",
+  "icons": [
+    { "src": "ikon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "ikon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "ikon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
