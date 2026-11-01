@@ -350,9 +350,9 @@ body.ia-dugmeli{padding-bottom:84px}
   // ---------------- Alt alta işlem şablonları ----------------
   // Her şablon: a, b (öğrencinin yazdığı sayılar, metin), hucre: { "satır:sütun": rakam }, secim: { tur: "giris"|"hucre", ... }
   const SB = {};
-  const yeniSablon = () => ({ a: "", b: "", hucre: {}, secim: { tur: "giris", ad: "a" }, isaret: {}, mesaj: null, gosterildi: false });
+  const yeniSablon = () => ({ a: "", b: "", a2: "", b2: "", hucre: {}, secim: { tur: "giris", ad: "a" }, isaret: {}, mesaj: null, gosterildi: false });
   for (const s of ["topla", "cikar", "carp", "bol"]) SB[s] = yeniSablon();
-  const SINIR = { topla: [7, 7], cikar: [7, 7], carp: [5, 3], bol: [6, 3] };
+  const SINIR = { topla: [7, 7], cikar: [7, 7], carp: [5, 3], bol: [6, 3], a2: [9], b2: [6] };
   const OP = { topla: "+", cikar: "−", carp: "×", bol: "÷" };
   const BASAMAK = ["B", "O", "Y", "Bb", "Ob", "Yb", "M", "OM"];
   const ONDALIK = ["⅒", "1/100", "1/1000"];
@@ -423,8 +423,21 @@ body.ia-dugmeli{padding-bottom:84px}
     temizle.onclick = () => { SB[sekme] = yeniSablon(); sablonCiz(); };
     arac.append(kontrol, goster, temizle);
     const parca = [h("div", { class: "ia-ipucu", text: ipucuMetni() }), sayilar];
-    if (s.a && s.b) parca.push(h("div", { class: "ia-izgara-kap" }, sekme === "bol" ? bolmeIzgara(s) : izgara(s)), arac);
-    else parca.push(h("div", { class: "ia-ipucu", text: "İki sayıyı da yazınca işlem kutuları açılır." }));
+    const tamYazildi = s.a && s.b && !s.a.endsWith(",") && !s.b.endsWith(",");
+    const D = sekme === "bol" && tamYazildi ? bolDurum(s) : null;
+    if (D && D.adimGerek) {
+      const g2 = (ad, bos, ok) => {
+        const el = h("div", { class: "ia-giris" + (s.secim.tur === "giris" && s.secim.ad === ad ? " secili" : ""), role: "textbox", tabindex: "0", "data-bos": bos, "aria-label": bos, style: s[ad] && !ok && !(s.secim.tur === "giris" && s.secim.ad === ad) ? "border-color:#dc2626;border-style:solid" : s[ad] && ok ? "border-color:#16a34a;border-style:solid" : null }, s[ad]);
+        el.onclick = () => { s.secim = { tur: "giris", ad }; sablonCiz(); };
+        return el;
+      };
+      parca.push(h("div", { class: "ia-adim" }, h("b", { text: "1. adım: Böleni doğal sayı yap" }),
+        h("div", { class: "ia-satir" }, g2("a2", "yeni bölünen", D.a2ok), h("span", { class: "ia-op", text: "÷" }), g2("b2", "yeni bölen", D.b2ok)),
+        h("div", { class: "ia-not", text: `Bölende virgülden sonra ${D.k} basamak var. İki sayıyı da ${10 ** D.k} ile çarp (virgülü ${D.k} basamak sağa kaydır).` })));
+    }
+    if (tamYazildi && (!D || D.hazir)) parca.push(h("div", { class: "ia-izgara-kap" }, sekme === "bol" ? bolmeIzgara(s) : izgara(s)), arac);
+    else if (D && D.adimGerek) parca.push(arac);
+    else if (!tamYazildi) parca.push(h("div", { class: "ia-ipucu", text: "İki sayıyı da yazınca işlem kutuları açılır." }));
     if (s.mesaj) parca.push(h("div", { class: "ia-sonuc " + s.mesaj.tur }, ...s.mesaj.satirlar.map((x, i) => (i ? [h("br"), x] : x))));
     govde.replaceChildren(...parca);
   }
@@ -434,7 +447,7 @@ body.ia-dugmeli{padding-bottom:84px}
       topla: "Sayıları yaz (ondalık için , tuşu), sonra en sağdaki basamaktan başlayarak topla. Eldeyi üstteki küçük kutulara yazabilirsin.",
       cikar: "Eksileni ve çıkanı yaz. Birler basamağından başla; onluk bozduğunda yeni rakamı üstteki küçük kutuya yaz.",
       carp: "Çarpanları yaz (ondalık olabilir). 2. çarpanın her basamağı için bir satır var; taralı kutular boş kalır. Sonra satırları topla.",
-      bol: "Bölüneni ve böleni yaz. Bölümü sağdaki çizginin altına, çarpma ve çıkarma adımlarını soldaki kutulara yaz."
+      bol: "Bölüneni ve böleni yaz (ondalık olabilir). Bölümü sağdaki çizginin altına, çarpma ve çıkarma adımlarını soldaki kutulara yaz."
     }[sekme];
   }
 
@@ -476,25 +489,29 @@ body.ia-dugmeli{padding-bottom:84px}
 
   // Bölme: solda bölünen ve adımlar, sağda bölen / bölüm (Türkiye'deki uzun bölme düzeni)
   function bolmeIzgara(s) {
-    const n = s.a.length, m = Math.max(s.b.length, Math.min(n, 6));
-    const adim = Math.min(n, 6);
+    const D = bolDurum(s), A = D.A, Bs = D.B, d = D.d;
+    const n = A.length, m = Math.max(Bs.length, Math.min(n, 9));
+    const adim = Math.min(n, 9);
+    const qUzun = d ? Math.max(String(BigInt(A) / (BigInt(Bs) || 1n)).length, d + 1) : 0;
     // sütunlar: [işaret] [n hücre] [dikey çizgi] [m hücre]
     const g = h("div", { class: "ia-izgara", style: `grid-template-columns:28px repeat(${n},40px) 10px repeat(${m},40px)` });
+    const virgulKoy = (el) => { el.append(h("span", { class: "ia-virgul", "aria-hidden": "true", text: "," })); return el; };
     const hucre = (id, i, yon) => {
       const anahtar = id + ":" + i;
       const sinif = ["ia-h"];
       if (s.secim.tur === "hucre" && s.secim.anahtar === anahtar) sinif.push("secili");
       if (s.isaret[anahtar]) sinif.push(s.isaret[anahtar]);
       const el = h("div", { class: sinif.join(" "), "data-a": anahtar, style: id === "bolum" ? "border-top:3px solid #334155" : null, "aria-label": id === "bolum" ? "bölüm" : id.startsWith("k") ? "kalan" : "çıkarılan" }, s.hucre[anahtar] || "");
+      if (id === "bolum" && d && i === qUzun - d - 1) virgulKoy(el);
       el.onclick = () => { s.secim = { tur: "hucre", anahtar, satir: id, yon }; sablonCiz(); };
       return el;
     };
     const bos = (k = 1) => { const e = []; for (let i = 0; i < k; i++) e.push(h("div")); return e; };
     // 1. satır: bölünen | bölen
     g.append(h("div"));
-    for (let i = 0; i < n; i++) g.append(h("div", { class: "ia-h sabit" }, s.a[i]));
+    for (let i = 0; i < n; i++) { const el = h("div", { class: "ia-h sabit" }, A[i]); if (d && i === n - d - 1) virgulKoy(el); g.append(el); }
     g.append(h("div", { class: "ia-dikey", style: "grid-row:span 2;align-self:stretch" }));
-    for (let i = 0; i < m; i++) g.append(h("div", { class: "ia-h sabit" }, s.b[i] || ""));
+    for (let i = 0; i < m; i++) g.append(h("div", { class: "ia-h sabit" }, Bs[i] || ""));
     // 2. satır: adım 1 çarpım | bölen çizgisi + bölüm
     // bölüm satırı sağda, solda ilk çıkarılan
     g.append(h("div", { class: "ia-isaret", text: "−" }));
@@ -556,20 +573,23 @@ body.ia-dugmeli{padding-bottom:84px}
     s.mesaj = null;
     if (k === "Tamam") { kontrolEt(false); return; }
     if (s.secim.tur === "giris") {
-      const ad = s.secim.ad, sinir = ad === "a" ? ma : mb;
+      const ad = s.secim.ad, sinir = ad === "a" ? ma : ad === "b" ? mb : SINIR[ad][0];
       if (/^\d$/.test(k)) {
         const x = s[ad];
         if (x.includes(",") ? ond(x) >= 3 : x.length >= sinir) s.mesaj = { tur: "bilgi", satirlar: [x.includes(",") ? "Virgülden sonra en çok 3 basamak yazılabilir." : `Bu kutuya en çok ${sinir} basamaklı sayı yazılabilir.`] };
         else if (x === "0") s[ad] = k; else s[ad] += k;
       } else if (k === ",") {
-        if (sekme === "bol") s.mesaj = { tur: "bilgi", satirlar: ["Bölme şablonu şimdilik doğal sayılarla çalışır."] };
+        if (ad === "b2") s.mesaj = { tur: "bilgi", satirlar: ["Yeni bölen doğal sayı olmalı; virgül kalmamalı."] };
         else if (!s[ad].includes(",")) s[ad] = (s[ad] || "0") + ",";
       } else if (k === "⌫") s[ad] = s[ad].slice(0, -1);
       else if (k === "Sıfırla") s[ad] = "";
       else if (k === "→" || k === "Sonraki" || k === "↓") {
+        const D = sekme === "bol" && s.a && s.b ? bolDurum(s) : null;
         if (ad === "a") s.secim = { tur: "giris", ad: "b" };
+        else if (ad === "b" && D && D.adimGerek) s.secim = { tur: "giris", ad: "a2" };
+        else if (ad === "a2") s.secim = { tur: "giris", ad: "b2" };
         else ilkHucre();
-      } else if (k === "←" || k === "↑") s.secim = { tur: "giris", ad: "a" };
+      } else if (k === "←" || k === "↑") s.secim = { tur: "giris", ad: ad === "b2" ? "a2" : ad === "a2" ? "b" : "a" };
       s.isaret = {};
       sablonCiz();
       return;
@@ -688,18 +708,55 @@ body.ia-dugmeli{padding-bottom:84px}
     sablonCiz();
   }
 
+  // Ondalık bölme: bölen ondalıksa önce iki sayı 10^k ile çarpılıp bölen doğal sayı yapılır (1. adım)
+  const ondVal = (x) => [BigInt(rak(x) || "0"), 10n ** BigInt(ond(x))];
+  const ondEsit = (x, y) => { const [p, q] = ondVal(x), [r, t] = ondVal(y); return p * t === r * q; };
+  function kaydir(x, k) { // x × 10^k, virgüllü metin olarak
+    const d = ond(x), r = rak(x), yeniOnd = Math.max(d - k, 0), rak2 = r + "0".repeat(Math.max(k - d, 0));
+    let t = yeniOnd ? rak2.slice(0, -yeniOnd) + "," + rak2.slice(-yeniOnd) : rak2;
+    t = t.replace(/^0+(?=\d)/, "");
+    return t.startsWith(",") ? "0" + t : t;
+  }
+  function bolDurum(s) {
+    const k = ond(s.b), adimGerek = k > 0;
+    const beklenenA = adimGerek ? kaydir(s.a, k) : s.a, beklenenB = adimGerek ? kaydir(s.b, k) : s.b;
+    const a2ok = !adimGerek || (s.a2 && !s.a2.endsWith(",") && ondEsit(s.a2, beklenenA));
+    const b2ok = !adimGerek || (s.b2 && ondEsit(s.b2, beklenenB));
+    const hazir = !!(a2ok && b2ok);
+    const Ea = adimGerek ? s.a2 : s.a, Eb = (adimGerek ? s.b2 : s.b).replace(/^0+(?=\d)/, "");
+    return { k, adimGerek, beklenenA, beklenenB, a2ok, b2ok, hazir, Ea, Eb, A: hazir ? rak(Ea) : "", B: hazir ? Eb : "", d: hazir ? ond(Ea) : 0 };
+  }
+
   function bolmeKontrol(s, goster) {
-    const a = BigInt(s.a), b = BigInt(s.b);
+    const D = bolDurum(s);
+    if (!D.hazir) {
+      if (goster) {
+        s.a2 = D.beklenenA; s.b2 = D.beklenenB;
+        s.mesaj = { tur: "bilgi", satirlar: [`1. adım: ${sayiYaz(s.a)} ÷ ${sayiYaz(s.b)} işleminde bölende virgülden sonra ${D.k} basamak var. İki sayı da ${10 ** D.k} ile çarpılır: ${sayiYaz(D.beklenenA)} ÷ ${sayiYaz(D.beklenenB)}`, "Şimdi bölmeyi yap."] };
+        return;
+      }
+      s.mesaj = { tur: "kotu", satirlar: [!s.a2 || !s.b2 ? "Önce 1. adımı yap: böleni doğal sayı yap." : `1. adımda hata var. Bölende virgülden sonra ${D.k} basamak var; iki sayıyı da ${10 ** D.k} ile çarp.`] };
+      return;
+    }
+    return bolmeKontrolDogal(s, goster, D);
+  }
+
+  function bolmeKontrolDogal(s, goster, D) {
+    const a = BigInt(D.A), b = BigInt(D.B), d = D.d;
     if (b === 0n) { s.mesaj = { tur: "kotu", satirlar: ["Bir sayı 0'a bölünemez. Böleni değiştir."] }; return; }
-    const q = String(a / b), r = String(a % b);
-    const m = Math.max(s.b.length, Math.min(s.a.length, 6));
+    // Bölüm virgülsüz rakamlarla: ondalık bölünende en az d+1 basamak (0,15 ÷ 3 → "005" = 0,05)
+    const q = d ? String(a / b).padStart(d + 1, "0") : String(a / b), r = String(a % b);
+    const qYaz = d ? olcekliYaz(q, d) : binlik(q), rYaz = d ? olcekliYaz(r.padStart(d + 1, "0"), d) : r;
+    const once = D.adimGerek ? `${sayiYaz(s.a)} ÷ ${sayiYaz(s.b)} = ${sayiYaz(D.Ea)} ÷ ${binlik(D.B)} → ` : "";
+    const saglama = `Sağlama: ${binlik(D.B)} × ${qYaz} + ${rYaz} = ${sayiYaz(D.Ea)}`;
+    const m = Math.max(D.B.length, Math.min(D.A.length, 9));
     // bölüm soldan yazılır
     let bolum = "";
     for (let i = 0; i < m; i++) bolum += s.hucre["bolum:" + i] || " ";
     if (goster) {
       for (let i = 0; i < m; i++) { const k = "bolum:" + i; if (i < q.length) { s.hucre[k] = q[i]; s.isaret[k] = "gosterilen"; } else delete s.hucre[k]; }
       s.gosterildi = true;
-      s.mesaj = { tur: "bilgi", satirlar: [`Bölüm: ${binlik(q)}, kalan: ${r}`, `Sağlama: ${binlik(s.b)} × ${binlik(q)} + ${r} = ${binlik(s.a)}`] };
+      s.mesaj = { tur: "bilgi", satirlar: [`${once}Bölüm: ${qYaz}, kalan: ${rYaz}`, saglama] };
       return;
     }
     const yazilan = bolum.trim();
@@ -708,23 +765,23 @@ body.ia-dugmeli{padding-bottom:84px}
     if (!yazilan) { satirlar.push("Bölümü sağdaki çizginin altındaki kutulara yaz."); ok = false; }
     else if (!/^\d+$/.test(yazilan) || /\s/.test(bolum.slice(0, bolum.trimEnd().length).trimStart())) { satirlar.push("Bölümü kutulara aralıksız, soldan başlayarak yaz."); ok = false; }
     else {
-      const bd = yazilan.replace(/^0+(?=\d)/, "") === q;
+      const bd = d ? yazilan === q : yazilan.replace(/^0+(?=\d)/, "") === q;
       for (let i = 0; i < m; i++) { const k = "bolum:" + i; if (s.hucre[k]) s.isaret[k] = bd ? "dogru" : (q[i] === s.hucre[k] ? "dogru" : "yanlis"); }
-      if (!bd) { ok = false; satirlar.push("Bölüm yanlış (kırmızı rakamlar). Her adımda bölenin kaç katının sığdığını tekrar düşün."); }
+      if (!bd) { ok = false; satirlar.push("Bölüm yanlış (kırmızı rakamlar). Her adımda bölenin kaç katının sığdığını tekrar düşün." + (d ? " Ondalık bölmede bölünenin her basamağı için bölüme bir rakam yaz (sığmıyorsa 0); virgülü geçerken bölüme virgül gelir." : "")); }
     }
     // kalan: en alttaki dolu satır (k0, k1, ...) kalan olarak okunur
-    const n = s.a.length, adim = Math.min(n, 6);
+    const n = D.A.length, adim = Math.min(n, 9);
     let kalanSatir = null;
     for (let i = adim - 1; i >= 0; i--) { let v = ""; for (let c = 0; c < n; c++) v += s.hucre["k" + i + ":" + c] || " "; if (v.trim()) { kalanSatir = { i, v: v.trim() }; break; } }
     if (ok) {
-      if (!kalanSatir) satirlar.push(`🎉 Bölüm doğru: ${binlik(q)}. Kalanı da en alttaki satıra yazmayı unutma (kalan: ?).`);
-      else if (kalanSatir.v.replace(/\s/g, "").replace(/^0+(?=\d)/, "") === r) {
-        satirlar.push(`🎉 Doğru! ${binlik(s.a)} ÷ ${binlik(s.b)} = ${binlik(q)}, kalan ${r}`);
-        satirlar.push(`Sağlama: ${binlik(s.b)} × ${binlik(q)} + ${r} = ${binlik(s.a)}`);
+      if (!kalanSatir) satirlar.push(`🎉 Bölüm doğru: ${qYaz}. Kalanı da en alttaki satıra yazmayı unutma.`);
+      else if (/^\d+$/.test(kalanSatir.v.replace(/\s/g, "")) && BigInt(kalanSatir.v.replace(/\s/g, "")) === BigInt(r)) {
+        satirlar.push(`🎉 Doğru! ${once}${D.adimGerek ? "" : sayiYaz(D.Ea) + " ÷ " + binlik(D.B) + " = "}${qYaz}${D.adimGerek ? "" : ""}, kalan ${rYaz}`);
+        satirlar.push(saglama);
         for (let c = 0; c < n; c++) { const k = "k" + kalanSatir.i + ":" + c; if (s.hucre[k]) s.isaret[k] = "dogru"; }
       } else {
         ok = false;
-        satirlar.push(`Bölüm doğru (${binlik(q)}) ama en alttaki kalan yanlış. Kalan bölenden (${s.b}) küçük olmalı.`);
+        satirlar.push(`Bölüm doğru (${qYaz}) ama en alttaki kalan yanlış. Kalan bölenden (${binlik(D.B)}) küçük olmalı.`);
         for (let c = 0; c < n; c++) { const k = "k" + kalanSatir.i + ":" + c; if (s.hucre[k]) s.isaret[k] = "yanlis"; }
       }
     }
