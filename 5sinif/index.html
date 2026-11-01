@@ -181,5 +181,6 @@ window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); kuru
 document.getElementById("yukle").onclick = async () => { if (!kurulumIstegi) return; kurulumIstegi.prompt(); await kurulumIstegi.userChoice; kurulumIstegi = null; document.getElementById("yukle").hidden = true; };
 window.addEventListener("appinstalled", () => { document.getElementById("yukle").hidden = true; });
 </script>
+<script src="islem-alani.js"></script>
 </body>
 </html>
