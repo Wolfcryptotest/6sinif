@@ -1,5 +1,5 @@
 // ✏️ İşlem Alanı — soru ekranlarında açılan karalama defteri, alt alta 4 işlem şablonları ve ekran klavyesi.
-// Uygulama koduna dokunmaz: #ekran içinde soru (.soru, .soru-metni, .kagit, textarea) görünce köşede düğme çıkar.
+// Uygulama koduna dokunmaz: Matematik dersinde #ekran içinde soru (.soru, .soru-metni, .kagit, textarea) görünce köşede düğme çıkar.
 // Bütün sınıflarda (1–11) aynı dosya kullanılır.
 (function () {
   "use strict";
@@ -976,9 +976,44 @@ body.ia-dugmeli{padding-bottom:84px}
   window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (!panel.hidden && sekme === "karalama") boyutla(); }, 150); });
 
   // ---------------- Soru ekranını izleme ----------------
+  // Yalnızca Matematik derslerinde göster: hangi dersin içinde olunduğu başlıktan (ders sayfası, konu adı) ya da
+  // karma denemelerde sorunun üstündeki ders etiketinden anlaşılır.
+  const MAT = /matematik|geometri/i;
+  const dersler = () => {
+    try { if (typeof DERSLER !== "undefined" && Array.isArray(DERSLER)) return DERSLER.map((d) => ({ ad: d.ad, key: d.key })); } catch (e) { /* yok */ }
+    const D = window.DERS && typeof window.DERS === "object" ? window.DERS : {};
+    return Object.keys(D).map((k) => ({ ad: D[k] && D[k].ad, key: k })).filter((d) => d.ad);
+  };
+  function konuDersi(ad) { // konu adından dersi bul (5-12: ICERIK, 1-4: DERS.temalar)
+    const I = window.ICERIK || {}, D = window.DERS && typeof window.DERS === "object" ? window.DERS : {};
+    for (const [k, d] of Object.entries(I)) if ((d.uniteler || []).some((u) => u.konular.some((x) => x.ad === ad))) return (d.ad || k);
+    for (const d of Object.values(D)) if (d && (d.temalar || []).some((t) => (t.konular || []).some((x) => x.ad === ad))) return d.ad;
+    return null;
+  }
+  let dersBaglam = null, sonBaslik = null;
+  function dersBaglamGuncelle() {
+    const el = document.getElementById("baslik"), b = el ? el.textContent.trim() : "";
+    if (b === sonBaslik) return;
+    sonBaslik = b;
+    const t = b.replace(/^[^\p{L}\d]+/u, "").trim();
+    const d = dersler().find((x) => t === x.ad || t.startsWith(x.ad + " ·") || t.startsWith(x.ad + " Mini") || t.startsWith(x.ad + " Havuz"));
+    if (d) { dersBaglam = MAT.test(d.ad) || d.key === "matematik" ? "mat" : "diger"; return; }
+    const kd = konuDersi(t.replace(/^Test:\s*/, ""));
+    if (kd) { dersBaglam = MAT.test(kd) ? "mat" : "diger"; return; }
+    if (/Çalışma Merkezi|Oyunla Öğren/.test(b) || (window.SINIF && b === window.SINIF.baslik)) dersBaglam = null;
+  }
+  window.ISLEM_ALANI_DURUM = () => ({ ders: dersBaglam, baslik: sonBaslik });
+  function matematikMi() {
+    dersBaglamGuncelle();
+    const etiket = ekran.querySelector(".sayac + .not"); // LGS / YKS denemelerinde her sorunun dersi
+    if (etiket) { const ad = dersler().find((x) => etiket.textContent.includes(x.ad)); if (ad) return MAT.test(ad.ad); }
+    return dersBaglam === "mat";
+  }
+
   let imza = null;
   function soruVarMi() {
-    const var_ = !!ekran.querySelector(".soru, .soru-metni, .kagit textarea, #sec .secenek");
+    dersBaglamGuncelle(); // başlık her değiştiğinde (soru olmasa da) ders bağlamını güncelle
+    const var_ = !!ekran.querySelector(".soru, .soru-metni, .kagit textarea, #sec .secenek") && matematikMi();
     if (!var_) {
       if (!panel.hidden) kapat();
       dugme.hidden = true;
@@ -1000,5 +1035,7 @@ body.ia-dugmeli{padding-bottom:84px}
   }
   let bekle = 0;
   new MutationObserver(() => { cancelAnimationFrame(bekle); bekle = requestAnimationFrame(soruVarMi); }).observe(ekran, { childList: true, subtree: true, characterData: true });
+  const bEl = document.getElementById("baslik");
+  if (bEl) new MutationObserver(() => { cancelAnimationFrame(bekle); bekle = requestAnimationFrame(soruVarMi); }).observe(bEl, { childList: true, subtree: true, characterData: true });
   soruVarMi();
 })();
