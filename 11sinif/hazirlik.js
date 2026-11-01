@@ -78,15 +78,28 @@
   let secili = varsayilanSinav();
   const sinavBul = (id) => SINAVLAR.find((x) => x.id === id);
 
-  // Kapsam: 1. yazılı → dönemin ilk yarısı, 2. yazılı → dönemin tamamı (ünitede `yazili` alanı varsa o geçerli)
+  // Ünitenin dönemi: ünitede `donem` alanı → SINIF.donem[ders][sıra] → yoksa ilk yarı 1. dönem, ikinci yarı 2. dönem
+  const sayilan = (D) => D.uniteler.filter((u) => !/Kelime Havuzu|Ek Konu/i.test(u.ad));
+  function donemOf(dersKey, u) {
+    if (u.donem) return u.donem;
+    const L = sayilan(ICERIK[dersKey]), i = L.indexOf(u), ayar = S.donem && S.donem[dersKey];
+    if (ayar && ayar[i]) return ayar[i];
+    return i < Math.ceil(L.length / 2) ? 1 : 2;
+  }
+  // Kapsam: SINIF.kapsam[ders]["dönem-yazılı"] = [konu kimlikleri] (resmî konu-soru dağılımı) varsa o;
+  // yoksa 1. yazılı → dönemin ilk yarısı, 2. yazılı → dönemin tamamı
   function kapsam(dersKey, sinavId) {
     const sv = sinavBul(sinavId), D = ICERIK[dersKey];
-    const donem = D.uniteler.filter((u) => u.donem === sv.donem);
+    const ozel = S.kapsam && S.kapsam[dersKey] && S.kapsam[dersKey][sinavId];
+    if (ozel === "*") return sayilan(D);
+    if (ozel) return D.uniteler.map((u) => ({ ...u, konular: u.konular.filter((k) => ozel.includes(k.id)) })).filter((u) => u.konular.length);
+    const donem = sayilan(D).filter((u) => donemOf(dersKey, u) === sv.donem);
     if (!donem.length) return [];
     if (sv.yazili === 2) return donem;
     return donem.slice(0, Math.ceil(donem.length / 2));
   }
   const konularOf = (uniteler) => uniteler.flatMap((u) => u.konular);
+  const acikOf = (k) => (k.acik && k.acik.length ? k.acik : ((window.ACIK && window.ACIK[k.id]) || []).map((x) => (Array.isArray(x) ? { soru: x[0], cevap: x[1] } : x)));
   const ortakMi = (dersKey, sinavId) => (S.ortak || []).find((o) => o.ders === dersKey && `${o.donem}-${o.yazili}` === sinavId);
 
   // Konulara dengeli dağıtarak n soru (soruHazirla üreteçleri de kullanır)
@@ -98,7 +111,7 @@
     for (const [k, c] of adet) liste.push(...soruHazirla(k, c));
     return karistir(liste).slice(0, n);
   }
-  window.HAZIRLIK = { kapsam, konularOf, dagit, SINAVLAR, gunFark, tarihYaz };
+  window.HAZIRLIK = { kapsam, konularOf, dagit, SINAVLAR, gunFark, tarihYaz, donemOf, sayilan };
 
   // ---------- Ana sayfa kartı ----------
   window.ANA_KARTLAR = window.ANA_KARTLAR || [];
@@ -149,7 +162,7 @@
   // ---------- Ders + yazılı seçildi ----------
   function yaziliDers(dersKey) {
     const sv = sinavBul(secili), U = kapsam(dersKey, secili), K = konularOf(U), o = ortakMi(dersKey, secili);
-    const acikSay = K.reduce((a, k) => a + (k.acik || []).length, 0);
+    const acikSay = K.reduce((a, k) => a + acikOf(k).length, 0);
     ekran.innerHTML = `
       <h2>${esc(ICERIK[dersKey].ad)} — ${esc(sv.ad)}</h2>
       ${o ? `<div class="duyuru"><b>📢 Bu yazılı ülke geneli ortak sınav</b>${tarihYaz(o.bas)}${o.bit && o.bit !== o.bas ? " – " + tarihYaz(o.bit) : ""} · Sorular açık uçludur; cevabını gerekçesiyle, işlem adımlarıyla yaz.</div>` : ""}
@@ -184,7 +197,7 @@
   // ---------- Açık uçlu yazılı provası ----------
   function yaziliProvaSorulari(dersKey, n) {
     const K = konularOf(kapsam(dersKey, secili));
-    const havuzlar = karistir(K).map((k) => ({ k, acik: karistir(k.acik || []), test: karistir(k.sorular || []) }));
+    const havuzlar = karistir(K).map((k) => ({ k, acik: karistir(acikOf(k)), test: karistir(k.sorular || []) }));
     const sec = [];
     // Önce her konudan açık uçlu, bitince sırayla tekrar; açık uçlu yetmezse test sorusu şıksız sorulur
     for (let tur = 0; sec.length < n && tur < 6; tur++)
@@ -262,11 +275,14 @@
         ekran.innerHTML = `<div class="ozet">${puan}</div><p style="text-align:center">${puan >= 85 ? "🌟 Yazılıya hazırsın!" : puan >= 50 ? "👍 İyi gidiyor. Yarım/yanlış olan konuların özet notlarına bir daha bak." : "💪 Konu anlatımlarını tekrar edip yeni bir prova yap."}</p>
           <div class="satir" style="justify-content:center"><button class="btn" id="tekrar">🔄 Yeni Prova</button><button class="btn2" id="geriY">Yazılıya Hazırlık</button></div>`;
         $("tekrar").onclick = () => git(() => yaziliProva(dersKey), "✍️ Yazılı Provası", false);
-        $("geriY").onclick = () => { gecmis.length = 0; git(anaSayfa, S.baslik, false); git(yaziliAna, "📝 Yazılıya Hazırlık"); };
+        $("geriY").onclick = () => { gecmis.length = 0; git(anaSayfa, S.baslik || document.title, false); git(yaziliAna, "📝 Yazılıya Hazırlık"); };
       };
       $("yeni").onclick = () => git(() => yaziliProva(dersKey), "✍️ Yazılı Provası", false);
     };
     ciz();
     window.scrollTo(0, 0);
   }
+  // app.js ana sayfayı bu dosyadan önce çizdiyse kartlar görünsün diye yeniden çiz
+  window.ANA_YENILE = () => { if (typeof ekran !== "undefined" && ekran._son && ekran._son.fn === anaSayfa) git(anaSayfa, ekran._son.baslik, false); };
+  window.ANA_YENILE();
 })();

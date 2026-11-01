@@ -18,10 +18,10 @@
   // ---------- Ana sayfa kartı ----------
   window.ANA_KARTLAR = window.ANA_KARTLAR || [];
   window.ANA_KARTLAR.push((kutu) => {
-    const g = H.gunFark(L.tarih);
+    const g = L.tarih ? H.gunFark(L.tarih) : 0;
     const b = document.createElement("button");
     b.className = "ozel-kart lgs";
-    b.innerHTML = `<span class="ikon">🎯</span><span><b>LGS Hazırlık</b><small>${g > 0 ? `LGS'ye ${g} gün kaldı · ` : ""}Deneme, net takibi, soru havuzu</small></span>`;
+    b.innerHTML = `<span class="ikon">🎯</span><span><b>LGS Hazırlık</b><small>${g > 0 ? `LGS'ye ${g} gün kaldı · ` : L.altYazi ? esc(L.altYazi) + " · " : ""}Deneme, net takibi, soru havuzu</small></span>`;
     b.onclick = () => git(lgsAna, "🎯 LGS Hazırlık");
     kutu.appendChild(b);
   });
@@ -29,12 +29,13 @@
   // ---------- LGS ana ekranı ----------
   let kapsamTum = new Date().getMonth() + 1 >= 2 && new Date().getMonth() + 1 <= 7; // şubattan sonra tüm yıl
   function lgsAna() {
-    const g = H.gunFark(L.tarih), hv = tumHavuz();
+    const g = L.tarih ? H.gunFark(L.tarih) : 0, hv = tumHavuz();
+    const oturumYazi = L.oturumlar.map((o) => `${esc(o.ad)} oturum: ${o.dersler.map(([k, n]) => `${esc(dersAd(k))} ${n}`).join(", ")} soru (${o.sure} dk)`).join(" · ");
     const son = kayit.denemeler.slice(-10);
     const topNet = (dn) => Object.values(dn.dersler).reduce((a, x) => a + net(x), 0);
     const enCok = Math.max(1, ...son.map(topNet));
     ekran.innerHTML = `
-      <div class="duyuru"><b>🗓️ LGS: ${H.tarihYaz(L.tarih)}${L.tarihNot ? " " + esc(L.tarihNot) : ""}</b>${g > 0 ? `<span class="kalan">${g} gün kaldı</span> · ` : ""}Sözel oturum: Türkçe 20, İnkılap 10, Din 10, İngilizce 10 soru (75 dk) · Sayısal oturum: Matematik 20, Fen 20 soru (80 dk). 3 yanlış 1 doğruyu götürür.</div>
+      <div class="duyuru"><b>🗓️ ${L.tarih ? "LGS: " + H.tarihYaz(L.tarih) : esc(L.baslik || "LGS")}${L.tarihNot ? " " + esc(L.tarihNot) : ""}</b>${L.aciklama ? esc(L.aciklama) + "<br>" : ""}${g > 0 ? `<span class="kalan">${g} gün kaldı</span> · ` : ""}${oturumYazi}. 3 yanlış 1 doğruyu götürür.</div>
       <h2>Deneme Kapsamı</h2>
       <div class="secim"><span>Konular</span><button class="cip ${!kapsamTum ? "secili" : ""}" id="k1">1. dönem konuları</button><button class="cip ${kapsamTum ? "secili" : ""}" id="k2">Tüm yıl</button></div>
       <h2>📋 LGS Denemeleri</h2>
@@ -75,9 +76,9 @@
   // ---------- Deneme hazırlama ----------
   function dersSorulari(k, n) {
     const D = ICERIK[k]; if (!D) return [];
-    const U = D.uniteler.filter((u) => kapsamTum || u.donem === 1);
+    const U = H.sayilan(D).filter((u) => kapsamTum || H.donemOf(k, u) === 1);
     const havuz = karistir(tumHavuz().filter((s) => s.ders === k)).slice(0, Math.floor(n / 2)).map(havuzSoru);
-    const icerik = H.dagit(H.konularOf(U.length ? U : D.uniteler), n - havuz.length).map((s) => ({ ...s, ders: k }));
+    const icerik = H.dagit(H.konularOf(U.length ? U : H.sayilan(D)), n - havuz.length).map((s) => ({ ...s, ders: k }));
     return karistir([...havuz, ...icerik]);
   }
   function basla(oturumlar, ad) {
@@ -167,7 +168,7 @@
         }).join("") || `<p class="not">Bu filtrede soru yok.</p>`}
         <div class="satir"><button class="btn" id="lgsDon">🎯 LGS Hazırlık</button></div>`;
       ekran.querySelectorAll("[data-f]").forEach((b) => (b.onclick = () => { filtre = b.dataset.f; ciz(); }));
-      $("lgsDon").onclick = () => { gecmis.length = 0; git(anaSayfa, SINIF.baslik, false); git(lgsAna, "🎯 LGS Hazırlık"); };
+      $("lgsDon").onclick = () => { gecmis.length = 0; git(anaSayfa, SINIF.baslik || document.title, false); git(lgsAna, "🎯 LGS Hazırlık"); };
     }
     ciz();
   }
@@ -275,4 +276,5 @@
     $("fKaydet").onclick = () => { if (kaydetSoru()) { alert("✅ Soru havuza eklendi."); gecmis.pop(); git(havuzAna, "🗂️ Soru Havuzu", false); } };
     $("fYeni").onclick = () => { if (kaydetSoru()) { const ders = $("fDers").value, kaynak = $("fKaynak").value; git(soruEkle, "➕ Soru Ekle", false); $("fDers").value = ders; $("fKaynak").value = kaynak; } };
   }
+  if (window.ANA_YENILE) window.ANA_YENILE();
 })();

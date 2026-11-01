@@ -132,6 +132,7 @@ function anaSayfa() {
       <div class="hedef-alt">${hedefTamam(g) ? "🎉 Bugünün hedefi tamam! Yarın da gel, serin büyüsün." : h.kelime > 0 ? "Kelimeler İngilizce konularındaki Kelime Oyunu'ndan sayılır." : "Soru çözdükçe çubuk dolar."}</div>
       <button class="btn2" id="panel">📊 İlerleme Paneli</button>
     </div>
+    <div class="ozel-izgara" id="ozelKartlar"></div>
     <h2>Hangi dersi çalışalım?</h2>
     <div class="izgara" id="dersler"></div>
     <div class="satir">
@@ -150,6 +151,7 @@ function anaSayfa() {
   $("tekrar").onclick = () => yanlisSay ? git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") : alert("Harika! Tekrar edilecek yanlışın yok.");
   $("panel").onclick = () => git(ilerlemePaneli, "İlerleme Paneli");
   if (window.hikayeAnaKart) window.hikayeAnaKart(); // Günün Hikâyesi kartı (hikaye.js)
+  (window.ANA_KARTLAR || []).forEach((f) => f($("ozelKartlar"))); // Yazılıya Hazırlık, LGS (hazirlik.js, lgs.js)
 }
 
 // --- İlerleme paneli ---
