@@ -34,14 +34,16 @@
     const son = kayit.denemeler.slice(-10);
     const topNet = (dn) => Object.values(dn.dersler).reduce((a, x) => a + net(x), 0);
     const enCok = Math.max(1, ...son.map(topNet));
+    const TAM = L.tam === false ? [] : (L.tam || L.oturumlar.map((_, i) => i)).map((i) => L.oturumlar[i]);
+    const tamSoru = TAM.reduce((a, o) => a + o.dersler.reduce((b, x) => b + x[1], 0), 0), tamSure = TAM.reduce((a, o) => a + o.sure, 0);
     ekran.innerHTML = `
       <div class="duyuru"><b>🗓️ ${L.tarih ? "LGS: " + H.tarihYaz(L.tarih) : esc(L.baslik || "LGS")}${L.tarihNot ? " " + esc(L.tarihNot) : ""}</b>${L.aciklama ? esc(L.aciklama) + "<br>" : ""}${g > 0 ? `<span class="kalan">${g} gün kaldı</span> · ` : ""}${oturumYazi}. 3 yanlış 1 doğruyu götürür.</div>
       <h2>Deneme Kapsamı</h2>
       <div class="secim"><span>Konular</span><button class="cip ${!kapsamTum ? "secili" : ""}" id="k1">1. dönem konuları</button><button class="cip ${kapsamTum ? "secili" : ""}" id="k2">Tüm yıl</button></div>
       <h2>📋 LGS Denemeleri</h2>
       <div class="izgara">
-        ${L.oturumlar.map((o, i) => `<button class="kart oyun-mod" data-o="${i}" style="border-left-color:${i ? "#4f7cff" : "#e5484d"}"><span class="ikon">${i ? "🧮" : "📖"}</span><b>${esc(o.ad)} Oturum</b><span class="rozet">${o.dersler.map(([k, n]) => `${dersAd(k)} ${n}`).join(" · ")} · ${o.sure} dk</span></button>`).join("")}
-        <button class="kart oyun-mod" id="tam" style="border-left-color:#dc2626"><span class="ikon">🏁</span><b>Tam LGS Provası</b><span class="rozet">İki oturum art arda · 90 soru · 155 dk</span></button>
+        ${L.oturumlar.map((o, i) => `<button class="kart oyun-mod" data-o="${i}" style="border-left-color:${o.renk || (i ? "#4f7cff" : "#e5484d")}"><span class="ikon">${o.ikon || (i ? "🧮" : "📖")}</span><b>${esc(o.ad)} Oturum</b><span class="rozet">${o.dersler.map(([k, n]) => `${dersAd(k)} ${n}`).join(" · ")} · ${o.sure} dk</span></button>`).join("")}
+        ${TAM.length > 1 ? "" : "<!--"}<button class="kart oyun-mod" id="tam" style="border-left-color:#dc2626"><span class="ikon">🏁</span><b>Tam LGS Provası</b><span class="rozet">${TAM.map((o) => esc(o.ad)).join(" + ")} art arda · ${tamSoru} soru · ${tamSure} dk</span></button>${TAM.length > 1 ? "" : "-->"}
       </div>
       <h2>⚡ Ders Bazlı Mini Deneme</h2>
       <div class="izgara" id="mini"></div>
@@ -59,11 +61,12 @@
     $("k1").onclick = () => { kapsamTum = false; git(lgsAna, "🎯 LGS Hazırlık", false); };
     $("k2").onclick = () => { kapsamTum = true; git(lgsAna, "🎯 LGS Hazırlık", false); };
     ekran.querySelectorAll("[data-o]").forEach((b) => (b.onclick = () => { const o = L.oturumlar[+b.dataset.o]; basla([o], o.ad + " Oturum"); }));
-    $("tam").onclick = () => basla(L.oturumlar, "Tam LGS Provası");
+    if ($("tam")) $("tam").onclick = () => basla(TAM, "Tam LGS Provası");
     $("havuz").onclick = () => git(havuzAna, "🗂️ Soru Havuzu");
-    const mini = $("mini");
+    const mini = $("mini"), miniVar = new Set();
     L.oturumlar.forEach((o) => o.dersler.forEach(([k, n]) => {
-      if (!ICERIK[k]) return;
+      if (!ICERIK[k] || miniVar.has(k)) return;
+      miniVar.add(k);
       const d = dersBilgi(k), b = document.createElement("button");
       b.className = "kart ders"; b.style.setProperty("--renk", d.renk);
       const dk = Math.round((o.sure / o.dersler.reduce((a, x) => a + x[1], 0)) * 10);

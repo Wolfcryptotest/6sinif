@@ -14,6 +14,7 @@
 .ozel-kart .ikon{font-size:40px}.ozel-kart small{display:block;opacity:.9;font-size:15px;margin-top:2px}
 .ozel-kart.yazili{background:linear-gradient(135deg,#2563eb,#4f46e5)}
 .ozel-kart.lgs{background:linear-gradient(135deg,#dc2626,#ea580c)}
+.ozel-kart.yks{background:linear-gradient(135deg,#0f766e,#7c3aed)}
 .duyuru{background:color-mix(in srgb,#f59e0b 14%,var(--kart));border:1px solid color-mix(in srgb,#f59e0b 45%,var(--sinir));border-radius:16px;padding:14px 16px;margin:0 0 16px}
 .duyuru b{display:block;margin-bottom:4px}
 .duyuru .btn2{margin-top:10px;padding:10px 16px;font-size:17px}
