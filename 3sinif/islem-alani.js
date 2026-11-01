@@ -44,7 +44,22 @@ body.ia-dugmeli{padding-bottom:84px}
 .ia-op{font:700 26px system-ui,sans-serif}
 .ia-izgara-kap{overflow-x:auto;padding:6px 2px 10px}
 .ia-izgara{display:inline-grid;gap:3px;background:#fffef8;padding:10px;border-radius:12px;border:1px solid #d9dde5;color:#111827}
-.ia-h{width:40px;height:44px;border:1.5px solid #c7d0dd;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;font:700 24px ui-monospace,Menlo,Consolas,monospace;cursor:pointer;user-select:none}
+.ia-adim{background:#fffef8;color:#111827;border:1px solid #d9dde5;border-radius:12px;padding:8px 10px;margin:0 0 8px}
+.ia-adim>b{display:block;font-size:14px;margin-bottom:6px;color:#334155}
+.ia-adim .ia-not{font-size:13px;color:#64748b;margin-top:4px}
+.ia-satir{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ia-kesir{display:inline-flex;align-items:center;gap:4px}
+.ia-kd{display:inline-flex;flex-direction:column;align-items:stretch;gap:3px}
+.ia-kd .ia-kc{height:3px;background:#334155;border-radius:2px}
+.ia-kg{min-width:48px;min-height:38px;padding:2px 6px;border:2px dashed #94a3b8;border-radius:8px;background:#fff;color:#111827;font:700 20px ui-monospace,Menlo,Consolas,monospace;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ia-kg.tam{min-height:46px;font-size:24px}
+.ia-kg.secili{border-style:solid;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.2)}
+.ia-kg.dogru{border-style:solid;border-color:#16a34a;background:#dcfce7}
+.ia-kg.yanlis{border-style:solid;border-color:#dc2626;background:#fee2e2}
+.ia-kg.gosterilen{color:#2563eb}
+.ia-kg:empty::before{content:attr(data-bos);color:#94a3b8;font:500 12px system-ui,sans-serif}
+.ia-virgul{position:absolute;right:-8px;bottom:-4px;font:800 26px system-ui,sans-serif;color:#dc2626;pointer-events:none}
+.ia-h{position:relative;width:40px;height:44px;border:1.5px solid #c7d0dd;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;font:700 24px ui-monospace,Menlo,Consolas,monospace;cursor:pointer;user-select:none}
 .ia-h.kucuk{height:28px;font-size:16px;border-style:dashed;color:#7c3aed}
 .ia-h.sabit{background:#eef2ff;border-color:#c7d2fe;cursor:default}
 .ia-h.kapali{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 4px,#e2e8f0 4px,#e2e8f0 8px);border-color:#e2e8f0;cursor:default}
@@ -96,7 +111,7 @@ body.ia-dugmeli{padding-bottom:84px}
 
   const ekran = document.getElementById("ekran") || document.querySelector("main") || document.body;
   const SEKMELER = [
-    ["karalama", "✏️ Karalama"], ["topla", "➕ Toplama"], ["cikar", "➖ Çıkarma"], ["carp", "✖️ Çarpma"], ["bol", "➗ Bölme"]
+    ["karalama", "✏️ Karalama"], ["topla", "➕ Toplama"], ["cikar", "➖ Çıkarma"], ["carp", "✖️ Çarpma"], ["bol", "➗ Bölme"], ["kesir", "½ Kesir"]
   ];
   let sekme = oku("sekme", "karalama");
   if (!SEKMELER.some((s) => s[0] === sekme)) sekme = "karalama";
@@ -183,10 +198,10 @@ body.ia-dugmeli{padding-bottom:84px}
     };
     const ana = h("div", { class: "ia-tuslar" });
     const duzen = sablon
-      ? [["7", "8", "9", "⌫", "↑", "Sıfırla"], ["4", "5", "6", "←", "→", "↓"], ["1", "2", "3", "0", "Sonraki", "Tamam"]]
+      ? [["7", "8", "9", "⌫", ",", "Sıfırla"], ["4", "5", "6", "←", "→", "↑"], ["1", "2", "3", "0", "Sonraki", "Tamam"]]
       : [["7", "8", "9", "+", "−", "⌫"], ["4", "5", "6", "×", "÷", "="], ["1", "2", "3", "0", ",", "␣"]];
     for (const satir of duzen) for (const k of satir) {
-      const gri = /[⌫←→↑↓]|Sıfırla|Sonraki|Tamam|␣/.test(k);
+      const gri = /[⌫←→↑↓]|Sıfırla|Sonraki|Tamam|␣/.test(k) || (sablon && k === ",");
       const etiket = k === "Sıfırla" ? "🧹" : k === "Sonraki" ? "⏭️" : k === "Tamam" ? "✅" : k === "␣" ? "boşluk" : k;
       const b = tus(etiket, k, gri ? "gri" : "");
       if (k === "Sıfırla") b.title = "Seçili kutuyu boşalt";
@@ -212,7 +227,7 @@ body.ia-dugmeli{padding-bottom:84px}
       klavyeCiz(); karalamaIpucu();
       return;
     }
-    sablonTus(k);
+    if (sekme === "kesir") kesirTus(k); else sablonTus(k);
   }
 
   // ---------------- Karalama defteri ----------------
@@ -340,32 +355,53 @@ body.ia-dugmeli{padding-bottom:84px}
   const SINIR = { topla: [7, 7], cikar: [7, 7], carp: [5, 3], bol: [6, 3] };
   const OP = { topla: "+", cikar: "−", carp: "×", bol: "÷" };
   const BASAMAK = ["B", "O", "Y", "Bb", "Ob", "Yb", "M", "OM"];
+  const ONDALIK = ["⅒", "1/100", "1/1000"];
+  // Ondalık sayılar: "12,5" → rakamlar "125", virgülden sonra 1 basamak
+  const rak = (x) => x.replace(",", "");
+  const rakC = (x) => rak(x).replace(/^0+(?=\d)/, ""); // çarpmada baştaki sıfırlar (0,3 → 3) satır açmaz
+  const ond = (x) => (x.includes(",") ? x.length - x.indexOf(",") - 1 : 0);
+  const tamK = (x) => (x.includes(",") ? x.indexOf(",") : x.length);
+  const ondF = (tur, s) => (tur === "carp" ? ond(s.a) + ond(s.b) : Math.max(ond(s.a), ond(s.b)));
+  const olcekli = (x, F) => BigInt(rak(x) || "0") * 10n ** BigInt(F - ond(x));
+  // Sayının p. sütundaki rakamı (p = 0 en sağdaki sütun). Toplama/çıkarmada virgüller hizalanır, çarpmada sayılar sağa yaslanır.
+  function rakamAt(tur, x, p, F) {
+    const d = rak(x), kay = tur === "carp" ? 0 : F - ond(x), i = d.length - 1 - (p - kay);
+    return i >= 0 && i < d.length ? d[i] : "";
+  }
+  // Ekranda gösterim: binlik ayırıcı nokta, ondalık virgül
+  const sayiYaz = (x) => { const [t, o] = String(x).split(","); return binlik(t) + (o != null && o !== "" ? "," + o : ""); };
+  const olcekliYaz = (str, F) => { if (!F) return binlik(str.replace(/^0+(?=\d)/, "")); const t = str.slice(0, -F).replace(/^0+(?=\d)/, "") || "0", o = str.slice(-F).replace(/0+$/, ""); return binlik(t) + (o ? "," + o : ""); };
 
   // Şablonun satır yapısını üretir. Satır: { id, tur: "sayi"|"hucre"|"kucuk"|"cizgi", isaret, kapali:[sütunlar], yon: -1|1, kontrol }
   function yapi(tur, s) {
     const a = s.a, b = s.b;
     if (tur === "bol") return null;
-    const genis = tur === "topla" ? Math.max(a.length, b.length, 1) + 1 : tur === "cikar" ? Math.max(a.length, b.length, 1) : Math.max(a.length + b.length, 2);
+    const F = ondF(tur, s);
+    const genis = tur === "topla" ? Math.max(tamK(a), tamK(b), 1) + 1 + F : tur === "cikar" ? Math.max(tamK(a), tamK(b), 1) + F : Math.max(rakC(a).length + rakC(b).length, F + 1, 2);
     const sat = [];
     if (tur === "topla" || tur === "carp") sat.push({ id: "elde", tur: "kucuk", etiket: "elde", yon: -1 });
     if (tur === "cikar") sat.push({ id: "bozma", tur: "kucuk", etiket: "bozma", yon: -1 });
     sat.push({ id: "a", tur: "sayi", deger: a });
     sat.push({ id: "b", tur: "sayi", deger: b, isaret: OP[tur] });
     sat.push({ tur: "cizgi" });
-    if (tur === "carp" && b.length > 1) {
-      for (let i = 0; i < b.length; i++) sat.push({ id: "ara" + i, tur: "hucre", yon: -1, kapali: i, isaret: i === b.length - 1 ? "+" : "", ara: i });
+    const bn = rakC(b).length;
+    if (tur === "carp" && bn > 1) {
+      for (let i = 0; i < bn; i++) sat.push({ id: "ara" + i, tur: "hucre", yon: -1, kapali: i, isaret: i === bn - 1 ? "+" : "", ara: i });
       sat.push({ tur: "cizgi" });
     }
     sat.push({ id: "sonuc", tur: "hucre", yon: -1, kontrol: true });
-    return { genis, sat };
+    return { genis, sat, F };
   }
 
+  // Doğru sonuç: virgülsüz rakam dizisi, en az F+1 basamak (ör. 0,75 → "075", F = 2)
   function dogruSonuc(tur, s) {
-    const a = BigInt(s.a || "0"), b = BigInt(s.b || "0");
-    if (tur === "topla") return String(a + b);
-    if (tur === "cikar") return String(a - b);
-    if (tur === "carp") return String(a * b);
-    return null;
+    const F = ondF(tur, s);
+    let v;
+    if (tur === "topla") v = olcekli(s.a, F) + olcekli(s.b, F);
+    else if (tur === "cikar") v = olcekli(s.a, F) - olcekli(s.b, F);
+    else if (tur === "carp") v = BigInt(rak(s.a) || "0") * BigInt(rak(s.b) || "0");
+    else return null;
+    return String(v).padStart(F + 1, "0");
   }
 
   function sablonCiz() {
@@ -373,7 +409,7 @@ body.ia-dugmeli{padding-bottom:84px}
     const [ma, mb] = SINIR[sekme];
     const adlar = sekme === "bol" ? ["Bölünen", "Bölen"] : sekme === "cikar" ? ["Eksilen", "Çıkan"] : sekme === "carp" ? ["1. çarpan", "2. çarpan"] : ["1. sayı", "2. sayı"];
     const giris = (ad, i) => {
-      const el = h("div", { class: "ia-giris" + (s.secim.tur === "giris" && s.secim.ad === ad ? " secili" : ""), role: "textbox", tabindex: "0", "data-bos": `${adlar[i]} (en çok ${i ? mb : ma} basamak)`, "aria-label": adlar[i] }, s[ad]);
+      const el = h("div", { class: "ia-giris" + (s.secim.tur === "giris" && s.secim.ad === ad ? " secili" : ""), role: "textbox", tabindex: "0", "data-bos": adlar[i], "aria-label": adlar[i] }, s[ad]);
       el.onclick = () => { s.secim = { tur: "giris", ad }; sablonCiz(); };
       return el;
     };
@@ -395,28 +431,31 @@ body.ia-dugmeli{padding-bottom:84px}
 
   function ipucuMetni() {
     return {
-      topla: "Sayıları yaz, sonra birler basamağından başlayarak topla. Eldeyi üstteki küçük kutulara yazabilirsin.",
+      topla: "Sayıları yaz (ondalık için , tuşu), sonra en sağdaki basamaktan başlayarak topla. Eldeyi üstteki küçük kutulara yazabilirsin.",
       cikar: "Eksileni ve çıkanı yaz. Birler basamağından başla; onluk bozduğunda yeni rakamı üstteki küçük kutuya yaz.",
-      carp: "Çarpanları yaz. 2. çarpanın her basamağı için bir satır var; taralı kutular boş kalır. Sonra satırları topla.",
+      carp: "Çarpanları yaz (ondalık olabilir). 2. çarpanın her basamağı için bir satır var; taralı kutular boş kalır. Sonra satırları topla.",
       bol: "Bölüneni ve böleni yaz. Bölümü sağdaki çizginin altına, çarpma ve çıkarma adımlarını soldaki kutulara yaz."
     }[sekme];
   }
 
   // Sayı satırındaki rakamı sağa yaslanmış olarak göster
   function izgara(s) {
-    const { genis, sat } = yapi(sekme, s);
+    const { genis, sat, F } = yapi(sekme, s);
     const g = h("div", { class: "ia-izgara", style: `grid-template-columns:32px repeat(${genis},40px)` });
+    const etiket = (p) => (sekme === "carp" && F ? "" : p >= F ? BASAMAK[p - F] || "" : ONDALIK[F - 1 - p] || "");
+    const virgul = (el) => { el.append(h("span", { class: "ia-virgul", "aria-hidden": "true", text: "," })); return el; };
     // basamak etiketleri
     g.append(h("div"));
-    for (let c = 0; c < genis; c++) g.append(h("div", { class: "ia-etiket", text: BASAMAK[genis - 1 - c] || "" }));
+    for (let c = 0; c < genis; c++) g.append(h("div", { class: "ia-etiket", text: etiket(genis - 1 - c) }));
     for (const r of sat) {
       if (r.tur === "cizgi") { g.append(h("div", { class: "ia-cizgi", style: `grid-column:1 / span ${genis + 1}` })); continue; }
       g.append(h("div", { class: "ia-isaret", text: r.isaret || "" }));
       for (let c = 0; c < genis; c++) {
         const sagdan = genis - 1 - c; // 0 = birler
         if (r.tur === "sayi") {
-          const d = r.deger, i = d.length - 1 - sagdan;
-          g.append(h("div", { class: "ia-h sabit", "aria-label": `${r.id === "a" ? "1." : "2."} sayının ${BASAMAK[sagdan]} basamağı` }, i >= 0 ? d[i] : ""));
+          const x = r.deger, el = h("div", { class: "ia-h sabit", "aria-label": `${r.id === "a" ? "1." : "2."} sayı, ${etiket(sagdan)}` }, rakamAt(sekme, x, sagdan, F));
+          if (ond(x) > 0 && sagdan === (sekme === "carp" ? ond(x) : F)) virgul(el);
+          g.append(el);
           continue;
         }
         const kapali = r.ara != null && sagdan < r.ara;
@@ -426,7 +465,8 @@ body.ia-dugmeli{padding-bottom:84px}
         if (kapali) sinif.push("kapali");
         if (s.secim.tur === "hucre" && s.secim.anahtar === anahtar) sinif.push("secili");
         if (s.isaret[anahtar]) sinif.push(s.isaret[anahtar]);
-        const el = h("div", { class: sinif.join(" "), "data-a": anahtar, "aria-label": `${r.etiket || (r.id === "sonuc" ? "sonuç" : "ara çarpım")} ${BASAMAK[sagdan] || ""}` }, kapali ? "" : s.hucre[anahtar] || "");
+        const el = h("div", { class: sinif.join(" "), "data-a": anahtar, "aria-label": `${r.etiket || (r.id === "sonuc" ? "sonuç" : "ara çarpım")} ${etiket(sagdan)}` }, kapali ? "" : s.hucre[anahtar] || "");
+        if (r.id === "sonuc" && F > 0 && sagdan === F) virgul(el);
         if (!kapali) el.onclick = () => { s.secim = { tur: "hucre", anahtar, satir: r.id }; sablonCiz(); };
         g.append(el);
       }
@@ -518,8 +558,12 @@ body.ia-dugmeli{padding-bottom:84px}
     if (s.secim.tur === "giris") {
       const ad = s.secim.ad, sinir = ad === "a" ? ma : mb;
       if (/^\d$/.test(k)) {
-        if (s[ad].length >= sinir) { s.mesaj = { tur: "bilgi", satirlar: [`Bu kutuya en çok ${sinir} basamaklı sayı yazılabilir.`] }; }
-        else if (!(s[ad] === "0")) s[ad] += k; else s[ad] = k;
+        const x = s[ad];
+        if (x.includes(",") ? ond(x) >= 3 : x.length >= sinir) s.mesaj = { tur: "bilgi", satirlar: [x.includes(",") ? "Virgülden sonra en çok 3 basamak yazılabilir." : `Bu kutuya en çok ${sinir} basamaklı sayı yazılabilir.`] };
+        else if (x === "0") s[ad] = k; else s[ad] += k;
+      } else if (k === ",") {
+        if (sekme === "bol") s.mesaj = { tur: "bilgi", satirlar: ["Bölme şablonu şimdilik doğal sayılarla çalışır."] };
+        else if (!s[ad].includes(",")) s[ad] = (s[ad] || "0") + ",";
       } else if (k === "⌫") s[ad] = s[ad].slice(0, -1);
       else if (k === "Sıfırla") s[ad] = "";
       else if (k === "→" || k === "Sonraki" || k === "↓") {
@@ -560,7 +604,7 @@ body.ia-dugmeli{padding-bottom:84px}
     const s = SB[sekme];
     if (!(s.a && s.b)) return;
     s.secim = sekme === "bol" ? { tur: "hucre", anahtar: "bolum:0", satir: "bolum" }
-      : (sekme === "carp" && s.b.length > 1) ? { tur: "hucre", anahtar: "ara0:0", satir: "ara0" } : { tur: "hucre", anahtar: "sonuc:0", satir: "sonuc" };
+      : (sekme === "carp" && rakC(s.b).length > 1) ? { tur: "hucre", anahtar: "ara0:0", satir: "ara0" } : { tur: "hucre", anahtar: "sonuc:0", satir: "sonuc" };
   }
 
   // Satırdaki rakamları sağdan okuyup sayıya çevirir (boşlukları atlamaz: arada boş varsa geçersiz)
@@ -575,21 +619,25 @@ body.ia-dugmeli{padding-bottom:84px}
   function kontrolEt(goster) {
     const s = SB[sekme];
     s.isaret = {};
-    if (!(s.a && s.b)) { s.mesaj = { tur: "bilgi", satirlar: ["Önce iki sayıyı da yaz."] }; sablonCiz(); return; }
+    if (!(s.a && s.b) || s.a.endsWith(",") || s.b.endsWith(",")) { s.mesaj = { tur: "bilgi", satirlar: [s.a.endsWith(",") || s.b.endsWith(",") ? "Virgülden sonra en az bir rakam yaz." : "Önce iki sayıyı da yaz."] }; sablonCiz(); return; }
     if (sekme === "bol") { bolmeKontrol(s, goster); sablonCiz(); return; }
-    if (sekme === "cikar" && BigInt(s.a) < BigInt(s.b)) {
-      s.mesaj = { tur: "kotu", satirlar: ["Eksilen, çıkandan küçük. Doğal sayılarda büyük sayıdan küçük sayı çıkarılır; sayıların yerini kontrol et."] };
+    const { genis, F } = yapi(sekme, s);
+    if (sekme === "cikar" && olcekli(s.a, F) < olcekli(s.b, F)) {
+      s.mesaj = { tur: "kotu", satirlar: ["Eksilen, çıkandan küçük. Büyük sayıdan küçük sayı çıkarılır; sayıların yerini kontrol et."] };
       sablonCiz(); return;
     }
-    const { genis } = yapi(sekme, s);
     const dogru = dogruSonuc(sekme, s);
+    // Ondalık kısmın sonundaki sıfırlar yazılmasa da olur (2,50 = 2,5)
+    let sonSifir = 0;
+    while (sonSifir < F && dogru[dogru.length - 1 - sonSifir] === "0") sonSifir++;
     const satirlar = [];
     // ara çarpımlar (çarpma, 2+ basamaklı çarpan)
     let araHata = 0;
-    if (sekme === "carp" && s.b.length > 1) {
-      for (let i = 0; i < s.b.length; i++) {
-        const basamak = s.b[s.b.length - 1 - i];
-        const ara = String(BigInt(s.a) * BigInt(basamak));
+    const ra = rakC(s.a), rb = rakC(s.b);
+    if (sekme === "carp" && rb.length > 1) {
+      for (let i = 0; i < rb.length; i++) {
+        const basamak = rb[rb.length - 1 - i];
+        const ara = String(BigInt(ra) * BigInt(basamak));
         for (let c = i; c < genis; c++) {
           const anahtar = "ara" + i + ":" + c, j = ara.length - 1 - (c - i);
           const beklenen = j >= 0 ? ara[j] : "";
@@ -607,6 +655,8 @@ body.ia-dugmeli{padding-bottom:84px}
     for (let c = 0; c < genis; c++) {
       const anahtar = "sonuc:" + c, j = dogru.length - 1 - c, beklenen = j >= 0 ? dogru[j] : "";
       const v = s.hucre[anahtar] || "";
+      const sondaSifir = c < sonSifir; // ondalık kısmın sonundaki 0
+      if (sondaSifir && !v) continue;
       if (goster && beklenen && v !== beklenen) { s.hucre[anahtar] = beklenen; s.isaret[anahtar] = "gosterilen"; continue; }
       if (!v && !beklenen) continue;
       if (!v) { bos++; s.isaret[anahtar] = "yanlis"; continue; }
@@ -617,11 +667,13 @@ body.ia-dugmeli{padding-bottom:84px}
     const isim = { topla: "Toplam", cikar: "Fark", carp: "Çarpım" }[sekme];
     if (goster) {
       s.gosterildi = true;
-      s.mesaj = { tur: "bilgi", satirlar: [`${isim}: ${binlik(dogru)}`, "Mavi rakamlar cevaptır. Bir sonraki işlemde kendin dene!"] };
+      s.mesaj = { tur: "bilgi", satirlar: [`${isim}: ${olcekliYaz(dogru, F)}`, "Mavi rakamlar cevaptır. Bir sonraki işlemde kendin dene!"] };
     } else if (!hata && !bos && !araHata) {
-      satirlar.push(`🎉 Doğru! ${binlik(s.a)} ${OP[sekme]} ${binlik(s.b)} = ${binlik(dogru)}`);
-      if (sekme === "cikar") satirlar.push(`Sağlama: ${binlik(dogru)} + ${binlik(s.b)} = ${binlik(s.a)}`);
-      if (sekme === "topla") satirlar.push(`Sağlama: ${binlik(dogru)} − ${binlik(s.b)} = ${binlik(s.a)}`);
+      const sn = olcekliYaz(dogru, F);
+      satirlar.push(`🎉 Doğru! ${sayiYaz(s.a)} ${OP[sekme]} ${sayiYaz(s.b)} = ${sn}`);
+      if (sekme === "cikar") satirlar.push(`Sağlama: ${sn} + ${sayiYaz(s.b)} = ${sayiYaz(s.a)}`);
+      if (sekme === "topla") satirlar.push(`Sağlama: ${sn} − ${sayiYaz(s.b)} = ${sayiYaz(s.a)}`);
+      if (sekme === "carp" && F) satirlar.push(`Virgülden sonra ${ond(s.a)} + ${ond(s.b)} = ${F} basamak sayıldı.`);
       s.mesaj = { tur: "iyi", satirlar };
     } else {
       if (araHata) satirlar.push(`Ara çarpımlarda ${araHata} hatalı rakam var (kırmızı).`);
@@ -629,7 +681,8 @@ body.ia-dugmeli{padding-bottom:84px}
       if (bos) satirlar.push(`${bos} kutu boş kaldı.`);
       if (sekme === "topla") satirlar.push("İpucu: Bir basamağın toplamı 10 ya da daha büyükse birlerini yaz, onluğunu elde olarak sola aktar.");
       if (sekme === "cikar") satirlar.push("İpucu: Üstteki rakam alttakinden küçükse soldaki basamaktan 1 onluk boz.");
-      if (sekme === "carp") satirlar.push("İpucu: Her ara çarpımı bir basamak sola kaydırarak yaz, sonra hepsini topla.");
+      if (sekme === "carp") satirlar.push("İpucu: Her ara çarpımı bir basamak sola kaydırarak yaz, sonra hepsini topla." + (F ? " Virgülleri yok sayarak çarp; sonuçta virgülden sonra " + F + " basamak say." : ""));
+      if (F && sekme !== "carp") satirlar.push("Ondalık sayılarda virgüller alt alta gelir; sonuçtaki virgül de aynı hizadadır.");
       s.mesaj = { tur: "kotu", satirlar };
     }
     sablonCiz();
@@ -680,22 +733,186 @@ body.ia-dugmeli{padding-bottom:84px}
 
   const binlik = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
+  // ---------------- ½ Kesir işlemleri ----------------
+  // Alanlar: aT aP aD (1. kesir: tam, pay, payda), bT bP bD ve adım alanları; boş bırakılan "tam" yok sayılır.
+  const KS = { op: "+", f: {}, secim: "aP", isaret: {}, mesaj: null };
+  const BN = (x) => BigInt(x);
+  const ebob = (a, b) => { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) [a, b] = [b, a % b]; return a; };
+  const ekok = (a, b) => (a / ebob(a, b)) * b;
+  const sade = ([p, d]) => { if (d < 0n) { p = -p; d = -d; } const g = ebob(p, d) || 1n; return [p / g, d / g]; };
+  const esit = (x, y) => Array.isArray(x) && Array.isArray(y) && x[0] * y[1] === y[0] * x[1];
+  // Alanlardan kesir değeri: tam + pay/payda → [pay, payda]; eksikse null, payda 0 ise "sifir"
+  function kesirOku(on, tamVar = true) {
+    const f = KS.f, T = tamVar ? f[on + "T"] : "", P = f[on + "P"], D = f[on + "D"];
+    if (!D && !P && T) return [BN(T), 1n];
+    if (!P || !D) return null;
+    if (BN(D) === 0n) return "sifir";
+    return [BN(T || "0") * BN(D) + BN(P), BN(D)];
+  }
+  const kYaz = (k) => { const [p, d] = sade(k); if (d === 1n) return String(p); const t = p / d, kalan = p % d; return t && kalan ? `${t} tam ${kalan}/${d}` : `${p}/${d}`; };
+
+  function kesirAdimlari() {
+    const f = KS.f, op = KS.op, tamA = !!f.aT, tamB = !!f.bT, adim = [];
+    if (tamA || tamB) adim.push({ id: "bil", baslik: "Tam sayılı kesri bileşik kesre çevir", kesirler: [...(tamA ? [["A", "1. kesir"]] : []), ...(tamB ? [["B", "2. kesir"]] : [])], not: "Tam sayı × payda + pay → yeni pay; payda aynı kalır." });
+    if (op === "+" || op === "−") adim.push({ id: "es", baslik: "Paydaları eşitle", kesirler: [["E1", "1. kesir"], ["E2", "2. kesir"]], not: "Paydaların ortak katını bul; pay ve paydayı aynı sayıyla genişlet." });
+    if (op === "÷") adim.push({ id: "ters", baslik: "İkinci kesri ters çevir, çarpmaya dönüştür", kesirler: [["TB", "ters kesir"]], not: "Bölmede birinci kesir aynen yazılır, ikinci kesir ters çevrilip çarpılır." });
+    adim.push({ id: "son", baslik: op === "×" || op === "÷" ? "Payları ve paydaları çarp" : op === "+" ? "Payları topla, paydayı aynen yaz" : "Payları çıkar, paydayı aynen yaz", kesirler: [["R", "sonuç"]] });
+    adim.push({ id: "sade", baslik: "Sadeleştir / tam sayılı kesir olarak yaz (gerekiyorsa)", kesirler: [["S", "en sade hâli", true]], not: "Pay ve paydayı ortak bölenlerine böl. Pay paydadan büyükse tam sayılı kesir yaz." });
+    return adim;
+  }
+  // Gezinme sırası
+  function kesirAlanlari() {
+    const L = ["aT", "aP", "aD", "bT", "bP", "bD"];
+    for (const a of kesirAdimlari()) for (const [k, , tam] of a.kesirler) { if (tam) L.push(k + "T"); L.push(k + "P", k + "D"); }
+    return L;
+  }
+
+  function kesirCiz() {
+    const f = KS.f;
+    const alan = (ad, bos, tam = false) => {
+      const sinif = ["ia-kg"]; if (tam) sinif.push("tam");
+      if (KS.secim === ad) sinif.push("secili");
+      if (KS.isaret[ad]) sinif.push(KS.isaret[ad]);
+      const el = h("div", { class: sinif.join(" "), role: "textbox", "data-a": ad, "data-bos": bos, "aria-label": bos }, f[ad] || "");
+      el.onclick = () => { KS.secim = ad; kesirCiz(); };
+      return el;
+    };
+    const kesirKutu = (on, tamVar, etiket) => h("span", { class: "ia-kesir", "aria-label": etiket },
+      tamVar ? alan(on + "T", "tam", true) : null,
+      h("span", { class: "ia-kd" }, alan(on + "P", "pay"), h("span", { class: "ia-kc" }), alan(on + "D", "payda")));
+    const opler = h("div", { class: "ia-arac" }, h("span", { class: "ia-ipucu", text: "İşlem:" }));
+    for (const o of ["+", "−", "×", "÷"]) {
+      const b = h("button", { class: "ia-k" + (KS.op === o ? " secili" : ""), type: "button", "data-op": o, style: "min-width:44px;font-size:20px" }, o);
+      b.onclick = () => { KS.op = o; KS.isaret = {}; KS.mesaj = null; kesirCiz(); };
+      opler.append(b);
+    }
+    const parca = [h("div", { class: "ia-ipucu", text: "Kesirleri yaz (tam sayılı kesirse tam kısmı soldaki büyük kutuya), sonra adımları sırayla doldur." }), opler,
+      h("div", { class: "ia-adim" }, h("b", { text: "Soru" }), h("div", { class: "ia-satir" }, kesirKutu("a", true, "1. kesir"), h("span", { class: "ia-op", text: KS.op }), kesirKutu("b", true, "2. kesir")))];
+    const A = kesirOku("a"), B = kesirOku("b");
+    if (Array.isArray(A) && Array.isArray(B)) {
+      for (const [i, a] of kesirAdimlari().entries()) {
+        const sat = h("div", { class: "ia-satir" });
+        if (a.id === "ters") sat.append(h("span", { class: "ia-ipucu", text: "1. kesir  ×" }));
+        a.kesirler.forEach(([on, etiket, tam], j) => {
+          if (j) sat.append(h("span", { class: "ia-op", text: a.id === "es" ? KS.op : "·" }));
+          sat.append(kesirKutu(on, !!tam, etiket));
+        });
+        parca.push(h("div", { class: "ia-adim" }, h("b", { text: `${i + 1}. ${a.baslik}` }), sat, a.not ? h("div", { class: "ia-not", text: a.not }) : null));
+      }
+      const arac = h("div", { class: "ia-arac" });
+      const kontrol = h("button", { class: "ia-k", type: "button" }, "✅ Kontrol et");
+      const goster = h("button", { class: "ia-k", type: "button" }, "👁️ Cevabı göster");
+      const temizle = h("button", { class: "ia-k", type: "button" }, "🗑️ Yeni işlem");
+      kontrol.onclick = () => kesirKontrol(false); goster.onclick = () => kesirKontrol(true);
+      temizle.onclick = () => { KS.f = {}; KS.isaret = {}; KS.mesaj = null; KS.secim = "aP"; kesirCiz(); };
+      arac.append(kontrol, goster, temizle);
+      parca.push(arac);
+    } else parca.push(h("div", { class: "ia-ipucu" + (A === "sifir" || B === "sifir" ? " uyari" : ""), text: A === "sifir" || B === "sifir" ? "Payda 0 olamaz." : "İki kesrin pay ve paydasını yazınca adımlar açılır." }));
+    if (KS.mesaj) parca.push(h("div", { class: "ia-sonuc " + KS.mesaj.tur }, ...KS.mesaj.satirlar.map((x, i) => (i ? [h("br"), x] : x))));
+    govde.replaceChildren(...parca);
+  }
+
+  function kesirTus(k) {
+    const L = kesirAlanlari(), i = Math.max(0, L.indexOf(KS.secim)), ad = L[i];
+    KS.mesaj = null;
+    if (/^\d$/.test(k)) {
+      const x = KS.f[ad] || "";
+      if (x.length >= 6) KS.mesaj = { tur: "bilgi", satirlar: ["En çok 6 basamak yazılabilir."] };
+      else KS.f[ad] = x === "0" ? k : x + k;
+      delete KS.isaret[ad];
+    } else if (k === "⌫") { KS.f[ad] = (KS.f[ad] || "").slice(0, -1); delete KS.isaret[ad]; }
+    else if (k === "Sıfırla") { delete KS.f[ad]; delete KS.isaret[ad]; }
+    else if (k === "→" || k === "Sonraki" || k === "↓") { const L2 = kesirAlanlari(); KS.secim = L2[Math.min(L2.length - 1, L2.indexOf(ad) + 1)]; }
+    else if (k === "←" || k === "↑") KS.secim = L[Math.max(0, i - 1)];
+    else if (k === "Tamam") { kesirKontrol(false); return; }
+    else if (k === ",") KS.mesaj = { tur: "bilgi", satirlar: ["Kesirlerde virgül kullanılmaz; pay ve paydayı ayrı kutulara yaz."] };
+    kesirCiz();
+  }
+
+  function kesirKontrol(goster) {
+    const f = KS.f, op = KS.op, A = kesirOku("a"), B = kesirOku("b");
+    KS.isaret = {};
+    if (!Array.isArray(A) || !Array.isArray(B)) return;
+    if (op === "÷" && B[0] === 0n) { KS.mesaj = { tur: "kotu", satirlar: ["Bir sayı 0'a bölünemez."] }; kesirCiz(); return; }
+    let sonuc;
+    if (op === "+") sonuc = [A[0] * B[1] + B[0] * A[1], A[1] * B[1]];
+    else if (op === "−") sonuc = [A[0] * B[1] - B[0] * A[1], A[1] * B[1]];
+    else if (op === "×") sonuc = [A[0] * B[0], A[1] * B[1]];
+    else sonuc = [A[0] * B[1], A[1] * B[0]];
+    if (op === "−" && sonuc[0] < 0n) { KS.mesaj = { tur: "kotu", satirlar: ["Birinci kesir ikinciden küçük. Büyük kesirden küçük kesir çıkarılır."] }; kesirCiz(); return; }
+    const S = sade(sonuc), L = ekok(A[1], B[1]);
+    // Gösterilecek beklenen değerler
+    const bek = {};
+    if (f.aT) { bek.AP = A[0]; bek.AD = A[1]; }
+    if (f.bT) { bek.BP = B[0]; bek.BD = B[1]; }
+    if (op === "+" || op === "−") { bek.E1P = A[0] * (L / A[1]); bek.E1D = L; bek.E2P = B[0] * (L / B[1]); bek.E2D = L; bek.RP = op === "+" ? bek.E1P + bek.E2P : bek.E1P - bek.E2P; bek.RD = L; }
+    else if (op === "×") { bek.RP = A[0] * B[0]; bek.RD = A[1] * B[1]; }
+    else { bek.TBP = B[1]; bek.TBD = B[0]; bek.RP = A[0] * B[1]; bek.RD = A[1] * B[0]; }
+    const st = S[0] / S[1], sk = S[0] % S[1];
+    if (S[1] === 1n) bek.ST = S[0];
+    else if (st > 0n) { bek.ST = st; bek.SP = sk; bek.SD = S[1]; }
+    else { bek.SP = S[0]; bek.SD = S[1]; }
+    if (goster) {
+      for (const k of ["ST", "SP", "SD"]) if (!(k in bek)) delete f[k];
+      for (const [k, v] of Object.entries(bek)) if (f[k] !== String(v)) { f[k] = String(v); KS.isaret[k] = "gosterilen"; }
+      KS.mesaj = { tur: "bilgi", satirlar: [`Sonuç: ${kYaz(S)}`, "Mavi sayılar cevaptır. Bir sonraki işlemde kendin dene!"] };
+      kesirCiz(); return;
+    }
+    const satirlar = [];
+    const isaretle = (on, ok) => { for (const x of ["T", "P", "D"]) if (f[on + x]) KS.isaret[on + x] = ok ? "dogru" : "yanlis"; };
+    let hata = 0;
+    // 1) bileşik kesir
+    for (const [on, ad, K] of [["A", "1.", A], ["B", "2.", B]]) {
+      if (!f[on.toLowerCase() + "T"] || !(f[on + "P"] || f[on + "D"])) continue;
+      const v = kesirOku(on, false), ok = esit(v, K) && f[on + "D"] === String(K[1]);
+      isaretle(on, ok); if (!ok) { hata++; satirlar.push(`${ad} kesrin bileşik kesir hâli yanlış: tam × payda + pay yeni paydır, payda aynı kalır.`); }
+    }
+    // 2) payda eşitleme
+    if ((op === "+" || op === "−") && (f.E1P || f.E1D || f.E2P || f.E2D)) {
+      const e1 = kesirOku("E1", false), e2 = kesirOku("E2", false);
+      const ok1 = esit(e1, A), ok2 = esit(e2, B), ayni = !!f.E1D && f.E1D === f.E2D;
+      isaretle("E1", ok1 && ayni); isaretle("E2", ok2 && ayni);
+      if (!ok1 || !ok2) { hata++; satirlar.push("Genişletirken pay ve paydayı aynı sayıyla çarpmalısın; kesrin değeri değişmemeli."); }
+      else if (!ayni) { hata++; satirlar.push("İki kesrin paydası aynı olmalı."); }
+    }
+    // 3) ters çevirme
+    if (op === "÷" && (f.TBP || f.TBD)) { const ok = f.TBP === String(B[1]) && f.TBD === String(B[0]); isaretle("TB", ok); if (!ok) { hata++; satirlar.push("İkinci kesrin payı ile paydası yer değiştirmeli."); } }
+    // 4) sonuç
+    const R = kesirOku("R", false);
+    if (!R) { hata++; satirlar.push("Sonucun pay ve paydasını yaz."); }
+    else { const ok = esit(R, sonuc); isaretle("R", ok); if (!ok) { hata++; satirlar.push("Sonuç yanlış. " + (op === "+" || op === "−" ? "Paydalar eşitken yalnızca paylar toplanır ya da çıkarılır." : op === "×" ? "Pay ile pay, payda ile payda çarpılır." : "Birinci kesir ile ters çevrilmiş ikinci kesri çarp.")); } }
+    // 5) sadeleştirme (isteğe bağlı)
+    if (f.ST || f.SP || f.SD) {
+      const v = kesirOku("S");
+      let ok = esit(v, sonuc), neden = "Bu son hâlin değeri sonuçla aynı olmalı.";
+      if (ok && f.SP && f.SD && ebob(BN(f.SP), BN(f.SD)) !== 1n) { ok = false; neden = "Daha da sadeleşebilir: pay ve paydayı ortak bölenlerine böl."; }
+      if (ok && f.ST && f.SP && f.SD && BN(f.SP) >= BN(f.SD)) { ok = false; neden = "Tam sayılı kesirde kesir kısmının payı paydadan küçük olmalı."; }
+      isaretle("S", ok); if (!ok) { hata++; satirlar.push(neden); }
+    }
+    if (!hata) {
+      satirlar.unshift(`🎉 Doğru! Sonuç: ${kYaz(S)}`);
+      if (!(f.ST || f.SP || f.SD) && (S[1] !== sonuc[1] || S[0] >= S[1]) && !(R && R[0] === S[0] && R[1] === S[1] && S[0] < S[1])) satirlar.push(`Son adım: sonucu en sade hâliyle ${kYaz(S)} olarak yaz.`);
+      KS.mesaj = { tur: "iyi", satirlar };
+    } else KS.mesaj = { tur: "kotu", satirlar };
+    kesirCiz();
+  }
+
   // Fiziksel klavye
   document.addEventListener("keydown", (e) => {
     if (panel.hidden || panel.classList.contains("kucuk") || sekme === "karalama") return;
     if (e.target && /^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName)) return;
     const harita = { Backspace: "⌫", Delete: "Sıfırla", ArrowLeft: "←", ArrowRight: "→", ArrowUp: "↑", ArrowDown: "↓", Enter: "Tamam", Tab: "Sonraki" };
-    const k = /^\d$/.test(e.key) ? e.key : harita[e.key];
+    const k = /^\d$/.test(e.key) ? e.key : e.key === "," || e.key === "." ? "," : harita[e.key];
     if (!k) return;
     e.preventDefault();
-    sablonTus(k);
+    if (sekme === "kesir") kesirTus(k); else sablonTus(k);
   });
 
   // ---------------- Çizim ----------------
   function ciz() {
     if (panel.hidden) return;
     sekmeleriCiz();
-    if (sekme === "karalama") karalamaCiz(); else { tuval = null; baglam = null; sablonCiz(); }
+    if (sekme === "karalama") karalamaCiz(); else { tuval = null; baglam = null; if (sekme === "kesir") kesirCiz(); else sablonCiz(); }
     klavyeCiz();
   }
   let rz = 0;
@@ -719,6 +936,7 @@ body.ia-dugmeli{padding-bottom:84px}
     if (imza !== null && yeni !== imza) {
       K.cizgiler = []; damga = null;
       for (const k of Object.keys(SB)) SB[k] = yeniSablon();
+      KS.f = {}; KS.isaret = {}; KS.mesaj = null; KS.secim = "aP";
       if (!panel.hidden) ciz();
     }
     imza = yeni;
