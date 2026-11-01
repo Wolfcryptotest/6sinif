@@ -47,6 +47,9 @@
       </div>
       <h2>⚡ Ders Bazlı Mini Deneme</h2>
       <div class="izgara" id="mini"></div>
+      ${L.cikmis ? `<h2>📄 ${esc(L.cikmisBaslik || "Çıkmış Sorular")}</h2>
+      <p class="not">${esc(L.cikmisNot || "")}</p>
+      <div class="grafik-kart kaynak cikmis">${L.cikmis.map(([ad, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">📄 ${esc(ad)}</a>`).join("")}</div>` : ""}
       <h2>📚 Soru Havuzu</h2>
       <button class="kart oyun-mod" id="havuz" style="border-left-color:#7c4dff;margin-bottom:12px"><span class="ikon">🗂️</span><b>Geçmiş Yıl / Ek Soru Havuzu (${hv.length} soru)</b><span class="rozet">${hv.length ? "Havuzdan çöz, yeni soru ekle, dışa/içe aktar" : "Havuz şu an boş — geçmiş yıl LGS sorularını ya da kendi sorularını ekleyerek doldur"}</span></button>
       <h2>📈 Deneme Geçmişi</h2>

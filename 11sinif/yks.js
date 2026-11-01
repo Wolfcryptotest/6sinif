@@ -3,8 +3,9 @@
 // Havuz: yks-havuz.js (window.YKS_HAVUZ, sitedeki herkes görür) + bu cihazda "Soru Ekle" ile eklenenler.
 // Ayarlar: window.SINIF.yks = { tarih, tarihNot, aciklama, tam: [oturum sıraları], oturumlar: [{ ad, sure, ikon, renk, dersler: [[dersKey, soru], ...] }] }
 (function () {
+  const CIKMIS = [["2026 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2026-yuksekogretim-kurumlari-sinavi-2026yks-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2025 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2025-yuksekogretim-kurumlari-sinavi-2025yks-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2024 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2024-yuksekogretim-kurumlari-sinavi-2024yks-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2023 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2023-yuksekogretim-kurumlari-sinavi-2023yks-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2022 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2022yuksekogretim-kurumlari-sinavi-2022yks-oturumlari-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2021 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2021yuksekogretim-kurumlari-sinavi-2021yks-oturumlari-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2020 YKS (TYT · AYT · YDT)", "https://osym.gov.tr/2020yuksekogretim-kurumlari-sinavi-2020yks-oturumlari-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi"], ["2019 YKS (TYT · AYT · YDT)", "https://www.osym.gov.tr/2019yks-tyt-ayt-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari"], ["2018 YKS (TYT · AYT)", "https://osym.gov.tr/2018yks-tyt-ve-ayt-oturumlari-temel-soru-kitapciklari-ve-cevap-anahtarlari-yayimlandi-1072018"], ["ÖSYM — Tüm sınavların soru kitapçıkları arşivi", "https://www.osym.gov.tr/TR,5771/temel-soru-kitapcigi-ve-yanitlari.html"]];
   if (typeof kayit === "undefined" || !window.ICERIK || !window.SINIF || !SINIF.yks || !window.HAZIRLIK) return;
-  const L = SINIF.yks, H = window.HAZIRLIK;
+  const L = SINIF.yks; L.cikmis = L.cikmis || CIKMIS; L.cikmisBaslik = L.cikmisBaslik || "ÖSYM Çıkmış Sorular"; L.cikmisNot = L.cikmisNot || "Geçmiş yılların soru kitapçıkları ve cevap anahtarları ÖSYM'nin resmî sitesinde. Bağlantıya dokun, açılan sayfadan TYT, AYT ya da YDT kitapçığını (PDF) indir. Çözdükten sonra cevap anahtarıyla kontrol et. İstersen bir soruyu 'Soru Ekle' ile kendi havuzuna da ekleyebilirsin.", H = window.HAZIRLIK;
   kayit.yksDenemeler = kayit.yksDenemeler || [];   // [{ t, ad, dersler: { key: { d, y, b } } }]
   kayit.yksHavuz = kayit.yksHavuz || [];           // cihazda eklenen sorular
   const dersAd = (k) => (ICERIK[k] ? ICERIK[k].ad : k);
@@ -47,6 +48,9 @@
       </div>
       <h2>⚡ Ders Bazlı Mini Deneme</h2>
       <div class="izgara" id="mini"></div>
+      ${L.cikmis ? `<h2>📄 ${esc(L.cikmisBaslik || "Çıkmış Sorular")}</h2>
+      <p class="not">${esc(L.cikmisNot || "")}</p>
+      <div class="grafik-kart kaynak cikmis">${L.cikmis.map(([ad, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">📄 ${esc(ad)}</a>`).join("")}</div>` : ""}
       <h2>📚 Soru Havuzu</h2>
       <button class="kart oyun-mod" id="havuz" style="border-left-color:#7c4dff;margin-bottom:12px"><span class="ikon">🗂️</span><b>Geçmiş Yıl / Ek Soru Havuzu (${hv.length} soru)</b><span class="rozet">${hv.length ? "Havuzdan çöz, yeni soru ekle, dışa/içe aktar" : "Havuz şu an boş — geçmiş yıl TYT/AYT sorularını ya da kendi sorularını ekleyerek doldur"}</span></button>
       <h2>📈 Deneme Geçmişi</h2>
