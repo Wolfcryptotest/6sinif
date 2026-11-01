@@ -2,6 +2,14 @@
 window.SINIF = {
   anahtar: "6sinif",
   baslik: "6. Sınıf Çalışma Merkezi",
+  // Okul geneli ortak yazılılar (MEB Ortak Yazılı Sınav Sistemi, 2026-2027 1. dönem 1. yazılı takvimi)
+  okul: [
+    { ders: "fen", donem: 1, yazili: 1, bas: "2026-11-03" },
+    { ders: "sosyal", donem: 1, yazili: 1, bas: "2026-11-06" },
+    { ders: "turkce", donem: 1, yazili: 1, bas: "2026-11-10" },
+    { ders: "ingilizce", donem: 1, yazili: 1, bas: "2026-11-12" },
+    { ders: "din", donem: 1, yazili: 1, bas: "2026-11-13" }
+  ],
   // 2026-2027 ülke geneli ortak yazılı sınavları (MEB takvimi)
   ortak: [
     { ders: "matematik", donem: 1, yazili: 1, bas: "2026-11-11", bit: "2026-11-11" },

@@ -18,6 +18,10 @@
 .duyuru b{display:block;margin-bottom:4px}
 .duyuru .btn2{margin-top:10px;padding:10px 16px;font-size:17px}
 .kalan{font-weight:700;color:#b45309}
+.rozet-ortak.okul{background:#2563eb}
+.sinav-liste{display:grid;gap:8px;margin:8px 0 4px}
+.sinav-satir{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;background:var(--kart);color:var(--yazi);border:1px solid var(--sinir);border-radius:12px;padding:10px 12px;font-size:16px}
+.sinav-satir .kalan{white-space:nowrap}
 .rozet-ortak{display:inline-block;background:#f59e0b;color:#fff;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;margin-left:6px;vertical-align:middle}
 .kapsam li{margin:4px 0}
 .kagit{background:var(--kart);border:1px solid var(--sinir);border-radius:16px;padding:18px 20px;margin-bottom:14px}
@@ -63,11 +67,16 @@
     { id: "2-2", ad: "2. Dönem 2. Yazılı", donem: 2, yazili: 2 }
   ];
   const tarih = (s) => new Date(s + "T09:00:00");
-  const gunFark = (s) => Math.ceil((tarih(s) - new Date(new Date().toDateString())) / 86400000);
+  const gunFark = (s) => Math.round((new Date(s + "T00:00:00") - new Date(new Date().toDateString())) / 86400000); // takvim günü farkı
   const tarihYaz = (s) => tarih(s).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+  // Bütün ortak sınavlar: SINIF.ortak (ülke geneli) + SINIF.okul (okul geneli ortak yazılı, MEB Ortak Yazılı Sınav Sistemi)
+  const TUM = [...(S.ortak || []).map((o) => ({ ...o, tur: "ulke" })), ...(S.okul || []).map((o) => ({ ...o, tur: "okul" }))].filter((o) => ICERIK[o.ders]);
+  const yaklasan = () => TUM.filter((o) => gunFark(o.bit || o.bas) >= 0).sort((a, b) => tarih(a.bas) - tarih(b.bas));
+  const turAd = (o) => (o.tur === "okul" ? "OKUL GENELİ" : "ÜLKE GENELİ");
+  const kalanYaz = (o) => { const g = gunFark(o.bas); return g > 1 ? g + " gün kaldı" : g === 1 ? "yarın!" : "bugün!"; };
   function varsayilanSinav() {
     // Önce takvimdeki ilk yaklaşan ortak sınav; yoksa aya göre tahmin
-    const yak = (S.ortak || []).filter((o) => gunFark(o.bit || o.bas) >= 0).sort((a, b) => tarih(a.bas) - tarih(b.bas))[0];
+    const yak = yaklasan()[0];
     if (yak) return `${yak.donem}-${yak.yazili}`;
     const d = new Date(), a = d.getMonth() + 1, g = d.getDate();
     if (a >= 9 && (a < 11 || (a === 11 && g <= 15))) return "1-1";
@@ -100,7 +109,7 @@
   }
   const konularOf = (uniteler) => uniteler.flatMap((u) => u.konular);
   const acikOf = (k) => (k.acik && k.acik.length ? k.acik : ((window.ACIK && window.ACIK[k.id]) || []).map((x) => (Array.isArray(x) ? { soru: x[0], cevap: x[1] } : x)));
-  const ortakMi = (dersKey, sinavId) => (S.ortak || []).find((o) => o.ders === dersKey && `${o.donem}-${o.yazili}` === sinavId);
+  const ortakMi = (dersKey, sinavId) => TUM.find((o) => o.ders === dersKey && `${o.donem}-${o.yazili}` === sinavId);
 
   // Konulara dengeli dağıtarak n soru (soruHazirla üreteçleri de kullanır)
   function dagit(konular, n) {
@@ -116,21 +125,21 @@
   // ---------- Ana sayfa kartı ----------
   window.ANA_KARTLAR = window.ANA_KARTLAR || [];
   window.ANA_KARTLAR.push((kutu) => {
-    const yak = (S.ortak || []).filter((o) => gunFark(o.bit || o.bas) >= 0).sort((a, b) => tarih(a.bas) - tarih(b.bas))[0];
+    const yak = yaklasan()[0];
     const b = document.createElement("button");
     b.className = "ozel-kart yazili";
-    b.innerHTML = `<span class="ikon">📝</span><span><b>Yazılıya Hazırlık</b><small>${yak ? `Ortak sınav: ${esc(ICERIK[yak.ders] ? ICERIK[yak.ders].ad : yak.ders)} · ${gunFark(yak.bas) > 0 ? gunFark(yak.bas) + " gün kaldı" : "bugün!"}` : "Açık uçlu yazılı provası, test ve özet notlar"}</small></span>`;
+    b.innerHTML = `<span class="ikon">📝</span><span><b>Yazılıya Hazırlık</b><small>${yak ? `Sıradaki yazılı: ${esc(ICERIK[yak.ders].ad)} · ${tarih(yak.bas).toLocaleDateString("tr-TR", { day: "numeric", month: "long" })} · ${kalanYaz(yak)}` : "Açık uçlu yazılı provası, test ve özet notlar"}</small></span>`;
     b.onclick = () => git(yaziliAna, "📝 Yazılıya Hazırlık");
     kutu.appendChild(b);
   });
 
   // ---------- Yazılıya Hazırlık ana ekranı ----------
   function yaziliAna() {
-    const gelecek = (S.ortak || []).filter((o) => gunFark(o.bit || o.bas) >= 0).sort((a, b) => tarih(a.bas) - tarih(b.bas));
-    const duyuru = gelecek.length ? `<div class="duyuru"><b>📢 Ülke Geneli Ortak Yazılı Sınav</b>
-      ${gelecek.map((o) => `${esc(ICERIK[o.ders] ? ICERIK[o.ders].ad : o.ders)} — ${esc(sinavBul(o.donem + "-" + o.yazili).ad)}: <b>${tarihYaz(o.bas)}${o.bit && o.bit !== o.bas ? " – " + tarihYaz(o.bit) : ""}</b> <span class="kalan">(${gunFark(o.bas) > 0 ? gunFark(o.bas) + " gün kaldı" : "bugün/yarın"})</span>`).join("<br>")}
-      <div class="not" style="margin-top:6px">Ortak sınavlar açık uçlu sorulardan oluşur. Aşağıdaki "Yazılı Provası" bu biçimde hazırlandı.</div>
-      <button class="btn2" id="ortakGit">✍️ ${esc(ICERIK[gelecek[0].ders] ? ICERIK[gelecek[0].ders].ad : "")} ortak sınav provasına başla</button></div>` : "";
+    const gelecek = yaklasan();
+    const varUlke = gelecek.some((o) => o.tur === "ulke"), varOkul = gelecek.some((o) => o.tur === "okul");
+    const duyuru = gelecek.length ? `<div class="duyuru"><b>📅 Yaklaşan Ortak Yazılılar</b>
+      <div class="sinav-liste">${gelecek.map((o, i) => `<button class="sinav-satir" data-i="${i}"><span><b>${esc(ICERIK[o.ders].ad)}</b> <span class="rozet-ortak ${o.tur}">${turAd(o)}</span><br><span class="not">${esc(sinavBul(o.donem + "-" + o.yazili).ad)} · ${tarihYaz(o.bas)}</span></span><span class="kalan">${kalanYaz(o)} ›</span></button>`).join("")}</div>
+      <div class="not" style="margin-top:6px">${varUlke ? "<b>Ülke geneli:</b> bütün Türkiye'de aynı gün, açık uçlu sorularla yapılır. " : ""}${varOkul ? "<b>Okul geneli:</b> MEB'in Ortak Yazılı Sınav Sistemi'yle okulda yapılır, süre 40 dakikadır. " : ""}Bir derse dokun, provasına başla.</div></div>` : "";
     const son = kayit.yazili.slice(-5).reverse();
     ekran.innerHTML = `${duyuru}
       <h2>Hangi yazılıya hazırlanıyoruz?</h2>
@@ -146,14 +155,14 @@
         <a href="https://www.eba.gov.tr" target="_blank" rel="noopener">🎓 EBA — Konu anlatım videoları ve ders içerikleri</a>
       </div>`;
     ekran.querySelectorAll("#sinavSec .cip").forEach((b) => (b.onclick = () => { secili = b.dataset.id; git(yaziliAna, "📝 Yazılıya Hazırlık", false); }));
-    if ($("ortakGit")) $("ortakGit").onclick = () => { const o = gelecek[0]; secili = `${o.donem}-${o.yazili}`; git(() => yaziliDers(o.ders), ICERIK[o.ders].ad + " · Yazılı"); };
+    ekran.querySelectorAll(".sinav-satir").forEach((b) => (b.onclick = () => { const o = gelecek[+b.dataset.i]; secili = `${o.donem}-${o.yazili}`; git(() => yaziliDers(o.ders), ICERIK[o.ders].ad + " · Yazılı"); }));
     const kutu = $("yDersler");
     DERSLER.filter((d) => ICERIK[d.key]).forEach((d) => {
       const k = kapsam(d.key, secili), o = ortakMi(d.key, secili);
       const b = document.createElement("button");
       b.className = "kart ders" + (k.length ? "" : " pasif");
       b.style.setProperty("--renk", d.renk);
-      b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${d.ad}${o ? '<span class="rozet-ortak">ORTAK SINAV</span>' : ""}</b><span class="rozet">${k.length ? konularOf(k).length + " konu kapsamda" : "Bu dönem için içerik yok"}</span>`;
+      b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${d.ad}${o ? `<span class="rozet-ortak ${o.tur}">${o.tur === "okul" ? "OKUL ORTAK" : "ORTAK SINAV"}</span>` : ""}</b><span class="rozet">${k.length ? konularOf(k).length + " konu kapsamda" : "Bu dönem için içerik yok"}</span>`;
       b.onclick = () => k.length ? git(() => yaziliDers(d.key), d.ad + " · Yazılı") : alert("Bu ders için seçilen yazılıya ait ünite henüz eklenmedi.");
       kutu.appendChild(b);
     });
@@ -165,7 +174,7 @@
     const acikSay = K.reduce((a, k) => a + acikOf(k).length, 0);
     ekran.innerHTML = `
       <h2>${esc(ICERIK[dersKey].ad)} — ${esc(sv.ad)}</h2>
-      ${o ? `<div class="duyuru"><b>📢 Bu yazılı ülke geneli ortak sınav</b>${tarihYaz(o.bas)}${o.bit && o.bit !== o.bas ? " – " + tarihYaz(o.bit) : ""} · Sorular açık uçludur; cevabını gerekçesiyle, işlem adımlarıyla yaz.</div>` : ""}
+      ${o ? `<div class="duyuru"><b>📢 Bu yazılı ${o.tur === "okul" ? "okul geneli" : "ülke geneli"} ortak sınav</b>${tarihYaz(o.bas)}${o.bit && o.bit !== o.bas ? " – " + tarihYaz(o.bit) : ""}${gunFark(o.bas) >= 0 ? " (" + kalanYaz(o) + ")" : ""} · ${o.tur === "okul" ? "MEB'in Ortak Yazılı Sınav Sistemi'yle okulunda yapılır, 40 dakika. Sorular MEB'in konu-soru dağılımına göre hazırlanır." : "Sorular açık uçludur; cevabını gerekçesiyle, işlem adımlarıyla yaz."}</div>` : ""}
       <div class="grafik-kart"><b>📚 Kapsamdaki konular</b><ul class="kapsam">${U.map((u) => `<li><b>${esc(u.ad)}</b>: ${u.konular.map((k) => esc(k.ad)).join(", ")}</li>`).join("")}</ul></div>
       <div class="izgara">
         <button class="kart oyun-mod" id="prova" style="border-left-color:#4f46e5"><span class="ikon">✍️</span><b>Yazılı Provası</b><span class="rozet">Açık uçlu, gerçek yazılı gibi · 40 dk · ${acikSay} hazır soru + konu soruları · yazdırılabilir</span></button>

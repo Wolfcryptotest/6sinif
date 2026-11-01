@@ -13,6 +13,19 @@ window.SINIF = {
     { key: "ingilizce", ad: "İngilizce", ikon: "🔤", renk: "#8b5cf6" },
     { key: "din", ad: "Din Kültürü", ikon: "🕌", renk: "#0ea5a4" }
   ],
+  // Okul geneli ortak yazılılar (MEB Ortak Yazılı Sınav Sistemi, 2026-2027 1. dönem 1. yazılı takvimi)
+  okul: [
+    { ders: "biyoloji", donem: 1, yazili: 1, bas: "2026-11-03" },
+    { ders: "kimya", donem: 1, yazili: 1, bas: "2026-11-04" },
+    { ders: "tarih", donem: 1, yazili: 1, bas: "2026-11-04" },
+    { ders: "matematik", donem: 1, yazili: 1, bas: "2026-11-05" },
+    { ders: "fizik", donem: 1, yazili: 1, bas: "2026-11-06" },
+    { ders: "felsefe", donem: 1, yazili: 1, bas: "2026-11-06" },
+    { ders: "cografya", donem: 1, yazili: 1, bas: "2026-11-10" },
+    { ders: "edebiyat", donem: 1, yazili: 1, bas: "2026-11-11" },
+    { ders: "din", donem: 1, yazili: 1, bas: "2026-11-11" },
+    { ders: "ingilizce", donem: 1, yazili: 1, bas: "2026-11-13" }
+  ],
   // 2026-2027 ülke geneli ortak yazılı sınavları (MEB takvimi)
   ortak: [
     { ders: "matematik", donem: 1, yazili: 2, bas: "2027-01-06", bit: "2027-01-06" },

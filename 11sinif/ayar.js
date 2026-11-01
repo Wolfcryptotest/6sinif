@@ -13,5 +13,17 @@ window.SINIF = {
     { key: "felsefe", ad: "Felsefe", ikon: "🤔", renk: "#64748b" },
     { key: "ingilizce", ad: "İngilizce", ikon: "🔤", renk: "#8b5cf6" }
   ],
+  // Okul geneli ortak yazılılar (MEB Ortak Yazılı Sınav Sistemi, 2026-2027 1. dönem 1. yazılı takvimi)
+  okul: [
+    { ders: "biyoloji", donem: 1, yazili: 1, bas: "2026-11-03" },
+    { ders: "kimya", donem: 1, yazili: 1, bas: "2026-11-04" },
+    { ders: "tarih", donem: 1, yazili: 1, bas: "2026-11-04" },
+    { ders: "matematik", donem: 1, yazili: 1, bas: "2026-11-05" },
+    { ders: "fizik", donem: 1, yazili: 1, bas: "2026-11-06" },
+    { ders: "felsefe", donem: 1, yazili: 1, bas: "2026-11-06" },
+    { ders: "cografya", donem: 1, yazili: 1, bas: "2026-11-10" },
+    { ders: "edebiyat", donem: 1, yazili: 1, bas: "2026-11-11" },
+    { ders: "din", donem: 1, yazili: 1, bas: "2026-11-11" }
+  ],
   ortak: [] // 11. sınıflar 2026-2027'de ülke geneli ortak yazılıya girmiyor (yazılılar okulda)
 };
