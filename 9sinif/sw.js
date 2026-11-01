@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders9-";
-const SURUM = ONEK + "873d63ff2e6";
-const DOSYALAR = ["./", "anlatim.js", "app.js", "apple-touch-icon.png", "ayar.js", "edebiyat.js", "fen-dersleri.js", "hazirlik.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "islem-alani.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "sozel-dersler.js", "veri.js"];
+const SURUM = ONEK + "7a276bdac18";
+const DOSYALAR = ["./", "anlatim.js", "app.js", "apple-touch-icon.png", "ayar.js", "edebiyat.js", "fen-dersleri.js", "hazirlik.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "islem-alani.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "sozel-dersler.js", "veri.js", "videolar.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));
