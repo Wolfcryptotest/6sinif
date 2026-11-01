@@ -135,16 +135,15 @@
 
   // ---------- Yazılıya Hazırlık ana ekranı ----------
   function yaziliAna() {
-    const gelecek = yaklasan();
+    const gelecek = yaklasan().filter((o) => `${o.donem}-${o.yazili}` === secili); // yalnızca seçili yazılının sınavları
     const varUlke = gelecek.some((o) => o.tur === "ulke"), varOkul = gelecek.some((o) => o.tur === "okul");
-    const duyuru = gelecek.length ? `<div class="duyuru"><b>📅 Yaklaşan Ortak Yazılılar</b>
-      <div class="sinav-liste">${gelecek.map((o, i) => `<button class="sinav-satir" data-i="${i}"><span><b>${esc(ICERIK[o.ders].ad)}</b> <span class="rozet-ortak ${o.tur}">${turAd(o)}</span><br><span class="not">${esc(sinavBul(o.donem + "-" + o.yazili).ad)} · ${tarihYaz(o.bas)}</span></span><span class="kalan">${kalanYaz(o)} ›</span></button>`).join("")}</div>
+    const duyuru = gelecek.length ? `<div class="duyuru"><b>📅 ${esc(sinavBul(secili).ad)} — Ortak Yazılılar</b>
+      <div class="sinav-liste">${gelecek.map((o, i) => `<button class="sinav-satir" data-i="${i}"><span><b>${esc(ICERIK[o.ders].ad)}</b> <span class="rozet-ortak ${o.tur}">${turAd(o)}</span><br><span class="not">${tarihYaz(o.bas)}</span></span><span class="kalan">${kalanYaz(o)} ›</span></button>`).join("")}</div>
       <div class="not" style="margin-top:6px">${varUlke ? "<b>Ülke geneli:</b> bütün Türkiye'de aynı gün, açık uçlu sorularla yapılır. " : ""}${varOkul ? "<b>Okul geneli:</b> MEB'in Ortak Yazılı Sınav Sistemi'yle okulda yapılır, süre 40 dakikadır. " : ""}Bir derse dokun, provasına başla.</div></div>` : "";
     const son = kayit.yazili.slice(-5).reverse();
     ekran.innerHTML = `${duyuru}
       <h2>Hangi yazılıya hazırlanıyoruz?</h2>
       <div class="secim" id="sinavSec">${SINAVLAR.map((s) => `<button class="cip ${s.id === secili ? "secili" : ""}" data-id="${s.id}">${s.ad}</button>`).join("")}</div>
-      <p class="not">1. yazılı: dönemin ilk yarısındaki üniteler · 2. yazılı: dönemin tüm üniteleri. Okulunun konu dağılımı farklıysa ders sayfasındaki ünite listesine göre çalış.</p>
       <h2>Ders seç</h2>
       <div class="izgara" id="yDersler"></div>
       ${son.length ? `<h2>Son Provalarım</h2><div class="grafik-kart">${son.map((x) => `<div class="konu-satir"><span>${esc(ICERIK[x.ders] ? ICERIK[x.ders].ad : x.ders)} · ${esc(sinavBul(x.sinav).ad)}<br><span class="not">${new Date(x.t).toLocaleDateString("tr-TR")}</span></span><span class="yuzde ${x.puan < 50 ? "dusuk" : x.puan < 85 ? "orta" : "yuksek"}">${x.puan}</span></div>`).join("")}</div>` : ""}
@@ -171,11 +170,12 @@
   // ---------- Ders + yazılı seçildi ----------
   function yaziliDers(dersKey) {
     const sv = sinavBul(secili), U = kapsam(dersKey, secili), K = konularOf(U), o = ortakMi(dersKey, secili);
+    const resmi = Array.isArray(S.kapsam && S.kapsam[dersKey] && S.kapsam[dersKey][secili]);
     const acikSay = K.reduce((a, k) => a + acikOf(k).length, 0);
     ekran.innerHTML = `
       <h2>${esc(ICERIK[dersKey].ad)} — ${esc(sv.ad)}</h2>
       ${o ? `<div class="duyuru"><b>📢 Bu yazılı ${o.tur === "okul" ? "okul geneli" : "ülke geneli"} ortak sınav</b>${tarihYaz(o.bas)}${o.bit && o.bit !== o.bas ? " – " + tarihYaz(o.bit) : ""}${gunFark(o.bas) >= 0 ? " (" + kalanYaz(o) + ")" : ""} · ${o.tur === "okul" ? "MEB'in Ortak Yazılı Sınav Sistemi'yle okulunda yapılır, 40 dakika. Sorular MEB'in konu-soru dağılımına göre hazırlanır." : "Sorular açık uçludur; cevabını gerekçesiyle, işlem adımlarıyla yaz."}</div>` : ""}
-      <div class="grafik-kart"><b>📚 Kapsamdaki konular</b><ul class="kapsam">${U.map((u) => `<li><b>${esc(u.ad)}</b>: ${u.konular.map((k) => esc(k.ad)).join(", ")}</li>`).join("")}</ul></div>
+      <div class="grafik-kart"><b>📚 ${resmi ? "Kapsamdaki konular" : "Çalışılacak konular"}</b><div class="not">${resmi ? "MEB konu-soru dağılım tablosuna göre." : "Bu yazılının resmî konu dağılımı henüz eklenmedi; dönemin ilgili ünitelerini gösteriyoruz. Kesin kapsamı öğretmenine sor."}</div><ul class="kapsam">${U.map((u) => `<li><b>${esc(u.ad)}</b>: ${u.konular.map((k) => esc(k.ad)).join(", ")}</li>`).join("")}</ul></div>
       <div class="izgara">
         <button class="kart oyun-mod" id="prova" style="border-left-color:#4f46e5"><span class="ikon">✍️</span><b>Yazılı Provası</b><span class="rozet">Açık uçlu, gerçek yazılı gibi · 40 dk · ${acikSay} hazır soru + konu soruları · yazdırılabilir</span></button>
         <button class="kart oyun-mod" id="testp" style="border-left-color:#22a06b"><span class="ikon">✅</span><b>Test Provası</b><span class="rozet">Kapsamın tamamından 20 çoktan seçmeli soru</span></button>
