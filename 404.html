@@ -6,9 +6,10 @@
 (function () {
   var p = decodeURIComponent(location.pathname).toLocaleLowerCase("tr");
   var y = p.replace(/ı/g, "i").replace(/ş/g, "s").replace(/(\d)[\.\-_ ]+sinif/g, "$1sinif").replace(/sinifi?(?=\/|$)/g, "sinif");
-  var m = y.match(/\/6sinif\/(\d)\s*sinif/) || y.match(/\/6sinif\/(\d)\/?$/);
+  var m = y.match(/\/6sinif\/(\d{1,2})\s*sinif/) || y.match(/\/6sinif\/(\d{1,2})\/?$/);
   var hedef = null;
-  if (m && "123457".indexOf(m[1]) >= 0) hedef = "/6sinif/" + m[1] + "sinif/";
+  if (m && ["1","2","3","4","5","7","8","9","11"].indexOf(m[1]) >= 0) hedef = "/6sinif/" + m[1] + "sinif/";
+  else if (m && m[1] === "6") hedef = "/6sinif/";
   else if (/\/6sinif\/(minik|kres|anaokul|okul ?oncesi|4-5|0sinif)/.test(y)) hedef = "/6sinif/minik/";
   else if (/^\/6sinif\/?(6sinif)?\/?$/.test(y)) hedef = "/6sinif/";
   if (hedef && hedef !== location.pathname) location.replace(hedef);
@@ -27,4 +28,7 @@ a span{font-size:34px}</style></head><body>
 <a href="/6sinif/5sinif/" style="background:#0ea5a4"><span>🧭</span>5. Sınıf</a>
 <a href="/6sinif/" style="background:#7b5cff"><span>📚</span>6. Sınıf</a>
 <a href="/6sinif/7sinif/" style="background:#e5484d"><span>🔬</span>7. Sınıf</a>
+<a href="/6sinif/8sinif/" style="background:#dc2626"><span>🎯</span>8. Sınıf (LGS)</a>
+<a href="/6sinif/9sinif/" style="background:#2563eb"><span>📐</span>9. Sınıf</a>
+<a href="/6sinif/11sinif/" style="background:#7c3aed"><span>🎓</span>11. Sınıf</a>
 </body></html>
