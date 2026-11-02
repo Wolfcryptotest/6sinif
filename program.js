@@ -21,8 +21,23 @@
     { key: "secmeli", ad: "Seçmeli Ders", ikon: "📘", renk: "#64748b" },
     { key: "rehberlik", ad: "Rehberlik", ikon: "🧭", renk: "#7c3aed" }
   ];
-  const TUM = [...DERSLER, ...EK_DERSLER];
-  const dersBul = (k) => TUM.find((d) => d.key === k) || { key: k, ad: k, ikon: "📘", renk: "#64748b" };
+  // Seçmeli dersler: sık açılanlar + öğrencinin kendi yazdıkları (P.ozelDersler)
+  const SECMELI = [
+    { key: "s_siyer", ad: "Peygamberimizin Hayatı (Siyer)", ikon: "🕋", renk: "#0f766e" },
+    { key: "s_kuran", ad: "Kur'an-ı Kerim", ikon: "📗", renk: "#15803d" },
+    { key: "s_tdb", ad: "Temel Dinî Bilgiler", ikon: "🕌", renk: "#0e7490" },
+    { key: "s_matuyg", ad: "Matematik Uygulamaları", ikon: "🧮", renk: "#4338ca" },
+    { key: "s_fenuyg", ad: "Fen Bilimleri Uygulamaları", ikon: "🧪", renk: "#047857" },
+    { key: "s_okuma", ad: "Okuma Becerileri", ikon: "📚", renk: "#b45309" },
+    { key: "s_yazarlik", ad: "Yazarlık ve Yazma Becerileri", ikon: "✍️", renk: "#be185d" },
+    { key: "s_almanca", ad: "Almanca", ikon: "🇩🇪", renk: "#475569" },
+    { key: "s_satranc", ad: "Satranç", ikon: "♟️", renk: "#1f2937" }
+  ];
+  P.ozelDersler = P.ozelDersler || []; // [{ key: "o_...", ad, ikon, renk }]
+  const tumDersler = () => [...DERSLER, ...EK_DERSLER, ...SECMELI, ...P.ozelDersler];
+  const dersSecenek = (v) => `<optgroup label="Dersler">${[...DERSLER, ...EK_DERSLER.filter((d) => d.key !== "secmeli")].map((d) => `<option value="${d.key}" ${d.key === v ? "selected" : ""}>${d.ikon} ${esc(d.ad)}</option>`).join("")}</optgroup>
+    <optgroup label="Seçmeli dersler">${[...SECMELI, ...P.ozelDersler, EK_DERSLER.find((d) => d.key === "secmeli")].map((d) => `<option value="${d.key}" ${d.key === v ? "selected" : ""}>${d.ikon} ${esc(d.ad)}</option>`).join("")}</optgroup>`;
+  const dersBul = (k) => tumDersler().find((d) => d.key === k) || { key: k, ad: k, ikon: "📘", renk: "#64748b" };
   const GUNLER = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
   const anahtar = (t) => `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
   const tarih = (s) => new Date(s + "T00:00:00");
@@ -280,22 +295,39 @@
     const hucre = (g, i) => {
       const v = (tablo[g] || [])[i] || "";
       if (!duzenle) { const d = v ? dersBul(v) : null; return `<td class="${g === bg ? "bugun" : ""}">${d ? `${d.ikon}<br><small>${esc(d.ad.split(" ")[0])}</small>` : ""}</td>`; }
-      return `<td><select data-g="${g}" data-i="${i}" aria-label="${GUNLER[g]} ${i + 1}. ders"><option value="">—</option>${TUM.map((d) => `<option value="${d.key}" ${d.key === v ? "selected" : ""}>${d.ikon} ${esc(d.ad)}</option>`).join("")}</select></td>`;
+      return `<td><select data-g="${g}" data-i="${i}" aria-label="${GUNLER[g]} ${i + 1}. ders"><option value="">—</option>${dersSecenek(v)}</select></td>`;
     };
     return `<table class="pr-tablo"><tr><th></th>${[1, 2, 3, 4, 5].map((g) => `<th>${GUNLER[g].slice(0, 3)}</th>`).join("")}</tr>
       ${Array.from({ length: n }, (_, i) => `<tr><th>${i + 1}.</th>${[1, 2, 3, 4, 5].map((g) => hucre(g, i)).join("")}</tr>`).join("")}</table>`;
   }
 
-  function programDuzenle(ilk) {
+  let taslak = null;
+  function programDuzenle(ilk, tsl) {
     ekran.innerHTML = `
       ${ilk ? `<div class="koc"><span class="baykus">🦉</span><div><p>Merhaba! Ben Bilge Baykuş. Önce okuldaki haftalık ders programını girelim. Her ders saati için dersi seç; aynı ders üst üste iki saatse iki kutuya da yaz.</p><p>Bunu bir kez yapman yeterli, sonra seni her gün yönlendiririm.</p></div></div>` : ""}
       <h2>✏️ Haftalık Ders Programı</h2>
       <div class="secim"><span>Günlük ders saati</span>${[6, 7, 8].map((n) => `<button class="cip ${(P.saat || 7) === n ? "secili" : ""}" data-n="${n}">${n}</button>`).join("")}</div>
-      <div class="pr-kap" id="tablo">${tabloHTML(true, P.tablo)}</div>
+      <div class="pr-kap" id="tablo">${tabloHTML(true, tsl || P.tablo)}</div>
+      <p class="not">Seçmeli derslerin listede yoksa ekle; sonra kutulardan seçebilirsin.${P.ozelDersler.length ? " Eklediklerin: " + P.ozelDersler.map((d) => esc(d.ad)).join(", ") : ""}</p>
+      <div class="satir" style="margin-top:0"><button class="btn2" id="secEkle">➕ Seçmeli ders ekle</button>${P.ozelDersler.length ? `<button class="btn2" id="secSil">🗑️ Eklediğim seçmeliyi sil</button>` : ""}</div>
       <div class="satir"><button class="btn" id="kaydetP">💾 Programı Kaydet</button>${P.tablo ? `<button class="btn2" id="sifirla">🗑️ Programı Temizle</button>` : ""}</div>
       <p class="not">Program yalnızca bu cihazda saklanır.</p>`;
     const oku = () => { const t = {}; ekran.querySelectorAll("select[data-g]").forEach((s2) => { const g = +s2.dataset.g, i = +s2.dataset.i; (t[g] = t[g] || [])[i] = s2.value; }); return t; };
     ekran.querySelectorAll("[data-n]").forEach((b) => (b.onclick = () => { const t = oku(); P.saat = +b.dataset.n; $("tablo").innerHTML = tabloHTML(true, t); ekran.querySelectorAll("[data-n]").forEach((x) => x.classList.toggle("secili", x === b)); }));
+    $("secEkle").onclick = () => {
+      const ad = (prompt("Seçmeli dersin adı (örn: Peygamberimizin Hayatı, Satranç, Drama):") || "").trim().slice(0, 40);
+      if (!ad) return;
+      if (tumDersler().some((d) => d.ad.toLocaleLowerCase("tr") === ad.toLocaleLowerCase("tr"))) return alert("Bu ders listede zaten var; kutulardan seçebilirsin.");
+      P.ozelDersler.push({ key: "o_" + Date.now(), ad, ikon: "📘", renk: "#7c3aed" }); kaydet();
+      taslak = oku(); git(() => programDuzenle(ilk, taslak), "✏️ Ders Programı", false);
+    };
+    if ($("secSil")) $("secSil").onclick = () => {
+      const ad = prompt("Silinecek seçmeli dersin adını yaz:\n" + P.ozelDersler.map((d) => "• " + d.ad).join("\n")); if (!ad) return;
+      const d = P.ozelDersler.find((x) => x.ad.toLocaleLowerCase("tr") === ad.trim().toLocaleLowerCase("tr")); if (!d) return alert("Bu adla eklenmiş ders bulunamadı.");
+      P.ozelDersler = P.ozelDersler.filter((x) => x !== d); taslak = oku();
+      Object.keys(taslak).forEach((g) => (taslak[g] = taslak[g].map((v) => (v === d.key ? "" : v))));
+      kaydet(); git(() => programDuzenle(ilk, taslak), "✏️ Ders Programı", false);
+    };
     $("kaydetP").onclick = () => {
       const t = oku(), dolu = Object.values(t).some((g) => g.some(Boolean));
       if (!dolu) return alert("En az bir ders seç.");
@@ -310,7 +342,7 @@
   function odevEkle() {
     const t = bugunT();
     ekran.innerHTML = `<div class="pr-ders" style="--renk:#0d9488">
-      <label>Ders</label><select id="oD">${TUM.map((d) => `<option value="${d.key}">${d.ikon} ${esc(d.ad)}</option>`).join("")}</select>
+      <label>Ders</label><select id="oD">${dersSecenek("")}</select>
       <label>Not (isteğe bağlı)</label><input type="text" id="oM" placeholder="Örn: Proje ödevi">
       <label>Teslim günü</label><input type="date" id="oT" value="${anahtar(gunEkle(t, 1))}">
       <div class="satir"><button class="btn" id="oK">💾 Kaydet</button></div></div>`;
@@ -341,6 +373,7 @@
       <p class="not">Bu özeti velinle de paylaşabilirsin. 🦉 Bilge Baykuş: "${hafta.length && biten === hafta.length ? "Bu hafta bütün ödevlerini yaptın, tebrikler!" : "Her gün birkaç dakika takip, hafta sonunda büyük fark yaratır."}"</p>`;
   }
 
+  window.PROGRAM_DERS_AD = (k) => dersBul(k).ad;
   window.PROGRAM_AC = () => git(programAna, "📅 Ders Programım");
   window.PROGRAM_TEST = { anahtar, sonrakiDersGunu: (dk, s) => sonrakiDersGunu(dk, tarih(s)), seri };
   if (window.ANA_YENILE) window.ANA_YENILE();

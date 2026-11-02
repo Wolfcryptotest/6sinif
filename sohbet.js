@@ -64,7 +64,8 @@
   const ICERDE = (q, ...l) => l.some((x) => q.includes(x));
   const sec = (a) => a[Math.floor(Math.random() * a.length)];
   const bugunA = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; };
-  const dersAd = (dk) => { const d = (typeof DERSLER !== "undefined" ? DERSLER : []).find((x) => x.key === dk); return d ? d.ad : dk; };
+  const dersAd = (dk) => window.PROGRAM_DERS_AD ? window.PROGRAM_DERS_AD(dk) : dersAd0(dk);
+  const dersAd0 = (dk) => { const d = (typeof DERSLER !== "undefined" ? DERSLER : []).find((x) => x.key === dk); return d ? d.ad : dk; };
 
   function cevapla(girdi) {
     const q = sade(girdi);
@@ -96,7 +97,8 @@
       if (!pr.tablo) return { html: "Ders programını henüz girmedin. Girersen hangi gün hangi derslerin olduğunu söyleyebilirim.", btn: [["📅 Programı gir", "program"]] };
       const t = new Date(); if (ICERDE(q, "yarın")) t.setDate(t.getDate() + 1);
       const g = t.getDay(), d = g >= 1 && g <= 5 ? [...new Set((pr.tablo[g] || []).filter(Boolean))] : [];
-      const ad = (k) => { const x = [...(typeof DERSLER !== "undefined" ? DERSLER : [])].find((y) => y.key === k); return x ? x.ad : ({ beden: "Beden Eğitimi", muzik: "Müzik", gorsel: "Görsel Sanatlar", bilisim: "Bilişim Teknolojileri", secmeli: "Seçmeli Ders", rehberlik: "Rehberlik" })[k] || k; };
+      const ad = (k) => dersAd(k) || ad0(k);
+      const ad0 = (k) => { const x = [...(typeof DERSLER !== "undefined" ? DERSLER : [])].find((y) => y.key === k); return x ? x.ad : ({ beden: "Beden Eğitimi", muzik: "Müzik", gorsel: "Görsel Sanatlar", bilisim: "Bilişim Teknolojileri", secmeli: "Seçmeli Ders", rehberlik: "Rehberlik" })[k] || k; };
       return { html: d.length ? `${ICERDE(q, "yarın") ? "Yarın" : "Bugün"} derslerin: <b>${d.map(ad).join(", ")}</b>.` : `${ICERDE(q, "yarın") ? "Yarın" : "Bugün"} programında ders yok. 😊`, btn: [["📅 Ders Programım", "program"]] };
     }
     if (ICERDE(q, "kaldık", "kaldığımız", "tekrar edelim", "tekrar yapalım")) {
