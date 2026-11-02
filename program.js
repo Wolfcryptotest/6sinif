@@ -10,7 +10,8 @@
   P.son = P.son || {};            // { dersKey: konuId }  kaldığımız yer
   P.odevler = P.odevler || [];    // [{ id, ders, metin, verildi, teslim, bitti, bittiT }]
   P.kontrol = P.kontrol || {};    // { "YYYY-AA-GG": true }  günü tamamladı
-  P.tekrar = P.tekrar || {};      // { "YYYY-AA-GG": sayı }  bugün yapılan tekrar testleri
+  P.tekrar = P.tekrar || {};
+  P.odevYok = P.odevYok || {};    // { "YYYY-AA-GG": { dersKey: true } }  "ödev yok" işaretlenenler      // { "YYYY-AA-GG": sayı }  bugün yapılan tekrar testleri
 
   const EK_DERSLER = [
     { key: "beden", ad: "Beden Eğitimi ve Spor", ikon: "⚽", renk: "#16a34a" },
@@ -92,7 +93,7 @@
       const hazir = yarinD.map((d) => P.son[d] && konuBulId(P.son[d]) ? `${dersBul(d).ad}'te "${konuBulId(P.son[d]).ad}"` : null).filter(Boolean);
       satir.push(`${tarihYaz(anahtar(yarinT)) === "yarın" ? "Yarın" : tarihYaz(anahtar(yarinT)).replace(/^./, (c) => c.toUpperCase())} ${yarinD.map((d) => dersBul(d).ad).join(", ")} var.${hazir.length ? " Kaldığımız yerler: " + hazir.join("; ") + ". Hadi kısa bir tekrar yapalım!" : ""}`);
     }
-    if (yarinOdev.length) satir.push(`📝 ${tarihYaz(anahtar(yarinT)) === "yarın" ? "Yarına" : "Bir sonraki okul gününe"} ${yarinOdev.length} ödevin var: ${yarinOdev.map((o) => `${dersBul(o.ders).ad} – ${o.metin}`).join("; ")}. Yaptın mı?`);
+    if (yarinOdev.length) satir.push(`📝 ${tarihYaz(anahtar(yarinT)) === "yarın" ? "Yarına" : "Bir sonraki okul gününe"} ${yarinOdev.length} ödevin var: ${yarinOdev.map((o) => dersBul(o.ders).ad + (o.metin === "Ödev" ? "" : ` (${o.metin})`)).join(", ")}. Yaptın mı?`);
     else if (bekleyen.length === 0) satir.push(sec(["Bekleyen ödevin yok, harika! 🎉 Bu boş zamanı bir tekrar testiyle değerlendirebilirsin.", "Bütün ödevlerin bitmiş, süpersin! ⭐"]));
     if (!bugunD.length) satir.push(t.getDay() === 0 || t.getDay() === 6 ? "Hafta sonu dinlenmek de önemli 😊 Ama haftanın konularından kısa bir tekrar, pazartesi derste parlamanı sağlar." : "");
     const s = seri();
@@ -152,7 +153,7 @@
     ekran.innerHTML = `
       <div class="koc"><span class="baykus">🦉</span><div>${kocMesaji().map((x) => `<p>${esc(x)}</p>`).join("")}</div></div>
       <div class="satir" style="margin-top:0"><span class="seri">🔥 ${s} gün seri</span><span class="seri">📝 ${yapilan()} ödev bitti</span></div>
-      ${bugunD.length ? `<h2>📚 Bugünkü Derslerim (${GUNLER[t.getDay()]})</h2><p class="not">Derste işlenen konuyu seç; ödev verildiyse yaz. Konu seçince "kaldığımız yer" güncellenir.</p><div id="bugunD"></div>` : `<h2>📚 Bugün okul yok</h2><p class="not">${t.getDay() === 0 || t.getDay() === 6 ? "Hafta sonu! Aşağıdan haftanın tekrarını yapabilirsin." : "Programında bugün için ders yok."}</p>`}
+      ${bugunD.length ? `<h2>📚 Bugünkü Derslerim (${GUNLER[t.getDay()]})</h2><p class="not">Derste işlenen konuyu seç, ödev verildiyse "Var"a dokun. Konu seçince "kaldığımız yer" güncellenir.</p><div id="bugunD"></div>` : `<h2>📚 Bugün okul yok</h2><p class="not">${t.getDay() === 0 || t.getDay() === 6 ? "Hafta sonu! Aşağıdan haftanın tekrarını yapabilirsin." : "Programında bugün için ders yok."}</p>`}
       <h2>📝 Ödevlerim</h2><div id="odevler"></div>
       <div class="satir"><button class="btn2" id="odevEkle">➕ Başka ödev ekle</button></div>
       <h2>🎒 ${tarihYaz(anahtar(yarinT)) === "yarın" ? "Yarın" : tarihYaz(anahtar(yarinT)).replace(/^./, (c) => c.toUpperCase())}: Hazırlık</h2><div id="yarin"></div>
@@ -174,11 +175,17 @@
         ${liste.length ? `<label>Bugün derste hangi konu işlendi?</label>
           <select data-k="${dk}"><option value="">— Seç —</option><option value="-" ${secili === "-" ? "selected" : ""}>Konu işlenmedi / tekrar yapıldı</option>
           ${ICERIK[dk].uniteler.map((u) => `<optgroup label="${esc(u.ad)}">${u.konular.map((k) => `<option value="${k.id}" ${secili === k.id ? "selected" : ""}>${esc(k.ad)}${!secili && oneri && k.id === oneri.id ? " (sıradaki)" : ""}</option>`).join("")}</optgroup>`).join("")}</select>` : ""}
-        <details class="pr-ac"><summary>📝 Ödev verildi mi? Dokun, ekle${(() => { const n = P.odevler.filter((o) => o.ders === dk && o.verildi === bk).length; return n ? ` <b>(${n} ödev kaydedildi ✅)</b>` : ""; })()}</summary>
-          <input type="text" data-o="${dk}" placeholder="Örn: Ders kitabı s. 45-46, 1-10. sorular" aria-label="Ödev">
-          <label>Teslim günü (bir sonraki ${esc(d.ad)} dersi)</label><input type="date" data-t="${dk}" value="${sonrakiDersGunu(dk, t)}">
-          <div class="satir" style="margin:10px 0 0"><button class="btn2" data-ekle="${dk}">➕ Ödevi kaydet</button></div>
-        </details>
+        ${(() => {
+          const od = P.odevler.filter((o) => o.ders === dk && o.verildi === bk), yok = (P.odevYok[bk] || {})[dk];
+          return `<label>Ödev verildi mi?</label>
+          <div class="secim" style="margin:0"><button class="cip ${od.length ? "secili" : ""}" data-var="${dk}">📝 Var</button><button class="cip ${yok && !od.length ? "secili" : ""}" data-yok="${dk}">❌ Yok</button></div>
+          ${od.length ? `<div class="not" style="margin-top:6px">✅ Ödev kaydedildi · Teslim: <b>${esc(tarihYaz(od[0].teslim))}</b> (bir sonraki ${esc(d.ad)} dersi)</div>
+          <details class="pr-ac"><summary>İstersen not ekle ya da teslim gününü değiştir</summary>
+            <input type="text" data-o="${od[0].id}" value="${od[0].metin === "Ödev" ? "" : esc(od[0].metin)}" placeholder="İsteğe bağlı not (örn: kitap s. 45)" aria-label="Ödev notu">
+            <label>Teslim günü</label><input type="date" data-t="${od[0].id}" value="${od[0].teslim}">
+            <div class="satir" style="margin:10px 0 0"><button class="btn2" data-kaydet="${od[0].id}">💾 Kaydet</button></div>
+          </details>` : ""}`;
+        })()}
         ${secili && secili !== "-" ? `<div class="satir" style="margin:10px 0 0"><button class="btn2" data-tk="${secili}">🔁 Bugünkü konuyu tekrar et (5 soru)</button></div>` : ""}`;
       kutu.appendChild(el);
     });
@@ -188,10 +195,23 @@
       if (v) { P.islenen[bk][dk] = v; if (v !== "-") P.son[dk] = v; } else delete P.islenen[bk][dk];
       kaydet(); git(programAna, "📅 Ders Programım", false);
     }));
-    ekran.querySelectorAll("[data-ekle]").forEach((b) => (b.onclick = () => {
-      const dk = b.dataset.ekle, metin = ekran.querySelector(`[data-o="${dk}"]`).value.trim(), teslim = ekran.querySelector(`[data-t="${dk}"]`).value;
-      if (!metin) return alert("Ödevi kısaca yaz (örn: Kitap s. 45).");
-      P.odevler.push({ id: "o" + Date.now(), ders: dk, metin, verildi: bk, teslim: teslim || sonrakiDersGunu(dk, t), bitti: false });
+    ekran.querySelectorAll("[data-var]").forEach((b) => (b.onclick = () => {
+      const dk = b.dataset.var;
+      if (!P.odevler.some((o) => o.ders === dk && o.verildi === bk)) P.odevler.push({ id: "o" + Date.now(), ders: dk, metin: "Ödev", verildi: bk, teslim: sonrakiDersGunu(dk, t), bitti: false });
+      if (P.odevYok[bk]) delete P.odevYok[bk][dk];
+      kaydet(); git(programAna, "📅 Ders Programım", false);
+    }));
+    ekran.querySelectorAll("[data-yok]").forEach((b) => (b.onclick = () => {
+      const dk = b.dataset.yok, var_ = P.odevler.filter((o) => o.ders === dk && o.verildi === bk);
+      if (var_.length && !confirm("Bu dersin bugünkü ödev kaydı silinsin mi?")) return;
+      P.odevler = P.odevler.filter((o) => !(o.ders === dk && o.verildi === bk));
+      (P.odevYok[bk] = P.odevYok[bk] || {})[dk] = true;
+      kaydet(); git(programAna, "📅 Ders Programım", false);
+    }));
+    ekran.querySelectorAll("[data-kaydet]").forEach((b) => (b.onclick = () => {
+      const o = P.odevler.find((x) => x.id === b.dataset.kaydet); if (!o) return;
+      o.metin = ekran.querySelector(`[data-o="${o.id}"]`).value.trim() || "Ödev";
+      o.teslim = ekran.querySelector(`[data-t="${o.id}"]`).value || o.teslim;
       kaydet(); git(programAna, "📅 Ders Programım", false);
     }));
     ekran.querySelectorAll("[data-tk]").forEach((b) => (b.onclick = () => tekrarAc(b.dataset.tk)));
@@ -202,7 +222,7 @@
     [...bekleyen, ...sonBiten].forEach((o) => {
       const d = dersBul(o.ders), el = document.createElement("label");
       el.className = "pr-odev" + (o.bitti ? " bitti" : o.teslim < bk ? " gec" : o.teslim === anahtar(yarinT) ? " yarin" : "");
-      el.innerHTML = `<input type="checkbox" ${o.bitti ? "checked" : ""} data-id="${o.id}" aria-label="Yaptım"><span class="pr-metin"><b>${d.ikon} ${esc(d.ad)}</b> – ${esc(o.metin)}<small>${o.bitti ? "✅ Yapıldı" : o.teslim < bk ? "⚠️ Teslim " + tarihYaz(o.teslim) + " idi" : "Teslim: " + tarihYaz(o.teslim)}</small></span><button class="btn2" style="padding:6px 10px" data-sil="${o.id}" aria-label="Sil">🗑️</button>`;
+      el.innerHTML = `<input type="checkbox" ${o.bitti ? "checked" : ""} data-id="${o.id}" aria-label="Yaptım"><span class="pr-metin"><b>${d.ikon} ${esc(d.ad)}</b>${o.metin === "Ödev" ? " ödevi" : " – " + esc(o.metin)}<small>${o.bitti ? "✅ Yapıldı" : o.teslim < bk ? "⚠️ Teslim " + tarihYaz(o.teslim) + " idi" : "Teslim: " + tarihYaz(o.teslim)}</small></span><button class="btn2" style="padding:6px 10px" data-sil="${o.id}" aria-label="Sil">🗑️</button>`;
       ok.appendChild(el);
     });
     ok.querySelectorAll("[data-id]").forEach((c) => (c.onchange = () => {
@@ -222,7 +242,7 @@
       const el = document.createElement("div");
       el.className = "pr-ders"; el.style.setProperty("--renk", d.renk);
       el.innerHTML = `<h3>${d.ikon} ${esc(d.ad)}</h3>
-        ${od.length ? `<div>📝 Ödev: ${od.map((o) => esc(o.metin)).join("; ")} <b style="color:#dc2626">(henüz yapılmadı)</b></div>` : P.odevler.some((o) => o.ders === dk && o.teslim === anahtar(yarinT)) ? "<div>✅ Bu dersin ödevini yaptın.</div>" : ""}
+        ${od.length ? `<div>📝 Ödev${od.some((o) => o.metin !== "Ödev") ? ": " + od.filter((o) => o.metin !== "Ödev").map((o) => esc(o.metin)).join("; ") : " var"} <b style="color:#dc2626">(henüz yapılmadı)</b></div>` : P.odevler.some((o) => o.ders === dk && o.teslim === anahtar(yarinT)) ? "<div>✅ Bu dersin ödevini yaptın.</div>" : ""}
         ${son ? `<div>📍 Kaldığımız yer: <b>${esc(son.ad)}</b></div>` : ICERIK[dk] ? `<div class="not">Henüz bu dersten konu işaretlemedin.</div>` : ""}
         ${son ? `<div class="pr-hazir"><button class="btn2" data-tk="${son.id}">🔁 5 soruluk tekrar</button><button class="btn2" data-ko="${son.id}">📖 Konuya göz at</button></div>` : ""}`;
       yk.appendChild(el);
@@ -291,13 +311,13 @@
     const t = bugunT();
     ekran.innerHTML = `<div class="pr-ders" style="--renk:#0d9488">
       <label>Ders</label><select id="oD">${TUM.map((d) => `<option value="${d.key}">${d.ikon} ${esc(d.ad)}</option>`).join("")}</select>
-      <label>Ödev</label><input type="text" id="oM" placeholder="Örn: Proje ödevi, s. 50 alıştırmalar">
+      <label>Not (isteğe bağlı)</label><input type="text" id="oM" placeholder="Örn: Proje ödevi">
       <label>Teslim günü</label><input type="date" id="oT" value="${anahtar(gunEkle(t, 1))}">
       <div class="satir"><button class="btn" id="oK">💾 Kaydet</button></div></div>`;
     $("oD").onchange = () => { $("oT").value = sonrakiDersGunu($("oD").value, t); };
     $("oD").onchange();
     $("oK").onclick = () => {
-      const metin = $("oM").value.trim(); if (!metin) return alert("Ödevi kısaca yaz.");
+      const metin = $("oM").value.trim() || "Ödev";
       P.odevler.push({ id: "o" + Date.now(), ders: $("oD").value, metin, verildi: anahtar(t), teslim: $("oT").value || anahtar(gunEkle(t, 1)), bitti: false });
       kaydet(); gecmis.pop(); git(programAna, "📅 Ders Programım", false);
     };

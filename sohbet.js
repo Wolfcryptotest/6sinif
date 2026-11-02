@@ -90,7 +90,7 @@
     if (ICERDE(q, "ödev")) {
       const bek = (pr.odevler || []).filter((o) => !o.bitti).sort((a, b) => a.teslim.localeCompare(b.teslim));
       if (!pr.tablo && !bek.length) return { html: "Henüz kayıtlı ödevin yok. Ana sayfadaki <b>📅 Ders Programım</b> bölümünden ödevlerini kaydedersen sana hatırlatırım.", btn: [["📅 Ders Programım", "program"]] };
-      return { html: bek.length ? `Bekleyen ödevlerin:<br>${bek.map((o) => `• <b>${esc(dersAd(o.ders))}</b> – ${esc(o.metin)} (teslim ${o.teslim < bugunA() ? "<b style='color:#dc2626'>geçti</b>" : esc(new Date(o.teslim + "T00:00:00").toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" }))})`).join("<br>")}` : "Bekleyen ödevin yok, harika! 🎉", btn: [["📅 Ders Programım", "program"]] };
+      return { html: bek.length ? `Bekleyen ödevlerin:<br>${bek.map((o) => `• <b>${esc(dersAd(o.ders))}</b>${o.metin === "Ödev" ? " ödevi" : " – " + esc(o.metin)} (teslim ${o.teslim < bugunA() ? "<b style='color:#dc2626'>geçti</b>" : esc(new Date(o.teslim + "T00:00:00").toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" }))})`).join("<br>")}` : "Bekleyen ödevin yok, harika! 🎉", btn: [["📅 Ders Programım", "program"]] };
     }
     if (ICERDE(q, "yarın", "bugün", "ders programı", "derslerim", "hangi ders")) {
       if (!pr.tablo) return { html: "Ders programını henüz girmedin. Girersen hangi gün hangi derslerin olduğunu söyleyebilirim.", btn: [["📅 Programı gir", "program"]] };
