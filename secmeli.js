@@ -1,5 +1,5 @@
 window.ICERIK = window.ICERIK || {};
-// 6. sınıf SEÇMELİ dersler — anahtarlar ders programındaki seçmeli anahtarlarıyla aynıdır (program.js SECMELI).
+// Ortaokul SEÇMELİ dersler (temel üniteler; 5, 7, 8. sınıfta Siyer secmeli-siyer.js ile değiştirilir, ek üniteler secmeli-ortak*.js) — anahtarlar ders programındaki seçmeli anahtarlarıyla aynıdır (program.js SECMELI).
 // Ana sayfada yalnızca ders programına yazılmış seçmeliler görünür. Ünite adları MEB öğretim programlarından alınmıştır.
 // Her derste "kaynaklar": resmî MEB / EBA bağlantıları. Sorularda doğru cevap ilk şıktır; uygulama şıkları karıştırır.
 (function () {

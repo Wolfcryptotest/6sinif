@@ -141,6 +141,24 @@ function anaSayfa() {
     b.onclick = () => var_ ? git(() => uniteler(d.key), d.ad) : alert("Bu dersin içeriği henüz eklenmedi.");
     kutu.appendChild(b);
   });
+  // Seçmeli dersler: ayrı bölüm (program.js → PROGRAM_SECMELI_TUM; asıl derse bağlı "takma" seçmeliler gösterilmez)
+  const secTum = window.PROGRAM_SECMELI_TUM ? PROGRAM_SECMELI_TUM().filter((x) => !ICERIK[x.d.key].takma) : [];
+  const eskiSec = document.getElementById("secmeliBolum"); if (eskiSec) eskiSec.remove();
+  if (secTum.length) {
+    const bol = document.createElement("section");
+    bol.id = "secmeliBolum";
+    bol.innerHTML = `<h2 class="bolum-baslik">⭐ Seçmeli Dersler</h2><div class="izgara"></div>`;
+    const ic = bol.querySelector(".izgara");
+    secTum.forEach(({ d, programda }) => {
+      const b = document.createElement("button");
+      b.className = "kart ders" + (programda ? " programda" : "");
+      b.style.setProperty("--renk", d.renk);
+      b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${esc(d.ad)}</b><span class="rozet">${programda ? "📅 Programında · " : ""}${ICERIK[d.key].uniteler.length} ünite</span>`;
+      b.onclick = () => git(() => uniteler(d.key), d.ad);
+      ic.appendChild(b);
+    });
+    kutu.after(bol);
+  }
   $("tekrar").onclick = () => yanlisSay ? git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") : alert("Harika! Tekrar edilecek yanlışın yok.");
   $("panel").onclick = () => git(ilerlemePaneli, "İlerleme Paneli");
   if (window.hikayeAnaKart) window.hikayeAnaKart(); // Günün Hikâyesi kartı (hikaye.js)
@@ -257,13 +275,15 @@ function konuSayfa(k) {
       <div class="konu-a">
         <h2>📚 Konu Anlatımı</h2>
         <div class="anlatim">${k.anlatim.map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+        ${k.ornekler && k.ornekler.length ? `<h2>🧩 Çözümlü Örnekler</h2><div class="ornekler">${k.ornekler.map((o, i) => `<details class="ornek"${i === 0 ? " open" : ""}><summary><b>Örnek ${i + 1}.</b> ${esc(o[0])}</summary><div class="cozum-ic">✅ ${esc(o[1])}</div></details>`).join("")}</div>` : ""}
+        ${k.hatalar && k.hatalar.length ? `<div class="hatalar"><h3>⚠️ Sık Yapılan Hatalar</h3><ul>${k.hatalar.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
       </div>
       ${ozet}
       <div class="konu-v">
         ${window.sesliAnlatim ? `<button class="anlatim-btn" id="anlatimBtn"><span class="anlatim-ikon">🎬</span><span><b>Sesli Anlatım${window.ANLATIM && window.ANLATIM[k.id] ? " ⭐" : ""}</b><br><small>Konuyu tahtada adım adım, sesli dinle</small></span></button>` : ""}
         ${k.video ? `<h2>▶️ Konu Videosu</h2>
         <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(k.video)}?rel=0&modestbranding=1" title="Konu videosu" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
-        <div class="not">Video açılmazsa: <a href="https://www.youtube.com/watch?v=${encodeURIComponent(k.video)}" target="_blank" rel="noopener">YouTube'da izle</a></div>` : ""}
+        <div class="not">Video açılmazsa: <a href="https://www.youtube.com/watch?v=${encodeURIComponent(k.video)}" target="_blank" rel="noopener">YouTube'da izle</a></div>` : `<h2>▶️ Konu Videoları</h2><a class="video-ara" href="https://www.youtube.com/results?search_query=${encodeURIComponent(k.videoAra || (parseInt((window.SINIF && SINIF.anahtar) || document.title, 10) || "") + ". sınıf " + k.ad + " konu anlatımı")}" target="_blank" rel="noopener"><span>▶️</span><span><b>Bu konunun videolarını aç</b><small>YouTube'da "${esc(k.videoAra || k.ad)}" konu anlatımları (EBA ve öğretmen kanalları)</small></span></a>`}
       </div>
       <div class="konu-b satir">
         <button class="btn" id="basla">✏️ Soru Çöz (${TEST_BOYU} soru)</button>
