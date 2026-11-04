@@ -42,7 +42,8 @@
     const gelen = zamaniGelen().length, top = Object.keys(kayit.kelime).length;
     const ogrenilen = Object.values(kayit.kelime).filter((v) => v.k >= 3).length;
     const b = document.createElement("button");
-    b.className = "hk-kart"; b.style.background = "linear-gradient(135deg,#efe9ff,#e0d6ff)"; b.style.borderColor = "#b9a3ff"; b.style.color = "#2b1a66";
+    b.className = "hk-kart kh-mor";
+    if (!document.getElementById("kh-mor-stil")) { const st = document.createElement("style"); st.id = "kh-mor-stil"; st.textContent = ".hk-kart.kh-mor{background:linear-gradient(135deg,#efe9ff,#e0d6ff);border-color:#b9a3ff;color:#2b1a66}@media (prefers-color-scheme:dark){.hk-kart.kh-mor{background:linear-gradient(135deg,#241a45,#2d2058);border-color:#5b47a8;color:#e4dcff}}"; document.head.appendChild(st); }
     b.innerHTML = `<span class="buyuk">🧠</span><span><b>Kelime Hatırlama${gelen ? `: ${gelen} kelime tekrar zamanı` : ""}</b><small>${top ? `Listende ${top} kelime · ${ogrenilen} tanesi kalıcı öğrenildi` : "İngilizce kelimeleri ve okunuşlarını unutmaman için kısa günlük tekrarlar"}</small><small>${gelen ? "Hadi başlayalım! 🔊 Okunuşları da dinleyeceksin." : `Bugün için tekrar yok. ${GUNLUK_YENI} yeni kelime öğrenebilirsin.`}</small></span>`;
     b.onclick = () => git(hatirlaGiris, "🧠 Kelime Hatırlama");
     return b;

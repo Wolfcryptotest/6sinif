@@ -148,15 +148,24 @@ function anaSayfa() {
     b.onclick = () => var_ ? git(() => uniteler(d.key), d.ad) : alert("Bu dersin içeriği henüz eklenmedi.");
     kutu.appendChild(b);
   });
-  // Ders programına yazılmış seçmeli dersler (program.js → PROGRAM_SECMELI, içerik secmeli.js)
-  (window.PROGRAM_SECMELI ? PROGRAM_SECMELI() : []).forEach((d) => {
-    const b = document.createElement("button");
-    b.className = "kart ders";
-    b.style.setProperty("--renk", d.renk);
-    b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${esc(d.ad)}</b><span class="rozet">Seçmeli · ${ICERIK[d.key].uniteler.length} ünite</span>`;
-    b.onclick = () => git(() => uniteler(d.key), d.ad);
-    kutu.appendChild(b);
-  });
+  // Seçmeli dersler: her zaman ayrı bölümde (program.js → PROGRAM_SECMELI_TUM, içerik secmeli.js)
+  const secTum = window.PROGRAM_SECMELI_TUM ? PROGRAM_SECMELI_TUM() : [];
+  const eskiSec = document.getElementById("secmeliBolum"); if (eskiSec) eskiSec.remove();
+  if (secTum.length) {
+    const bol = document.createElement("section");
+    bol.id = "secmeliBolum";
+    bol.innerHTML = `<h2 class="bolum-baslik">⭐ Seçmeli Dersler</h2><div class="izgara"></div>`;
+    const ic = bol.querySelector(".izgara");
+    secTum.forEach(({ d, programda }) => {
+      const b = document.createElement("button");
+      b.className = "kart ders" + (programda ? " programda" : "");
+      b.style.setProperty("--renk", d.renk);
+      b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${esc(d.ad)}</b><span class="rozet">${programda ? "📅 Programında · " : ""}${ICERIK[d.key].uniteler.length} ünite</span>`;
+      b.onclick = () => git(() => uniteler(d.key), d.ad);
+      ic.appendChild(b);
+    });
+    kutu.after(bol);
+  }
   $("tekrar").onclick = () => yanlisSay ? git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") : alert("Harika! Tekrar edilecek yanlışın yok.");
   $("panel").onclick = () => git(ilerlemePaneli, "İlerleme Paneli");
   if (window.hikayeAnaKart) window.hikayeAnaKart(); // Günün Hikâyesi kartı (hikaye.js)

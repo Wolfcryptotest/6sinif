@@ -77,6 +77,11 @@
     const yazili = new Set(Object.values(P.tablo || {}).flat().filter(Boolean));
     return SECMELI.filter((d) => yazili.has(d.key) && window.ICERIK[d.key]);
   };
+  // Ana sayfadaki "Seçmeli Dersler" bölümü: içeriği olan bütün seçmeliler, programa yazılanlar önde
+  window.PROGRAM_SECMELI_TUM = () => {
+    const yazili = new Set(Object.values(P.tablo || {}).flat().filter(Boolean));
+    return SECMELI.filter((d) => window.ICERIK[d.key]).map((d) => ({ d, programda: yazili.has(d.key) })).sort((x, y) => y.programda - x.programda);
+  };
   const tumDersler = () => [...DERSLER, ...EK_DERSLER, ...SECMELI, ...P.ozelDersler];
   const dersSecenek = (v) => `<optgroup label="Dersler">${[...DERSLER, ...EK_DERSLER.filter((d) => d.key !== "secmeli")].map((d) => `<option value="${d.key}" ${d.key === v ? "selected" : ""}>${d.ikon} ${esc(d.ad)}</option>`).join("")}</optgroup>
     <optgroup label="Seçmeli dersler">${[...SECMELI, ...P.ozelDersler, EK_DERSLER.find((d) => d.key === "secmeli")].map((d) => `<option value="${d.key}" ${d.key === v ? "selected" : ""}>${d.ikon} ${esc(d.ad)}</option>`).join("")}</optgroup>`;

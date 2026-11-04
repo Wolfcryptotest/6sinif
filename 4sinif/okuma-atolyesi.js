@@ -66,6 +66,7 @@
 .oa-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
 .oa-kart{border:2px solid var(--sinir,#eadfc8);background:var(--kart,#fff);border-radius:18px;padding:16px;text-align:left;font-size:17px;color:inherit;box-shadow:0 4px 0 rgba(0,0,0,.06)}
 .oa-kart b{display:block;font-size:19px;margin:4px 0}.oa-kart small{color:var(--soluk,#7a6f8f)}.oa-kart .i{font-size:34px}
+/*oa-telefon*/@media (max-width:560px){.oa-ic{padding:12px}.oa-menu{grid-template-columns:1fr;gap:8px}.oa-kart{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;padding:10px 14px;font-size:15px;border-radius:14px}.oa-kart .i{grid-row:1/3;font-size:28px;text-align:center}.oa-kart b{font-size:16.5px;margin:0}.oa-kart small{font-size:13px;line-height:1.35}.oa-btn{padding:10px 16px;font-size:16px}.oa-ust{padding:8px 12px}}
 .oa-kart.ana{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none}.oa-kart.ana small{color:#e0e7ff}
 .oa-btn{display:inline-block;border:none;border-radius:14px;padding:13px 20px;font-size:18px;font-weight:700;background:#0ea5e9;color:#fff;margin:6px 4px}
 .oa-btn.ik{background:var(--kart,#fff);color:inherit;border:2px solid var(--sinir,#eadfc8)}

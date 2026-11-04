@@ -146,6 +146,8 @@ main.genis{max-width:1180px}
 .cevir-kart.acik{background:color-mix(in srgb,var(--mor) 12%,var(--kart))}
 </style>
 <style id="telefon-duzen">
+#secmeliBolum .bolum-baslik{margin:26px 0 12px}
+.kart.ders.programda{box-shadow:0 0 0 2px var(--renk) inset}
 /* Telefon düzeni: küçük ekranlarda butonlar ve kartlar derli toplu, yazılar okunaklı */
 @media (max-width:560px){
 html body{font-size:16px;line-height:1.5}
@@ -166,9 +168,10 @@ body .satir{gap:8px;margin:12px 0}
 body .secenek{padding:12px 14px;font-size:16px;margin-bottom:8px}
 body .soru{font-size:18px;margin:4px 0 12px}
 body .cozum{padding:11px 13px;font-size:15.5px}
-body .ozel-kart{padding:12px 14px;font-size:16px;min-height:72px;gap:12px;border-radius:15px}
-body .ozel-kart .ikon{font-size:30px}
-body .ozel-kart small{font-size:13px}
+body .ozel-izgara{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+body .ozel-kart{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;min-height:112px;padding:12px;font-size:15.5px;line-height:1.3;border-radius:15px}
+body .ozel-kart .ikon{font-size:28px;line-height:1}
+body .ozel-kart small{font-size:12.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 body .hk-kart{padding:12px 14px;gap:12px;margin:10px 0;border-radius:15px}
 body .hk-kart .buyuk{font-size:32px}
 body .hk-kart b{font-size:16.5px}
@@ -177,6 +180,7 @@ body .hedef-kart{padding:12px 14px;margin-bottom:14px}
 body .hedef-ust{font-size:16px}
 body .kutlama{font-size:17px;padding:12px 18px}
 }
+#secmeliBolum h2{margin:24px 0 12px}
 @media (max-width:380px){
 body .izgara{grid-template-columns:repeat(2,1fr)}
 }
