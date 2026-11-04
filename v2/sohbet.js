@@ -67,8 +67,39 @@
   const dersAd = (dk) => window.PROGRAM_DERS_AD ? window.PROGRAM_DERS_AD(dk) : dersAd0(dk);
   const dersAd0 = (dk) => { const d = (typeof DERSLER !== "undefined" ? DERSLER : []).find((x) => x.key === dk); return d ? d.ad : dk; };
 
+  // Düşündüren Bilge: işlemin cevabını hemen söylemez; önce çocuğun denemesini ister, sonra ipucu, en son çözüm.
+  let bekleyen = null;
+  const sayiStr = (v) => String(Math.round(v * 1e6) / 1e6).replace(".", ",");
+  function ipucuUret(ifade) {
+    const m = /^\s*(-?\d+(?:[.,]\d+)?)\s*([+\-−×x*÷:/])\s*(-?\d+(?:[.,]\d+)?)\s*$/i.exec(ifade);
+    if (!m) return "İşlem önceliğini hatırla: önce parantez, sonra üslü sayılar, sonra çarpma-bölme (soldan sağa), en son toplama-çıkarma. İşlemleri tek tek yaz.";
+    const a = parseFloat(m[1].replace(",", ".")), o = m[2], b = parseFloat(m[3].replace(",", "."));
+    if (/[×x*]/i.test(o)) { if (Number.isInteger(b) && b >= 10) { const on = Math.floor(b / 10) * 10, bir = b - on; return `Parçala: ${a} × ${b} = ${a} × ${on}${bir ? ` + ${a} × ${bir}` : ""}. Önce ${a} × ${on} kaç, onu bul.`; } return `${a} tane ${b}'i art arda topla ya da çarpım tablosunu hatırla. ${a} × ${b - 1} kaç? Üstüne bir ${a} daha ekle.`; }
+    if (/[÷:/]/.test(o)) return `${a} içinde kaç tane ${b} var? Şöyle düşün: ${b} × ? = ${a}. Çarpım tablosunda ${b}'in katlarını say.`;
+    if (o === "+") return `Önce onlukları, sonra birlikleri topla. ${Math.floor(a / 10) * 10} + ${Math.floor(b / 10) * 10} kaç? Sonra birlikleri ekle.`;
+    return `Önce onlukları çıkar: ${a} − ${Math.floor(b / 10) * 10} kaç? Sonra kalan ${b % 10}'u da çıkar.`;
+  }
+  function bilgeIslem(girdi, q) {
+    if (bekleyen) {
+      const sayi = /^\s*[=]?\s*(-?\d+(?:[.,]\d+)?)\s*$/.exec(girdi), b = bekleyen;
+      if (/ipucu|yardım|ipuc/.test(q)) { b.deneme = Math.max(b.deneme, 1); return { html: `💡 <b>İpucu:</b> ${esc(ipucuUret(b.ifade))}<br>Şimdi sonucu yaz bakalım: <b>${esc(b.ifade)} = ?</b>`, btn: [["👀 Çözümü göster", "say:çözüm"]] }; }
+      if (/çözüm|cevap|göster|bilmiyorum|yapamadım/.test(q)) { bekleyen = null; return { html: `📖 <b>${esc(b.ifade)} = ${sayiStr(b.sonuc)}</b><br>${esc(ipucuUret(b.ifade))}<br>Bir benzerini de sen dene: <b>${esc(benzerSoru(b.ifade))}</b>` }; }
+      if (sayi) {
+        const v = parseFloat(sayi[1].replace(",", "."));
+        if (Math.abs(v - b.sonuc) < 1e-6) { bekleyen = null; return { html: `✅ <b>Doğru!</b> ${esc(b.ifade)} = ${sayiStr(b.sonuc)} 🎉 ${b.deneme ? "İpucuyla buldun, harika!" : "Hiç yardım almadan buldun, süpersin!"}` }; }
+        b.deneme++;
+        if (b.deneme >= 3) { bekleyen = null; return { html: `Bu sefer olmadı, sorun değil 🌱 Doğrusu: <b>${esc(b.ifade)} = ${sayiStr(b.sonuc)}</b>.<br>${esc(ipucuUret(b.ifade))}` }; }
+        return { html: `${b.deneme === 1 ? "Yaklaştın ama tam değil." : "Bir daha bakalım."} 💡 ${esc(ipucuUret(b.ifade))}<br>Tekrar dene: <b>${esc(b.ifade)} = ?</b>`, btn: [["👀 Çözümü göster", "say:çözüm"]] };
+      }
+      bekleyen = null; // başka bir şey sordu: normal akışa dön
+    }
+    return null;
+  }
+  function benzerSoru(ifade) { return ifade.replace(/\d+/g, (d) => { const n = parseInt(d, 10); return String(Math.max(1, n + (Math.random() < 0.5 ? 1 : 2))); }); }
+
   function cevapla(girdi) {
     const q = sade(girdi);
+    const bi = bilgeIslem(girdi, q || ""); if (bi) return bi;
     if (!q) return { html: "Bir şey yazmadın 🙂 Merak ettiğin bir konuyu sorabilirsin." };
 
     // Güvenlik: zor bir durum yaşadığını anlatan çocuğa yetişkin yönlendirmesi
@@ -109,6 +140,7 @@
 
     // Hesap
     const h = hesapla(girdi.replace(/kaç(tır|eder)?|eder|sonucu|hesapla/gi, ""));
+    if (h && !h.hata) { h.ifade = h.ifade.replace(/\s+/g, " ").trim(); bekleyen = { ifade: h.ifade, sonuc: h.sonuc, deneme: 0 }; return { html: `🦉 Birlikte çözelim! Önce sen dene: <b>${esc(h.ifade)} = ?</b><br>Sonucu yaz, ben kontrol edeyim.`, btn: [["💡 İpucu", "say:ipucu"], ["👀 Çözümü göster", "say:çözüm"]] }; }
     if (h) return h.hata ? { html: h.hata } : { html: `<b>${esc(h.ifade)} = ${String(h.sonuc).replace(".", ",")}</b><br><small>İşlem önceliği: önce parantez, sonra çarpma-bölme, en son toplama-çıkarma. Adım adım yapmak için soruda <b>✏️ İşlem Alanı</b>'nı kullanabilirsin.</small>` };
 
     // İngilizce kelime
@@ -196,6 +228,7 @@
       kutu.querySelectorAll("[data-s]").forEach((b) => (b.onclick = () => gonder(b.dataset.s)));
       kutu.querySelectorAll("[data-e]").forEach((b) => (b.onclick = () => {
         const e = b.dataset.e;
+        if (e.startsWith("say:")) return gonder(e.slice(4));
         if (e === "program") return window.PROGRAM_AC ? window.PROGRAM_AC() : alert("Ders programı bu sınıfta yok.");
         const [tur, id] = e.split(":"), k = konuBulK(id); if (!k) return;
         if (tur === "konu") git(() => konuSayfa(k), k.ad);

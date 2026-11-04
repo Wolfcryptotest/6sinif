@@ -171,6 +171,26 @@
     b.innerHTML = `<span class="ikon">🏅</span><span><b>Rozetler ve Haftalık Hedef</b><small>Bu hafta ${buHaftaUsta()}/2 usta konu · ${Object.keys(kayit.rozetler).length} rozet · toplam ${ustaSay()} usta</small></span>`;
     b.onclick = () => git(rozetEkrani, "🏅 Rozetler"); kutu.appendChild(b);
   });
+  // ---------- Ön koşul uyarısı: önceki konu zayıfsa önce kısa tekrar öner ----------
+  if (typeof window.konuSayfa === "function") {
+    const asilKS = window.konuSayfa;
+    window.konuSayfa = function (k) {
+      const r = asilKS.apply(this, arguments);
+      try {
+        const b = k && konuBul(k.id); if (!b) return r;
+        const i = b.unite.konular.findIndex((x) => x.id === k.id), on = i > 0 ? b.unite.konular[i - 1] : null, u = on && U[on.id];
+        if (on && u && u.n >= 3 && u.p < 60) {
+          const d = document.createElement("div"); d.className = "onkosul";
+          d.innerHTML = `🧩 Bu konu, <b>${esc(on.ad)}</b> konusunun üzerine kurulur. Orada puanın <b>${u.p}/100</b>. Önce 5 soruluk kısa bir tekrar yaparsan bu konu çok daha kolay gelir.<div class="satir" style="margin:8px 0 0"><button class="btn" data-t>🔁 Önce ${esc(on.ad)}</button><button class="btn2" data-k>Bu konuya devam</button></div>`;
+          d.querySelector("[data-t]").onclick = () => git(() => test(() => soruHazirla(on, 5), "Tekrar: " + on.ad, false, on.id), "🔁 " + on.ad);
+          d.querySelector("[data-k]").onclick = () => d.remove();
+          ekran.prepend(d);
+        }
+      } catch (e) {}
+      return r;
+    };
+    const st2 = document.createElement("style"); st2.textContent = ".onkosul{background:color-mix(in srgb,#f59e0b 14%,var(--kart));border:1px solid color-mix(in srgb,#f59e0b 50%,var(--sinir));border-radius:16px;padding:12px 14px;margin-bottom:14px;font-size:16.5px;line-height:1.5}"; document.head.appendChild(st2);
+  }
   kaydet();
   if (window.ANA_YENILE) try { ANA_YENILE(); } catch (e) {}
 })();
