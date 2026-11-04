@@ -17,8 +17,10 @@ window.SINIF = {
     aciklama: "Bu denemeler 5. sınıf konularından LGS biçiminde hazırlanır. Netini takip et, zayıf konularını gör. Bursluluk sınavına (İOKBS) ve ileride LGS'ye hazırlık için iyi bir alışkanlıktır.",
     oturumlar: [
       { ad: "Sözel", sure: 75, dersler: [["turkce", 20], ["sosyal", 10], ["din", 10], ["ingilizce", 10]] },
-      { ad: "Sayısal", sure: 80, dersler: [["matematik", 20], ["fen", 20]] }
-    ]
+      { ad: "Sayısal", sure: 80, dersler: [["matematik", 20], ["fen", 20]] },
+      { ad: "Bursluluk (İOKBS)", sure: 100, ikon: "🏅", renk: "#ca8a04", dersler: [["turkce", 20], ["matematik", 20], ["fen", 20], ["sosyal", 20]] }
+    ],
+    tam: [0, 1]
   },
   ortak: [] // 5. sınıflar 2026-2027'de ülke geneli ortak yazılıya girmiyor (yazılılar okulda)
 };

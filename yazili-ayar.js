@@ -31,7 +31,9 @@ window.SINIF = {
     aciklama: "LGS'ye 8. sınıfın sonunda gireceksin. Buradaki denemeler LGS biçimindedir ama 6. sınıf konularından hazırlanır; şimdiden alışmak için.",
     oturumlar: [
       { ad: "Sözel", sure: 75, dersler: [["turkce", 20], ["sosyal", 10], ["din", 10], ["ingilizce", 10]] },
-      { ad: "Sayısal", sure: 80, dersler: [["matematik", 20], ["fen", 20]] }
-    ]
+      { ad: "Sayısal", sure: 80, dersler: [["matematik", 20], ["fen", 20]] },
+      { ad: "Bursluluk (İOKBS)", sure: 100, ikon: "🏅", renk: "#ca8a04", dersler: [["turkce", 20], ["matematik", 20], ["fen", 20], ["sosyal", 20]] }
+    ],
+    tam: [0, 1]
   }
 };

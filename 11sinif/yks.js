@@ -11,6 +11,26 @@
   const dersAd = (k) => (ICERIK[k] ? ICERIK[k].ad : k);
   const dersBilgi = (k) => DERSLER.find((d) => d.key === k) || { ikon: "📘", ad: k };
   const net = (x) => x.d - x.y / 4;
+  // Yaklaşık TYT puanı: 100 + Türkçe×3,3 + Sosyal×3,4 + Temel Mat×3,3 + Fen×3,4 (ÖSYM katsayıları yıldan yıla az değişir; sonuç tahminidir)
+  const TYT_KAT = { tr: 3.3, sos: 3.4, mat: 3.3, fen: 3.4 };
+  const tytPuan = (n) => 100 + n.tr * TYT_KAT.tr + n.sos * TYT_KAT.sos + n.mat * TYT_KAT.mat + n.fen * TYT_KAT.fen;
+  const TYT_GRUP = { edebiyat: "tr", turkce: "tr", tarih: "sos", inkilap: "sos", cografya: "sos", din: "sos", felsefe: "sos", matematik: "mat", fizik: "fen", kimya: "fen", biyoloji: "fen" };
+  function puanHesap() {
+    let d = {}; try { d = JSON.parse(localStorage.getItem("yks-puan-girdi") || "{}"); } catch (e) {}
+    const alan = (k, ad, max) => `<label style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0"><span>${ad} <small class="not">(en çok ${max})</small></span><input type="number" step="0.25" min="0" max="${max}" data-k="${k}" value="${d[k] ?? ""}" style="width:96px;padding:8px;border-radius:10px;border:1px solid var(--sinir);background:var(--kart);color:var(--yazi);font-size:17px"></label>`;
+    ekran.innerHTML = `<p class="not">Netlerini gir; yaklaşık TYT puanın ve diploma notunla birlikte yerleştirme puanın hesaplansın. Net = doğru − yanlış ÷ 4.</p>
+      <div class="grafik-kart">${alan("tr", "📖 Türkçe neti", 40)}${alan("sos", "🌍 Sosyal Bilimler neti", 20)}${alan("mat", "📐 Temel Matematik neti", 40)}${alan("fen", "🔬 Fen Bilimleri neti", 20)}${alan("dip", "🎓 Diploma notu (50–100)", 100)}</div>
+      <div class="ozet" id="phSonuc">—</div><p id="phDetay" style="text-align:center"></p>
+      <p class="not">⚠️ Bu hesap <b>yaklaşıktır</b>. ÖSYM puanları adayların ortalamasına ve standart sapmasına göre her yıl yeniden hesaplar; kesin puan ve sıralama için <a href="https://www.osym.gov.tr" target="_blank" rel="noopener">ÖSYM</a> ve <a href="https://yokatlas.yok.gov.tr" target="_blank" rel="noopener">YÖK Atlas</a>'a bakın. AYT puanları da TYT netleriyle birlikte (TYT %40, AYT %60) hesaplanır.</p>`;
+    const hesap = () => {
+      const v = {}; ekran.querySelectorAll("[data-k]").forEach((i) => { v[i.dataset.k] = Math.max(0, Math.min(+i.max, parseFloat(i.value) || 0)); });
+      try { localStorage.setItem("yks-puan-girdi", JSON.stringify(v)); } catch (e) {}
+      const ham = tytPuan(v), obp = v.dip >= 50 ? v.dip * 0.6 : 0;
+      $("phSonuc").textContent = `≈ ${ham.toFixed(1).replace(".", ",")} TYT puanı`;
+      $("phDetay").innerHTML = `Toplam net: <b>${(v.tr + v.sos + v.mat + v.fen).toLocaleString("tr-TR")}</b> / 120${obp ? ` · OBP katkısı: <b>+${obp.toFixed(1).replace(".", ",")}</b> → yerleştirme puanı ≈ <b>${(ham + obp).toFixed(1).replace(".", ",")}</b>` : ""}${ham < 150 ? "<br>ℹ️ Lisans tercihi için TYT'den en az 150 puan gerekir." : ""}`;
+    };
+    ekran.querySelectorAll("[data-k]").forEach((i) => (i.oninput = hesap)); hesap();
+  }
   const netYaz = (n) => (Math.round(n * 100) / 100).toLocaleString("tr-TR");
   const tumHavuz = () => [...(window.YKS_HAVUZ || []).map((s) => ({ ...s, site: true })), ...kayit.yksHavuz];
   const havuzSoru = (s) => ({ soru: s.soru, gorsel: s.gorsel || "", secenekler: s.secenekler.slice(), dogru: s.dogru, cozum: (s.kaynak ? "[" + s.kaynak + "] " : "") + (s.cozum || ""), ders: s.ders, sabit: true, havuzId: s.id });
@@ -52,6 +72,8 @@
       ${L.cikmis ? `<h2>📄 ${esc(L.cikmisBaslik || "Çıkmış Sorular")}</h2>
       <p class="not">${esc(L.cikmisNot || "")}</p>
       <div class="grafik-kart kaynak cikmis">${L.cikmis.map(([ad, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">📄 ${esc(ad)}</a>`).join("")}</div>` : ""}
+      <h2>🧮 Puan Hesaplama</h2>
+      <button class="kart oyun-mod" id="puanHes" style="border-left-color:#0f766e;margin-bottom:12px"><span class="ikon">🧮</span><b>Net → Yaklaşık TYT Puanı</b><span class="rozet">Netlerini ve diploma notunu gir, yaklaşık puanını gör</span></button>
       <h2>📚 Soru Havuzu</h2>
       <button class="kart oyun-mod" id="havuz" style="border-left-color:#7c4dff;margin-bottom:12px"><span class="ikon">🗂️</span><b>Geçmiş Yıl / Ek Soru Havuzu (${hv.length} soru)</b><span class="rozet">${hv.length ? "Havuzdan çöz, yeni soru ekle, dışa/içe aktar" : "Havuz şu an boş — geçmiş yıl TYT/AYT sorularını ya da kendi sorularını ekleyerek doldur"}</span></button>
       <h2>📈 Deneme Geçmişi</h2>
@@ -68,6 +90,7 @@
     ekran.querySelectorAll("[data-o]").forEach((b) => (b.onclick = () => { const o = L.oturumlar[+b.dataset.o]; basla([o], o.ad); }));
     if ($("tam")) $("tam").onclick = () => basla(TAM, "Tam YKS Provası");
     $("havuz").onclick = () => git(havuzAna, "🗂️ Soru Havuzu");
+    $("puanHes").onclick = () => git(puanHesap, "🧮 Puan Hesaplama");
     const mini = $("mini"), miniVar = new Set();
     L.oturumlar.forEach((o) => o.dersler.forEach(([k, n]) => {
       if (!ICERIK[k] || miniVar.has(k)) return;
@@ -160,6 +183,7 @@
       ekran.innerHTML = `
         <div class="ozet">${netYaz(net(top))} net</div>
         <p style="text-align:center">${top.d} doğru · ${top.y} yanlış · ${top.b} boş</p>
+        ${/^TYT/.test(ad) ? (() => { const n = { tr: 0, sos: 0, mat: 0, fen: 0 }; Object.entries(dersler).forEach(([k, x]) => { if (TYT_GRUP[k]) n[TYT_GRUP[k]] += net(x); }); return `<p style="text-align:center">🧮 Bu netlerle yaklaşık <b>${tytPuan(n).toFixed(1).replace(".", ",")}</b> TYT puanı <span class="not">(tahmini)</span></p>`; })() : ""}
         <table class="tablo"><tr><th>Ders</th><th>D</th><th>Y</th><th>B</th><th>Net</th></tr>
           ${Object.entries(dersler).map(([k, x]) => `<tr><td>${dersBilgi(k).ikon} ${esc(dersAd(k))}</td><td>${x.d}</td><td>${x.y}</td><td>${x.b}</td><td>${netYaz(net(x))}</td></tr>`).join("")}
           <tr><td>Toplam</td><td>${top.d}</td><td>${top.y}</td><td>${top.b}</td><td>${netYaz(net(top))}</td></tr></table>
