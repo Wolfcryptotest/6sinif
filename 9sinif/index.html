@@ -145,6 +145,42 @@ main.genis{max-width:1180px}
 .cevir-kart small{font-size:16px;font-weight:400;color:var(--soluk)}
 .cevir-kart.acik{background:color-mix(in srgb,var(--mor) 12%,var(--kart))}
 </style>
+<style id="telefon-duzen">
+/* Telefon düzeni: küçük ekranlarda butonlar ve kartlar derli toplu, yazılar okunaklı */
+@media (max-width:560px){
+html body{font-size:16px;line-height:1.5}
+body header{padding:8px 12px;gap:8px}
+body header h1{font-size:17px}
+body .geri{padding:7px 12px;font-size:15px}
+body main{padding:12px 12px 40px}
+body h2{font-size:20px}
+body .izgara{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+body .kart{padding:13px 14px;border-radius:15px}
+body .ders{min-height:100px;border-left-width:6px}
+body .ders .ikon{font-size:30px}
+body .ders b{font-size:17px}
+body .rozet{font-size:12.5px}
+body .anlatim p{padding:11px 13px;font-size:16px}
+body .btn,body .btn2{padding:11px 16px;font-size:16px;border-radius:12px}
+body .satir{gap:8px;margin:12px 0}
+body .secenek{padding:12px 14px;font-size:16px;margin-bottom:8px}
+body .soru{font-size:18px;margin:4px 0 12px}
+body .cozum{padding:11px 13px;font-size:15.5px}
+body .ozel-kart{padding:12px 14px;font-size:16px;min-height:72px;gap:12px;border-radius:15px}
+body .ozel-kart .ikon{font-size:30px}
+body .ozel-kart small{font-size:13px}
+body .hk-kart{padding:12px 14px;gap:12px;margin:10px 0;border-radius:15px}
+body .hk-kart .buyuk{font-size:32px}
+body .hk-kart b{font-size:16.5px}
+body .hk-kart small{font-size:13px}
+body .hedef-kart{padding:12px 14px;margin-bottom:14px}
+body .hedef-ust{font-size:16px}
+body .kutlama{font-size:17px;padding:12px 18px}
+}
+@media (max-width:380px){
+body .izgara{grid-template-columns:repeat(2,1fr)}
+}
+</style>
 </head>
 <body>
 <header><button class="geri" id="geri" hidden>← Geri</button><h1 id="baslik">9. Sınıf Çalışma Merkezi</h1><button class="yukle-btn" id="yukle" hidden>📲 Uygulamayı Yükle</button></header>
