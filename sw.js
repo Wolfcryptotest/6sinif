@@ -1,7 +1,7 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders-";
-const SURUM = ONEK + "aa69983d";
+const SURUM = ONEK + "1e809431";
 const DOSYALAR = ["secmeli-ortak.js", "secmeli-ortak2.js", "yedek.js", "takip.js", "okuma-atolyesi.js", "./", "acik-sorular.js", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "havuz.js", "hazirlik.js", "hikaye.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "islem-alani.js", "kelime-bankasi.js", "kelime-hatirla.js", "lgs.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "program.js", "secmeli.js", "ses.js", "sohbet.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js", "yazili-ayar.js"];
 
 self.addEventListener("install", (e) => {
@@ -15,7 +15,7 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET" || url.origin !== location.origin) return; // YouTube vb. dış istekler internetten
   const kapsam = self.registration.scope;
   if (!e.request.url.startsWith(kapsam)) return; // kapsam dışı
-  if (/^\d+sinif\//.test(e.request.url.slice(kapsam.length))) return; // aynı sitedeki diğer sınıflara karışma
+  if (/^(\d+sinif|minik|v2)\//.test(e.request.url.slice(kapsam.length))) return; // aynı sitedeki diğer sınıflara karışma
   e.respondWith(
     caches.open(SURUM).then((ca) => ca.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
       if (r.ok) ca.put(e.request, r.clone()); // hatalı yanıtlar (404) önbelleğe alınmaz
