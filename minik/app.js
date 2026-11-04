@@ -158,7 +158,7 @@
     const kc = $(`<div class="kucukler">
       <button><span>📚</span>${MASAL ? "Masal Kitaplığı" : "Hikâye Kitaplığı"}</button>
       <button><span>🏆</span>Çıkartma Albümüm</button>
-      <button><span>🔁</span>Hatalarım (${K.hatalar.length})</button>
+      <button><span>🔁</span>Hatalarım (${K.hatalar.length + tekrarVakti().length})</button>
       <button ${(window.KITAPLAR || []).length ? "" : 'style="display:none"'}><span>📕</span>MEB Kitaplarım</button>
       <button><span>👨‍👩‍👧</span>Veli Köşesi</button>
       ${DERS.ingilizce && SIRA.includes("ingilizce") ? `<button><span>🧠</span>Kelime Tekrarı (${kelimeVakti().length})</button>` : ""}</div>`);
@@ -255,17 +255,24 @@
     const gorevler = OYUN.hazirla(t.konular.map((k) => () => { const g = k.uret(); if (g) g.konu = k.id; return g; }), S.temaGorev);
     OYUN.tur({ gorevler, renk: D.renk, bitti: (s) => sonuc(s, { id, tema: t, tekrar: () => { yigin.pop(); git(() => temaYarisi(id, t), "🏁 " + t.ad); } }) });
   }
+  // Hatalarım + aralıklı tekrar: doğru çözülen hata 1, 3 ve 7 gün sonra yeniden sorulur (unutmayı önler)
+  const H_ARALIK = [1, 3, 7], GUN_MS = 86400000;
+  const tekrarVakti = () => (K.aralikli || (K.aralikli = [])).filter((x) => x.z <= Date.now());
   function hatalarim() {
-    if (!K.hatalar.length) { maskot(`Hiç hatan yok ${K.ad}! Oyun oynadıkça yanlış yaptığın sorular buraya gelir, sonra tekrar çözersin.`, true); return; }
-    maskot(`${K.hatalar.length} sorun bekliyor. Hadi bunları tekrar çözelim!`, true);
-    const b = $(`<button class="buyukbtn" style="--renk:var(--kirmizi)">🔁 Tekrar Çöz (${Math.min(8, K.hatalar.length)} soru)</button>`);
+    const vakti = tekrarVakti();
+    if (!K.hatalar.length && !vakti.length) { maskot(`Hiç hatan yok ${K.ad}! Oyun oynadıkça yanlış yaptığın sorular buraya gelir, sonra tekrar çözersin.${K.aralikli.length ? ` ${K.aralikli.length} soru da birkaç gün sonra hatırlıyor musun diye tekrar gelecek.` : ""}`, true); return; }
+    maskot(`${K.hatalar.length ? K.hatalar.length + " hatalı soru" : ""}${K.hatalar.length && vakti.length ? " ve " : ""}${vakti.length ? vakti.length + " tekrar sorusu" : ""} seni bekliyor. Hadi çözelim!`, true);
+    const b = $(`<button class="buyukbtn" style="--renk:var(--kirmizi)">🔁 Tekrar Çöz (${Math.min(8, K.hatalar.length + vakti.length)} soru)</button>`);
     b.onclick = () => {
       yigin.pop(); git(() => {
-        const gorevler = K.hatalar.slice(-8).reverse();
+        const tekrar = vakti.slice(0, 4), gorevler = [...tekrar.map((x) => x.g), ...K.hatalar.slice(-(8 - tekrar.length)).reverse()];
         OYUN.tur({ gorevler, renk: "#ef476f", bitti: (s) => {
           const bilinmeyen = new Set(s.yanlislar);
           const cozulen = gorevler.filter((g) => !bilinmeyen.has(g));
           K.hatalar = K.hatalar.filter((g) => !cozulen.includes(g));
+          tekrar.forEach((x) => { if (bilinmeyen.has(x.g)) { K.aralikli = K.aralikli.filter((y) => y !== x); K.hatalar.push(x.g); } else { x.a++; if (x.a >= H_ARALIK.length) K.aralikli = K.aralikli.filter((y) => y !== x); else x.z = Date.now() + H_ARALIK[x.a] * GUN_MS; } });
+          cozulen.forEach((g) => { if (!tekrar.some((x) => x.g === g)) K.aralikli.push({ g, a: 0, z: Date.now() + H_ARALIK[0] * GUN_MS }); });
+          if (K.aralikli.length > 60) K.aralikli = K.aralikli.slice(-60);
           sonuc(s, { hata: true, tekrar: () => { yigin.pop(); git(hatalarim, "🔁 Hatalarım"); } });
         } });
       }, "🔁 Hatalarım");
@@ -525,6 +532,7 @@
     // okuma hızı
     const ok = K.okuma.slice(-10);
     if (!MASAL) ekran.appendChild($(`<div class="panel"><h3>⏱ Okuma hızı (dakikada kelime)</h3>${ok.length ? ok.map((o) => `${o.t}: <b>${o.hiz}</b> — ${esc(HIKAYELER[o.h] ? HIKAYELER[o.h].baslik : "")}`).join("<br>") : "Henüz ölçüm yok. Çocuk hikâyeyi 🔊 kullanmadan kendisi okuyunca ölçülür."}<div class="not" style="margin-top:6px">${S.no}. sınıf sonu için hedeflenen okuma hızı genellikle dakikada ${S.okumaHedef} kelime civarındadır.</div></div>`));
+    if (window.KARNE_PAYLAS) ekran.appendChild(KARNE_PAYLAS()); // haftalık karne (veli-karne.js)
     // ayarlar
     const ay = $(`<div class="panel"><h3>⚙️ Ayarlar</h3>
       <div class="satir"><input class="ad" value="${esc(K.ad)}"><button class="buyukbtn ikincil" style="flex:0 0 auto;margin:0;padding:10px 18px;font-size:18px">Adı kaydet</button></div>
