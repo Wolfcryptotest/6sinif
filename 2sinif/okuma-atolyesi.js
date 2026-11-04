@@ -32,8 +32,13 @@
       const sor = (h.sorular || []).filter((q) => Array.isArray(q) && Array.isArray(q[2])).map((q) => ({ soru: q[0], dogru: q[1], secenek: karistir([q[1], ...q[2]]) }));
       if (sayfa.length) l.push({ baslik: h.baslik, metin: sayfa.join("\n"), sorular: sor });
     });
-    if (!l.length && window.ICERIK) for (const D of Object.values(ICERIK)) for (const u of D.uniteler || []) for (const k of u.konular || []) {
+    // Hikâye yoksa Türkçe konu anlatımları (yabancı dil dersleri hariç; Türkçe/edebiyat ve sözel dersler önce)
+    const YABANCI = /ingilizce|almanca|arapca|fransizca|ispanyolca|rusca|yabanci|^ing$|^alm$/i;
+    const SOZEL = /turkce|edebiyat|sosyal|tarih|inkilap|cografya|din|felsefe|siyer|masal|okuma/i;
+    const dersler = window.ICERIK ? Object.entries(ICERIK).filter(([dk]) => !YABANCI.test(dk)).sort((x, y) => SOZEL.test(y[0]) - SOZEL.test(x[0])).map((x) => x[1]) : [];
+    if (!l.length) for (const D of dersler) for (const u of D.uniteler || []) for (const k of u.konular || []) {
       if (!k.anlatim || !k.anlatim.length || !k.sorular) continue;
+      const tm = k.anlatim.join(" "); if (!/[çğıöşüÇĞİÖŞÜ]/.test(tm) || (tm.match(/[çğıöşü]/gi) || []).length < tm.length / 120) continue;
       l.push({ baslik: k.ad, metin: k.anlatim.join("\n"), sorular: k.sorular.slice(0, 5).map((q) => ({ soru: q.soru, dogru: q.secenekler[q.dogru], secenek: karistir(q.secenekler.slice()) })) });
     }
     return l;
