@@ -10,7 +10,7 @@
   if (NO < 1) return;
   const ANAHTAR = "okuma-atolyesi-" + (S.anahtar || NO + "sinif");
   const veri = (() => { try { return JSON.parse(localStorage.getItem(ANAHTAR)) || {}; } catch (e) { return {}; } })();
-  veri.schultz = veri.schultz || []; veri.flas = veri.flas || { ms: null, gecmis: [] }; veri.okuma = veri.okuma || []; veri.kamera = veri.kamera || []; veri.gun = veri.gun || {};
+  veri.schultz = veri.schultz || []; veri.flas = veri.flas || { ms: null, gecmis: [] }; veri.okuma = veri.okuma || []; veri.kamera = veri.kamera || []; veri.gun = veri.gun || {}; veri.olcum = veri.olcum || [];
   const kaydet = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(veri)); } catch (e) {} };
   const bugun = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -69,6 +69,10 @@
 .oa-ust b{flex:1;font-size:19px}.oa-ust button{border:1px solid var(--sinir,#eadfc8);background:var(--kart,#fff);color:inherit;border-radius:12px;padding:8px 12px;font-size:16px}
 .oa-ic{max-width:760px;margin:0 auto;padding:16px}
 .oa-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.oa-serit{display:grid;gap:6px;background:color-mix(in srgb,#0ea5e9 9%,var(--kart,#fff));border:1px solid color-mix(in srgb,#0ea5e9 35%,var(--sinir,#ddd));border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:16px;line-height:1.45}
+.oa-serit b{font-size:17px}.oa-bant{position:relative;height:12px;border-radius:8px;background:var(--sinir,#e5e7eb);margin:6px 0}.oa-bant i{position:absolute;top:0;bottom:0;background:#22c55e;border-radius:8px;opacity:.55}.oa-bant b{position:absolute;top:-5px;width:6px;height:22px;margin-left:-3px;border-radius:3px;background:#1d4ed8}
+.oa-kart.olc{background:linear-gradient(135deg,#16a34a,#0ea5e9)!important;color:#fff!important;border:none!important}.oa-kart.olc small{color:#f0fdf4!important}
+.oa-sonuc{text-align:center;font-size:17px;line-height:1.5}.oa-karolar{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:10px 0}.oa-karolar>div{background:var(--kart,#fff);border:1px solid var(--sinir,#ddd);border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center}.oa-karolar b{font-size:28px;line-height:1.2}.oa-karolar small{color:var(--soluk,#6b7280);font-size:13px}
 .oa-kart{border:2px solid var(--sinir,#eadfc8);background:var(--kart,#fff);border-radius:18px;padding:16px;text-align:left;font-size:17px;color:inherit;box-shadow:0 4px 0 rgba(0,0,0,.06)}
 .oa-kart b{display:block;font-size:19px;margin:4px 0}.oa-kart small{color:var(--soluk,#7a6f8f)}.oa-kart .i{font-size:34px}
 /*oa-telefon*/@media (max-width:560px){.oa-ic{padding:12px}.oa-menu{grid-template-columns:1fr;gap:8px}.oa-kart{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;padding:10px 14px;font-size:15px;border-radius:14px}.oa-kart .i{grid-row:1/3;font-size:28px;text-align:center}.oa-kart b{font-size:16.5px;margin:0}.oa-kart small{font-size:13px;line-height:1.35}.oa-btn{padding:10px 16px;font-size:16px}.oa-ust{padding:8px 12px}}
@@ -114,12 +118,75 @@
     if (mesaj) el.insertAdjacentHTML("afterbegin", mesaj);
   };
 
+  // ---------- Kendi hızında okuma ölçümü ----------
+  const etkili = (x) => Math.round((x.hiz * (x.anlama || 0)) / 100);
+  const rekor = () => veri.olcum.filter((x) => x.gecerli !== false).reduce((m, x) => Math.max(m, etkili(x)), 0);
+  const gunOnce = (t) => Math.round((new Date(bugun()) - new Date(t)) / 864e5);
+  function olcumAlt() {
+    const son = veri.olcum.slice(-1)[0];
+    if (!son) return "Kendi hızında oku, kaç kelime okuduğunu ve ne kadar anladığını öğren. Haftada bir ölç, gelişimini gör.";
+    const g = gunOnce(son.t);
+    return `Son: ${son.hiz} kelime/dk · anlama %${son.anlama} · rekor ${rekor()}${g >= 7 ? " · ⏰ Yeniden ölçme zamanı!" : g === 0 ? " · bugün ölçtün ✅" : ` · ${g} gün önce`}`;
+  }
+  function ozetSerit() {
+    const son = veri.olcum.slice(-1)[0], ilk = veri.olcum[0];
+    if (!son) return `<div class="oa-serit"><b>📖 Okuma hızını hiç ölçmedin.</b><span>Önce "Okuma Hızımı Ölç" ile başla; ${NO}. sınıf hedefi dakikada <b>${hedef[0]}–${hedef[1]}</b> kelime, anlama en az %80.</span></div>`;
+    const fark = veri.olcum.length > 1 ? son.hiz - ilk.hiz : 0;
+    const yer = Math.max(0, Math.min(100, ((son.hiz - hedef[0] * 0.5) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100));
+    return `<div class="oa-serit"><b>📖 Okuma hızın: ${son.hiz} kelime/dk · Anlama: %${son.anlama}</b>
+      <div class="oa-bant"><i style="left:${((hedef[0] - hedef[0] * 0.5) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100}%;width:${((hedef[1] - hedef[0]) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100}%"></i><b style="left:${yer}%"></b></div>
+      <span>Yeşil bölge ${NO}. sınıf hedefi (${hedef[0]}–${hedef[1]}).${fark > 0 ? ` İlk ölçümünden bu yana <b>+${fark}</b> kelime/dk 👏` : ""}</span></div>`;
+  }
+  function olc(el) {
+    const p = okumaParcasi(); if (!p) { el.innerHTML = "<p>Bu sınıfta okunacak metin bulunamadı.</p>"; return sonraki(el); }
+    const kelime = p.kelimeler.filter((x) => /[\p{L}\p{N}]/u.test(x)).length;
+    el.innerHTML = `<div class="oa-serit"><b>Nasıl ölçülür?</b><span>1) "Okumaya başla"ya bas, metin görünsün. 2) Her zamanki gibi, <b>anlayarak</b> sessizce oku. 3) Bitince "Bitirdim"e bas. 4) Metne bakmadan ${p.sorular.length || 3} soruyu cevapla. Acele etme: hız kadar anlamak da puanına sayılır.</span></div>
+      <h3 style="margin:10px 0 4px">${esc(p.baslik)}</h3><p class="oa-not">${kelime} kelime</p>
+      <p style="text-align:center"><button class="oa-btn" id="oaOBas">▶ Okumaya başla</button></p>
+      <div class="oa-metin" id="oaOM" style="display:none">${esc(p.kelimeler.join(" "))}</div>
+      <p style="text-align:center"><button class="oa-btn" id="oaOBit" style="display:none;background:#16a34a">✅ Bitirdim</button></p>`;
+    let bas = 0;
+    el.querySelector("#oaOBas").onclick = (e) => { e.target.style.display = "none"; el.querySelector("#oaOM").style.display = ""; el.querySelector("#oaOBit").style.display = ""; bas = Date.now(); };
+    el.querySelector("#oaOBit").onclick = () => {
+      const sn = (Date.now() - bas) / 1000, hiz = Math.round(kelime / Math.max(sn / 60, 0.05)), gecerli = sn >= 8 && hiz <= 600;
+      kat.scrollTop = 0; let n = 0, d = 0; const Q = p.sorular.slice(0, 4);
+      if (!Q.length) { veri.olcum.push({ t: bugun(), hiz, anlama: 100, kelime, sn: Math.round(sn), gecerli }); kaydet(); el.innerHTML = `<p>✅ ${hiz} kelime/dk</p>`; return sonraki(el); }
+      el.innerHTML = `<h3>Ne kadar anladın?</h3><p class="oa-not">Metne geri bakmadan cevapla.</p><div id="oaQ"></div>`;
+      const soru = () => {
+        if (n >= Q.length) return sonuc(Math.round((d / Q.length) * 100));
+        const q = Q[n], k = el.querySelector("#oaQ");
+        k.innerHTML = `<p style="font-size:20px"><b>${n + 1}/${Q.length}.</b> ${esc(q.soru)}</p><div class="oa-sec" style="grid-template-columns:1fr">${q.secenek.map((x) => `<button>${esc(x)}</button>`).join("")}</div>`;
+        k.querySelectorAll("button").forEach((b) => (b.onclick = () => { const ok = b.textContent === String(q.dogru); if (ok) d++; k.querySelectorAll("button").forEach((y) => { y.disabled = true; if (y.textContent === String(q.dogru)) y.classList.add("d"); }); if (!ok) b.classList.add("y"); n++; zam.push(setTimeout(soru, 900)); }));
+      };
+      const sonuc = (anlama) => {
+        const onceRekor = rekor(), onceki = veri.olcum.filter((x) => x.gecerli !== false).slice(-1)[0];
+        const x = { t: bugun(), hiz, anlama, kelime, sn: Math.round(sn), gecerli }; veri.olcum.push(x); veri.olcum = veri.olcum.slice(-100); isaretle(); kaydet();
+        const e = etkili(x), yeniRekor = gecerli && e > onceRekor && onceRekor > 0, hedefSonraki = Math.ceil((Math.max(gecerli ? e : 0, onceRekor, 20) * 1.05) / 5) * 5;
+        const tavsiye = !gecerli ? "⚠️ Metni çok hızlı geçtin; bu ölçüm rekora sayılmadı. Bir dahakinde gerçekten okuyarak dene."
+          : anlama < 70 ? "🐢 Hızlı okudun ama anlaman düştü. Bir dahaki ölçümde biraz yavaşla; önce anlamak gelir."
+          : hiz < hedef[0] ? "🌱 Anlaman iyi! Hızını artırmak için her gün <b>Günlük Antrenman</b> yap; 2 hafta sonra yeniden ölç."
+          : hiz > hedef[1] && anlama >= 80 ? "🚀 Sınıf hedefinin üstündesin! Daha uzun metinlerle anlamayı korumaya çalış."
+          : "👍 Sınıf hedefindesin. Düzenli okumaya devam; haftada bir ölç.";
+        el.innerHTML = `<div class="oa-sonuc">
+            <div style="font-size:46px">${!gecerli ? "⚠️" : yeniRekor ? "🏆" : anlama >= 80 ? "🌟" : anlama >= 60 ? "👍" : "📘"}</div>
+            ${yeniRekor ? `<p style="font-size:22px;font-weight:800;color:#16a34a">Yeni rekor!</p>` : ""}
+            <div class="oa-karolar"><div><small>Okuma hızı</small><b>${hiz}</b><small>kelime/dk</small></div><div><small>Anlama</small><b>%${anlama}</b><small>${d}/${Q.length} doğru</small></div><div><small>Etkili okuma</small><b>${e}</b><small>hız × anlama</small></div></div>
+            ${onceki && gecerli ? `<p>Geçen ölçüme göre: hız <b>${hiz - onceki.hiz >= 0 ? "+" : ""}${hiz - onceki.hiz}</b> kelime/dk, anlama <b>${anlama - onceki.anlama >= 0 ? "+" : ""}${anlama - onceki.anlama}</b> puan.</p>` : gecerli ? "<p>Bu senin ilk ölçümün. Bundan sonraki ölçümler bununla karşılaştırılacak.</p>" : ""}
+            <p>${tavsiye}</p>
+            <p class="oa-not">Sonraki hedefin: etkili okuma <b>${hedefSonraki}</b>. ${NO}. sınıf hedefi: ${hedef[0]}–${hedef[1]} kelime/dk, anlama %80+.</p></div>`;
+        sonraki(el);
+      };
+      soru();
+    };
+  }
+
   // ---------- Menü ----------
   function menu(el) {
     const son = veri.okuma.slice(-1)[0], seri = (() => { let n = 0; const d = new Date(); for (let i = 0; i < 60; i++) { const k = new Date(d - i * 864e5); const s = k.getFullYear() + "-" + String(k.getMonth() + 1).padStart(2, "0") + "-" + String(k.getDate()).padStart(2, "0"); if (veri.gun[s]) n++; else if (i > 0) break; } return n; })();
     el.innerHTML = `
-      <p>Okuma; doğru, akıcı ve <b>anlayarak</b> okumaktır. Bu atölyedeki egzersizler gözünü hızlandırır, dikkatini toplar ve kelimeleri grup grup görmeni sağlar. Her okumadan sonra anlama soruları var; hızın ancak anlaman iyiyse artar.</p>
+      ${ozetSerit()}
       <div class="oa-menu">
+        <button class="oa-kart ana olc" data-g="olc"><span class="i">⏱️</span><b>Okuma Hızımı Ölç</b><small>${olcumAlt()}</small></button>
         <button class="oa-kart ana" data-g="gunluk"><span class="i">🏋️</span><b>Günlük Antrenman</b><small>Göz egzersizi → Schultz → Kelime flaşı → İşaretçili okuma · ~8 dk${seri ? ` · 🔥 ${seri} gün` : ""}</small></button>
         <button class="oa-kart" data-g="okuma"><span class="i">👉</span><b>İşaretçili Okuma</b><small>Metin seçtiğin hızda vurgulanır, sonra anlama soruları${son ? ` · son: ${son.hiz} k/dk, %${son.anlama}` : ""}</small></button>
         <button class="oa-kart" data-g="flas"><span class="i">⚡</span><b>Kelime Flaşı</b><small>${NO <= 2 ? "Kelimeyi bir bakışta tanı" : "Kelime gruplarını bir bakışta oku"}${veri.flas.ms ? ` · ${veri.flas.ms} ms` : ""}</small></button>
@@ -129,7 +196,7 @@
         <button class="oa-kart" data-g="gelisim"><span class="i">📈</span><b>Gelişimim</b><small>Okuma hızı, anlama ve egzersiz sonuçların</small></button>
       </div>
       <p class="oa-not">${NO}. sınıf için yaklaşık akıcı okuma hedefi: dakikada <b>${hedef[0]}–${hedef[1]}</b> kelime, anlama en az %80. Her çocuğun hızı farklıdır; önemli olan kendi gelişimin.</p>`;
-    const G = { okuma: [isaretci, "İşaretçili Okuma"], flas: [flas, "Kelime Flaşı"], schultz: [schultz, "Schultz Tablosu"], kamera: [kamera, "Kamera Zihni"], goz: [goz, "Göz Egzersizi"], gelisim: [gelisim, "Gelişimim"] };
+    const G = { olc: [olc, "Okuma Hızımı Ölç"], okuma: [isaretci, "İşaretçili Okuma"], flas: [flas, "Kelime Flaşı"], schultz: [schultz, "Schultz Tablosu"], kamera: [kamera, "Kamera Zihni"], goz: [goz, "Göz Egzersizi"], gelisim: [gelisim, "Gelişimim"] };
     el.querySelectorAll("[data-g]").forEach((b) => (b.onclick = () => {
       if (b.dataset.g === "gunluk") { adimlar = [[schultz, "Schultz Tablosu"], [flas, "Kelime Flaşı"], [isaretci, "İşaretçili Okuma"]]; return ac(goz, "Göz Egzersizi"); }
       ac(...G[b.dataset.g]);
@@ -266,8 +333,13 @@
   function gelisim(el) {
     const ok = veri.okuma.slice(-12), enCok = Math.max(hedef[1], ...ok.map((x) => x.hiz), 1);
     const sch = veri.schultz.slice(-12), schMax = Math.max(1, ...sch.map((x) => x.sn));
+    const ol = veri.olcum.slice(-12), olMax = Math.max(hedef[1], ...ol.map((x) => x.hiz), 1), ilk = veri.olcum[0], son = veri.olcum.slice(-1)[0];
     el.innerHTML = `
-      <h3>👉 Okuma hızı ve anlama</h3>
+      <h3>⏱️ Okuma ölçümlerim</h3>
+      ${ol.length ? `<div class="oa-karolar"><div><small>Son hız</small><b>${son.hiz}</b><small>kelime/dk</small></div><div><small>Son anlama</small><b>%${son.anlama}</b></div><div><small>Rekor (etkili)</small><b>${rekor()}</b></div>${veri.olcum.length > 1 ? `<div><small>İlk ölçümden beri</small><b>${son.hiz - ilk.hiz >= 0 ? "+" : ""}${son.hiz - ilk.hiz}</b><small>kelime/dk</small></div>` : ""}</div>
+        <div class="oa-graf">${ol.map((x) => `<div><small>${x.hiz}</small><i style="height:${Math.round((x.hiz / olMax) * 100)}%;background:${x.anlama >= 80 ? "#22c55e" : x.anlama >= 60 ? "#f59e0b" : "#ef4444"}"></i><small>%${x.anlama}</small></div>`).join("")}</div>
+        <p class="oa-hedefcizgi">Sütun: kelime/dk · altı: anlama. Yeşil %80+, turuncu %60–79, kırmızı %60 altı.</p>` : '<p class="oa-not">Henüz ölçüm yapmadın. "Okuma Hızımı Ölç" ile başla.</p>'}
+      <h3>👉 İşaretçili okuma</h3>
       ${ok.length ? `<div class="oa-graf">${ok.map((x) => `<div><small>${x.hiz}</small><i style="height:${Math.round((x.hiz / enCok) * 100)}%;background:${x.anlama == null ? "#94a3b8" : x.anlama >= 80 ? "#22c55e" : x.anlama >= 60 ? "#f59e0b" : "#ef4444"}"></i><small>${x.anlama == null ? "–" : "%" + x.anlama}</small></div>`).join("")}</div>
         <p class="oa-hedefcizgi">Sütun: kelime/dk · altındaki yüzde: anlama. Yeşil %80+, turuncu %60–79, kırmızı %60 altı. Hedef: ${hedef[0]}–${hedef[1]} kelime/dk.</p>` : '<p class="oa-not">Henüz işaretçili okuma yapmadın.</p>'}
       <h3>🔢 Schultz tablosu süren</h3>
