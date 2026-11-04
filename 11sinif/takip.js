@@ -175,12 +175,18 @@
     b.innerHTML = `<span class="ikon">🧠</span><span><b>Aralıklı Tekrar</b><small>${n ? `Bugün ${n} soru seni bekliyor` : Object.keys(A).length ? "Bugünlük tekrar yok ✅" : "Yanlışların unutulmasın diye zamanında sorulur"}${kayit.ogrenilen ? ` · ${kayit.ogrenilen} öğrenildi` : ""}</small></span>`;
     b.onclick = window.ARALIKLI_AC; kutu.appendChild(b);
   });
-  window.ANA_KARTLAR.push((kutu) => {
-    const b = document.createElement("button"), H = hafta(gunEkle(bugunT(), -((new Date().getDay() + 6) % 7)));
-    b.className = "ozel-kart karne";
-    b.innerHTML = `<span class="ikon">👨‍👩‍👧</span><span><b>Veli Karnesi</b><small>Bu hafta: ${H.aktif} gün · ${H.soru} soru${H.soru ? ` · %${Math.round((H.dogru / H.soru) * 100)} başarı` : ""}</small></span>`;
-    b.onclick = window.VELI_KARNESI_AC; kutu.appendChild(b);
-  });
+  // Veli Karnesi ana sayfada ayrı kart değil, İlerleme Paneli'nin en üstünde
+  if (typeof window.ilerlemePaneli === "function" && !window.ilerlemePaneli.karneli) {
+    const asil = window.ilerlemePaneli;
+    window.ilerlemePaneli = function () {
+      asil.apply(this, arguments);
+      const H = hafta(gunEkle(bugunT(), -((new Date().getDay() + 6) % 7)));
+      const b = document.createElement("button"); b.className = "ozel-kart karne"; b.style.marginBottom = "16px";
+      b.innerHTML = `<span class="ikon">👨‍👩‍👧</span><span><b>Haftalık Veli Karnesi</b><small>Bu hafta: ${H.aktif} gün · ${H.soru} soru${H.soru ? ` · %${Math.round((H.dogru / H.soru) * 100)} başarı` : ""} · paylaş / yazdır</small></span>`;
+      b.onclick = window.VELI_KARNESI_AC; ekran.prepend(b);
+    };
+    window.ilerlemePaneli.karneli = true;
+  }
   esitle();
   if (window.ANA_YENILE) window.ANA_YENILE();
 })();
