@@ -532,6 +532,7 @@
       ${window.SES ? `<details class="ses-detay" style="margin:10px 0"><summary style="font-size:19px;cursor:pointer;padding:8px 0">🗣️ Ses ve konuşma hızı</summary>${SES.ayarHTML()}</details>` : ""}
       <div class="satir"><button class="buyukbtn ikincil" style="font-size:19px">💾 İlerlemeyi yedekle</button><button class="buyukbtn ikincil" style="font-size:19px">📂 Yedekten yükle</button></div>
       <input type="file" accept=".json,application/json" hidden>
+      ${window.YEDEK_AC ? `<div class="yedek-tum"><button class="buyukbtn ikincil" style="font-size:19px">📦 Tüm cihaz yedeği / taşıma (bütün sınıflar)</button></div>` : ""}
       <button class="buyukbtn ikincil" style="font-size:19px;color:var(--kirmizi)">🗑 Tüm ilerlemeyi sıfırla</button>
       <div class="not">İlerleme bu cihazın tarayıcısında saklanır. Cihaz değiştirirken yedek dosyasını kullanın.</div></div>`);
     if (window.SES) { SES.ayarBagla(ay); SES.rehberGoster(ay); }
@@ -547,6 +548,7 @@
     dosya.onchange = () => { const f = dosya.files[0]; if (!f) return; f.text().then((t) => { try { const y = JSON.parse(t); if (typeof y.yildiz !== "number") throw 0; K = Object.assign(K, y); kaydet(); bt[3].textContent = "Yüklendi ✅"; } catch (e) { bt[3].textContent = "Dosya okunamadı ❌"; } }); };
     let onay = false;
     bt[4].onclick = () => { if (!onay) { onay = true; bt[4].textContent = "⚠️ Emin misiniz? Tekrar dokunun"; return; } localStorage.removeItem(ANAHTAR); location.reload(); };
+    const yt = ay.querySelector(".yedek-tum button"); if (yt) yt.onclick = () => window.YEDEK_AC();
     ekran.appendChild(ay);
     if (window.veliEk) window.veliEk(ekran, { K, kaydet, $ });
   }

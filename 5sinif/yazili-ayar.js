@@ -11,5 +11,14 @@ window.SINIF = {
     { ders: "ingilizce", donem: 1, yazili: 1, bas: "2026-11-12" },
     { ders: "din", donem: 1, yazili: 1, bas: "2026-11-13" }
   ],
+  lgs: {
+    baslik: "Deneme Sınavı",
+    altYazi: "5. sınıf konularıyla LGS biçimi",
+    aciklama: "Bu denemeler 5. sınıf konularından LGS biçiminde hazırlanır. Netini takip et, zayıf konularını gör. Bursluluk sınavına (İOKBS) ve ileride LGS'ye hazırlık için iyi bir alışkanlıktır.",
+    oturumlar: [
+      { ad: "Sözel", sure: 75, dersler: [["turkce", 20], ["sosyal", 10], ["din", 10], ["ingilizce", 10]] },
+      { ad: "Sayısal", sure: 80, dersler: [["matematik", 20], ["fen", 20]] }
+    ]
+  },
   ortak: [] // 5. sınıflar 2026-2027'de ülke geneli ortak yazılıya girmiyor (yazılılar okulda)
 };
