@@ -12,5 +12,5 @@ window.KITAPLAR = [
   { ders: "hayat", ad: "Hayat Bilgisi Ders Kitabı — 2. Kitap", url: "https://tymm.meb.gov.tr/assets/pdf/hayat-bilgisi-1sinif-ders-kitabi-2kitap_20261021_205603_554.pdf", tur: "Ders kitabı" },
   { ders: "hayat", ad: "Hayat Bilgisi Farklılaştırma Etkinlikleri", url: "https://tymm.meb.gov.tr/assets/pdf/farklilastirma-hayat-bilgisi-1.pdf", tur: "Etkinlik kitabı" },
   { ders: "diger", ad: "Beden Eğitimi, Oyun ve Müzik Ders Kitabı", url: "https://tymm.meb.gov.tr/assets/pdf/beden-egitimi-oyun-ve-muzik-1sinif-ders-kitabi_20261005_145953_985.pdf", tur: "Ders kitabı" },
-  { ders: "diger", ad: "Müzik Ders Kitabı", url: "https://meb.ai/U2X404g", tur: "Ders kitabı" }
+  { ders: "diger", ad: "Müzik Ders Kitabı", url: "https://cdn.eba.gov.tr/temel-egitim/yayin/2026-2027/ktp/muzik1.pdf", tur: "Ders kitabı" }
 ];

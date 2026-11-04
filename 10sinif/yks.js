@@ -29,6 +29,7 @@
 
   // ---------- YKS ana ekranı ----------
   let kapsamTum = new Date().getMonth() + 1 >= 2 && new Date().getMonth() + 1 <= 7; // şubattan sonra tüm yıl
+  window.YKS_AC = () => git(yksAna, "🎓 YKS Hazırlık");
   function yksAna() {
     const g = L.tarih ? H.gunFark(L.tarih) : 0, hv = tumHavuz();
     const oturumYazi = L.oturumlar.map((o) => `${esc(o.ad)}: ${o.dersler.map(([k, n]) => `${esc(dersAd(k))} ${n}`).join(", ")} soru (${o.sure} dk)`).join(" · ");

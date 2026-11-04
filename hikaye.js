@@ -8,7 +8,7 @@
   const HEDEF = window.HIKAYE_HEDEF || "120-160";
   const gunNo = () => { const d = new Date(); return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000) + d.getFullYear() * 366; };
   const bugunku = () => H[gunNo() % H.length];
-  const kelimeSay = (h) => h.sayfalar.join(" ").split(/\s+/).filter(Boolean).length;
+  const kelimeSay = (h) => h.sayfalar.join(" ").split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length; // noktalama ve tireler sayılmaz
   const bugunOkundu = () => { const g = kayit.gunluk[gunAnahtar()]; return !!(g && g.hikaye); };
 
   const STIL = `<style id="hikaye-stil">
@@ -63,13 +63,14 @@
         <div class="hk-ust"><span class="not">${esc(h.tur || "Hikâye")} · Sayfa ${i + 1} / ${h.sayfalar.length}</span>
           ${window.SES ? `<button class="btn2" id="hkDinle">🔊 Bu sayfayı dinle</button>` : ""}</div>
         <div class="hk-cubuk"><div style="width:${((i + 1) / h.sayfalar.length) * 100}%"></div></div>
-        <article class="hk-sayfa">${i === 0 ? `<h2 style="margin:0 0 12px;font-family:inherit">${esc(h.baslik)}</h2>` : ""}${h.sayfalar[i].split(/\n+/).map((p) => `<p>${esc(p)}</p>`).join("")}</article>
+        <article class="hk-sayfa">${i === 0 ? `<h2 style="margin:0 0 12px;font-family:inherit">${esc(h.baslik)}</h2>${h.kaynak ? `<p class="not" style="margin:-6px 0 12px">📚 ${esc(h.kaynak)}</p>` : ""}` : ""}${h.sayfalar[i].split(/\n+/).map((p) => `<p>${esc(p)}</p>`).join("")}</article>
         <div class="hk-alt">
           <button class="btn2" id="hkGeri" ${i === 0 ? "disabled" : ""}>← Önceki sayfa</button>
           <button class="btn" id="hkIleri">${i === h.sayfalar.length - 1 ? "Bitirdim, sorulara geç ✏️" : "Sonraki sayfa →"}</button>
         </div>
         ${i === h.sayfalar.length - 1 && h.kelimeler && h.kelimeler.length ? `<div class="hk-sozluk"><b>📒 Hikâyedeki kelimeler</b><br>${h.kelimeler.map(([k, a]) => `<b>${esc(k)}:</b> ${esc(a)}`).join(" · ")}</div>` : ""}
-        <p class="not" style="margin-top:10px">⏱ Okuma süren ölçülüyor. Sesli dinlersen okuma hızı kaydedilmez.</p>`;
+        <p class="not" style="margin-top:10px">⏱ Okuma süren ölçülüyor. Sesli dinlersen okuma hızı kaydedilmez.</p>
+        ${i === 0 ? `<p class="not" style="background:var(--kart,#fff7e0);border:1px dashed var(--sinir,#e5c87a);border-radius:12px;padding:8px 12px">ℹ️ <b>Kelime sayısı nasıl hesaplanıyor?</b> Bu hikâyede <b>${kelimeSay(h)}</b> kelime var. Program sayfalardaki kelimeleri tek tek sayar; nokta, virgül, tire gibi işaretleri saymaz. Okuma hızın = kelime sayısı ÷ okuma süren (dakika).</p>` : ""}`;
       window.scrollTo(0, 0);
       if ($("hkDinle")) $("hkDinle").onclick = () => { sesli = true; SES.konus(h.sayfalar[i].replace(/\n+/g, " "), "tr", { hiz: 0.95 }); };
       $("hkGeri").onclick = () => { if (i > 0) { if (window.SES) SES.dur(); i--; ciz(); } };

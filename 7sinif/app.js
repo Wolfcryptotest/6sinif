@@ -148,6 +148,15 @@ function anaSayfa() {
     b.onclick = () => var_ ? git(() => uniteler(d.key), d.ad) : alert("Bu dersin içeriği henüz eklenmedi.");
     kutu.appendChild(b);
   });
+  // Ders programına yazılmış seçmeli dersler (program.js → PROGRAM_SECMELI)
+  (window.PROGRAM_SECMELI ? PROGRAM_SECMELI() : []).forEach((d) => {
+    const b = document.createElement("button");
+    b.className = "kart ders";
+    b.style.setProperty("--renk", d.renk);
+    b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${esc(d.ad)}</b><span class="rozet">Seçmeli · ${ICERIK[d.key].uniteler.length} ünite</span>`;
+    b.onclick = () => git(() => uniteler(d.key), d.ad);
+    kutu.appendChild(b);
+  });
   $("tekrar").onclick = () => yanlisSay ? git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") : alert("Harika! Tekrar edilecek yanlışın yok.");
   $("panel").onclick = () => git(ilerlemePaneli, "İlerleme Paneli");
   if (window.hikayeAnaKart) window.hikayeAnaKart(); // Günün Hikâyesi kartı (hikaye.js)
@@ -235,6 +244,12 @@ function uniteler(dersKey) {
     b.onclick = () => git(() => konular(u), u.ad);
     $("l").appendChild(b);
   });
+  if (ders.kaynaklar && ders.kaynaklar.length) {
+    const k = document.createElement("div");
+    k.style.cssText = "margin-top:18px;padding:14px 16px;border-radius:14px;background:var(--kart,#fff);border:1px solid var(--sinir,#e5e7eb)";
+    k.innerHTML = `<b>📎 Resmî Kaynaklar</b>` + ders.kaynaklar.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:block;padding:10px 0;border-bottom:1px solid var(--sinir,#e5e7eb);text-decoration:none">${esc(x.ad)} ↗</a>`).join("");
+    ekran.appendChild(k);
+  }
 }
 
 function konular(unite) {

@@ -366,13 +366,13 @@
     // Sayfa sayfa okuma: her "metin" ögesi bir sayfadır (h.sayfalar varsa o kullanılır)
     const h = HIKAYELER[idx], bugun = h === bugununHikayesi();
     const sayfalar = h.sayfalar || h.metin;
-    const kelime = sayfalar.join(" ").split(/\s+/).length;
+    const kelime = sayfalar.join(" ").split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length; // noktalama ve tireler sayılmaz
     const bas = Date.now(); let dinledi = false, okuyorMu = false, n = 0;
     maskot(bugun ? "Günün hikâyesi hazır! Kendin oku ya da 🔊 ile ben okuyayım." : "Hadi bu hikâyeyi okuyalım!");
     const kap = $(`<div></div>`); ekran.appendChild(kap);
     const ciz = () => {
       kap.innerHTML = "";
-      const kart = $(`<div class="hikaye">${n === 0 ? `<div class="resim">${h.resim || "📖"}</div><h2>${esc(h.baslik)}</h2>` : `<div class="not" style="text-align:center">${esc(h.baslik)}</div>`}<p>${esc(sayfalar[n])}</p>
+      const kart = $(`<div class="hikaye">${n === 0 ? `<div class="resim">${h.resim || "📖"}</div><h2>${esc(h.baslik)}</h2>${h.kaynak ? `<div class="not" style="text-align:center">📚 ${esc(h.kaynak)}</div>` : ""}` : `<div class="not" style="text-align:center">${esc(h.baslik)}</div>`}<p>${esc(sayfalar[n])}</p>
         <div class="not" style="text-align:center">Sayfa ${n + 1} / ${sayfalar.length}</div>
         <div style="height:10px;border-radius:9px;background:#f3e3c4;overflow:hidden"><div style="height:100%;width:${((n + 1) / sayfalar.length) * 100}%;background:#f4a261"></div></div></div>`);
       const oku = $(`<button class="buyukbtn ikincil">${okuyorMu ? "⏹ Durdur" : "🔊 Bu sayfayı bana oku"}</button>`);
@@ -389,7 +389,8 @@
         yigin.pop(); git(() => hikayeSorulari(idx, hiz), "📚 " + h.baslik);
       };
       kap.appendChild(oku); kap.appendChild(kart); alt.appendChild(geri); alt.appendChild(ileri); kap.appendChild(alt);
-      kap.appendChild($(`<div class="not">⏱ Kendin okursan okuma hızın ölçülür. ${kelime} kelime.</div>`));
+      kap.appendChild($(`<div class="not">⏱ Kendin okursan okuma hızın ölçülür.</div>`));
+      kap.appendChild($(`<div class="not" style="background:#fff7e0;border-radius:12px;padding:8px 12px;margin-top:6px">ℹ️ Kelime sayısı: Bu hikâyede <b>${kelime}</b> kelime var. Her kelimeyi tek tek saydık; nokta, virgül gibi işaretleri saymadık. Okuma hızın da bu sayıyla hesaplanır.</div>`));
     };
     function sesliOku() { // bu sayfayı okur, bitince sonraki sayfaya geçip devam eder
       okuyorMu = true; dinledi = true; ciz();
@@ -457,7 +458,7 @@
       });
       ekran.appendChild(k);
     });
-    ekran.appendChild($(`<p class="not" style="margin-top:16px">Kitaplar MEB'in resmî sitesinden (tymm.meb.gov.tr / EBA) açılır, internet gerekir. Kitap PDF olarak yeni sekmede açılır; tabletteki geri tuşuyla uygulamaya dönebilirsin.</p>`));
+    ekran.appendChild($(`<p class="not" style="margin-top:16px">Kitaplar MEB'in resmî sitesinden (tymm.meb.gov.tr / EBA) açılır, internet gerekir. Ders kitapları uygulamanın içinde açılır; kaldığın sayfa hatırlanır.</p>`));
   }
 
   // ---------- Çıkartma albümü ----------

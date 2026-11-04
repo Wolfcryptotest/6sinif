@@ -122,6 +122,7 @@
     return karistir(liste).slice(0, n);
   }
   window.HAZIRLIK = { kapsam, konularOf, dagit, SINAVLAR, gunFark, tarihYaz, donemOf, sayilan };
+  window.YAZILI_AC = () => git(yaziliAna, "📝 Yazılıya Hazırlık");
 
   // ---------- Ana sayfa kartı ----------
   window.ANA_KARTLAR = window.ANA_KARTLAR || [];

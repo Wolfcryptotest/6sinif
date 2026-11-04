@@ -8,7 +8,7 @@
   var y = p.replace(/ı/g, "i").replace(/ş/g, "s").replace(/(\d)[\.\-_ ]+sinif/g, "$1sinif").replace(/sinifi?(?=\/|$)/g, "sinif");
   var m = y.match(/\/6sinif\/(\d{1,2})\s*sinif/) || y.match(/\/6sinif\/(\d{1,2})\/?$/);
   var hedef = null;
-  if (m && ["1","2","3","4","5","7","8","9","11"].indexOf(m[1]) >= 0) hedef = "/6sinif/" + m[1] + "sinif/";
+  if (m && ["1","2","3","4","5","7","8","9","10","11","12"].indexOf(m[1]) >= 0) hedef = "/6sinif/" + m[1] + "sinif/";
   else if (m && m[1] === "6") hedef = "/6sinif/";
   else if (/\/6sinif\/(minik|kres|anaokul|okul ?oncesi|4-5|0sinif)/.test(y)) hedef = "/6sinif/minik/";
   else if (/^\/6sinif\/?(6sinif)?\/?$/.test(y)) hedef = "/6sinif/";

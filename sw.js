@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders-";
-const SURUM = ONEK + "2cd54698e1f";
-const DOSYALAR = ["./", "acik-sorular.js", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "havuz.js", "hazirlik.js", "hikaye.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "islem-alani.js", "kelime-bankasi.js", "kelime-hatirla.js", "lgs.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "program.js", "ses.js", "sohbet.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js", "yazili-ayar.js"];
+const SURUM = ONEK + "f4db4cd89c8";
+const DOSYALAR = ["okuma-atolyesi.js", "./", "acik-sorular.js", "anlatim.js", "app.js", "apple-touch-icon.png", "din-uretec.js", "din.js", "fen-uretec.js", "fen.js", "havuz.js", "hazirlik.js", "hikaye.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce-ceviri.js", "ingilizce-uretec.js", "ingilizce.js", "islem-alani.js", "kelime-bankasi.js", "kelime-hatirla.js", "lgs.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "program.js", "secmeli.js", "ses.js", "sohbet.js", "sosyal-uretec.js", "sosyal.js", "turkce-uretec.js", "turkce.js", "yazili-ayar.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));
