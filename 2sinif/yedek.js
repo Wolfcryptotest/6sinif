@@ -2,6 +2,9 @@
 // kopyalanabilir bir kodda saklar. Telefon değişirken, tarayıcı verileri silinmeden önce ya da iki cihaz arasında taşımak için.
 // 5–12: ana sayfada kart (ANA_KARTLAR). Minik–4: Veli Köşesi → Ayarlar içinde düğme. Dışarıya açılan: window.YEDEK_AC()
 (function () {
+  // Kapalı: arayüzde gösterilmiyor (kafa karıştırdığı için). Yeniden açmak için true yapın.
+  const ACIK = false;
+  if (!ACIK) return;
   const SON = "yedek-son", SURUM = 1;
   const gun = (t) => Math.floor((Date.now() - t) / 86400000);
   const bugun = () => new Date().toISOString().slice(0, 10);
