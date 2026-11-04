@@ -403,8 +403,9 @@
       if (son) ekle({ id: "hz-" + dk, ikon: "🎒", ders: dk, dk: 10, oncelik: 4, baslik: `${dersBul(dk).ad} dersine hazırlık`, alt: `Kaldığımız yer: ${son.ad}`, eylem: () => git(() => konuSayfa(son), son.ad) });
     });
     // 6) Yanlışlar
-    const yn = (kayit.yanlislar || []).length;
-    if (yn && typeof yanlisSorular === "function") ekle({ id: "yanlis", ikon: "🔁", dk: 10, oncelik: 4, baslik: `Yanlışlarını tekrar et (${yn} soru)`, alt: "Yanlış yaptığın sorular bekliyor", eylem: () => git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") });
+    const at = window.ARALIKLI_BUGUN ? ARALIKLI_BUGUN() : 0, yn = (kayit.yanlislar || []).length;
+    if (at) ekle({ id: "aralikli", ikon: "🧠", dk: Math.min(15, 3 + at), oncelik: 2, baslik: `Aralıklı tekrar (${Math.min(15, at)} soru)`, alt: "Unutmamak için zamanı gelen yanlışların", eylem: window.ARALIKLI_AC });
+    else if (!window.ARALIKLI_BUGUN && yn && typeof yanlisSorular === "function") ekle({ id: "yanlis", ikon: "🔁", dk: 10, oncelik: 4, baslik: `Yanlışlarını tekrar et (${yn} soru)`, alt: "Yanlış yaptığın sorular bekliyor", eylem: () => git(() => test(yanlisSorular(), "Yanlışları Tekrar", true), "Yanlışları Tekrar") });
     // 7) Hafta sonu: haftanın tekrarı
     if (gun === 0 || gun === 6) ekle({ id: "hafta", ikon: "🗓️", dk: 20, oncelik: 3, baslik: "Haftanın tekrarı (10 soru)", alt: "Bu hafta derste işlenen konulardan", eylem: haftaTekrarAc });
     // 8) Okuma
