@@ -84,14 +84,19 @@
     const n = g.n || 5, duvar = Array.from({ length: n * n }, () => ({ u: 1, s: 1, a: 1, l: 1 })), gez = new Set([0]), yigin = [0];
     const kom = (i) => { const r = Math.floor(i / n), c = i % n, l = []; if (r > 0) l.push([i - n, "u", "a"]); if (c < n - 1) l.push([i + 1, "s", "l"]); if (r < n - 1) l.push([i + n, "a", "u"]); if (c > 0) l.push([i - 1, "l", "s"]); return l; };
     while (yigin.length) { const i = yigin[yigin.length - 1], ad = karistir(kom(i).filter(([j]) => !gez.has(j))); if (!ad.length) { yigin.pop(); continue; } const [j, a, b] = ad[0]; duvar[i][a] = 0; duvar[j][b] = 0; gez.add(j); yigin.push(j); }
-    const hedef = n * n - 1; let poz = 0, adim = 0, carp = 0;
+    // Emoji arabanın baktığı yön cihaza göre değişir (iPhone'da sola, bazı Android'lerde sağa). Bu yüzden araba her cihazda
+    // aynı görünen çizimle gösterilir: önü sağa bakar, sola giderken aynalanır — böylece hiçbir zaman geri geri gitmez.
+    const ARABA = `<svg viewBox="0 0 64 40" style="width:82%;height:auto;display:block;margin:auto" aria-label="araba"><path d="M6 26 L10 16 Q12 12 18 12 L36 12 Q42 12 46 17 L52 22 Q60 23 60 28 L60 31 L4 31 L4 28 Q4 26 6 26 Z" fill="#ef4444"/><path d="M16 15 L22 15 L22 22 L12 22 Z M25 15 L35 15 Q39 15 42 19 L44 22 L25 22 Z" fill="#bfe6ff"/><circle cx="17" cy="31" r="6" fill="#2b2140"/><circle cx="17" cy="31" r="2.5" fill="#d1d5db"/><circle cx="48" cy="31" r="6" fill="#2b2140"/><circle cx="48" cy="31" r="2.5" fill="#d1d5db"/><rect x="56" y="24" width="4" height="3" rx="1" fill="#fde047"/></svg>`;
+    const hedef = n * n - 1; let poz = 0, adim = 0, carp = 0, saga = true;
     const lab = $(`<div class="oe-lab" style="grid-template-columns:repeat(${n},1fr)"></div>`);
     duvar.forEach((d, i) => { const h = document.createElement("div"); h.style.borderWidth = `${d.u ? 3 : 0}px ${d.s ? 3 : 0}px ${d.a ? 3 : 0}px ${d.l ? 3 : 0}px`; h.onclick = () => git(i); lab.appendChild(h); });
-    const ciz = () => lab.querySelectorAll("div").forEach((h, i) => (h.textContent = i === poz ? g.kim : i === hedef ? g.hedef : ""));
+    const kahraman = () => (g.kim === "🚗" ? `<span style="display:block;width:100%;${saga ? "" : "transform:scaleX(-1)"}">${ARABA}</span>` : g.kim);
+    const ciz = () => lab.querySelectorAll("div").forEach((h, i) => { if (i === poz) h.innerHTML = kahraman(); else h.textContent = i === hedef ? g.hedef : ""; });
     const git = (j) => {
       if (poz === hedef) return;
       const yol = kom(poz).find(([k]) => k === j);
       if (!yol || duvar[poz][yol[1]]) { carp++; lab.children[poz].animate([{ transform: "scale(1)" }, { transform: "scale(.8)" }, { transform: "scale(1)" }], 200); return; }
+      if (j === poz + 1) saga = true; else if (j === poz - 1) saga = false;
       poz = j; adim++; efekt("tik"); ciz();
       if (poz === hedef) setTimeout(() => bitir(true, null), 300);
     };
@@ -207,7 +212,7 @@
   const ESYA = ["⚽", "🎈", "🧸", "🪁", "🎨", "📚", "✏️", "🎁", "🕰️", "☂️", "🔑", "🎒"];
   const SETLER = [HAYVAN, MEYVE, TASIT, ESYA];
   const hafizaG = (cift, set) => ({ tip: "hafiza", soru: "Kartları çevir, aynı resimleri bul!", ciftler: sec(set || pick(SETLER), cift).map((e) => [e, e]), cozum: "" });
-  const LAB = [["🐰", "🥕", "Tavşanı havuca ulaştır!"], ["🐭", "🧀", "Fareyi peynire götür!"], ["🐝", "🌸", "Arıyı çiçeğe ulaştır!"], ["🐶", "🦴", "Köpeği kemiğe götür!"], ["🚗", "🏠", "Arabayı eve götür!"], ["🐟", "🪸", "Balığı yuvasına ulaştır!"], ["🐻", "🍯", "Ayıyı bala götür!"]];
+  const LAB = [["🐰", "🥕", "Tavşanı havuca ulaştır!"], ["🐭", "🧀", "Fareyi peynire götür!"], ["🦋", "🌸", "Kelebeği çiçeğe ulaştır!"], ["🐶", "🦴", "Köpeği kemiğe götür!"], ["🚗", "🏠", "Arabayı eve götür!"], ["🐙", "🪸", "Ahtapotu yuvasına ulaştır!"], ["🐻", "🍯", "Ayıyı bala götür!"]];
   const labirentG = (n) => { const [kim, hedef, soru] = pick(LAB); return { tip: "labirent", soru: soru + " Oklara ya da yandaki kareye dokun.", okunacak: soru, kim, hedef, n, cozum: "" }; };
   const farkG = (sut, satir) => { const set = pick(SETLER), iz = Array.from({ length: sut * satir }, () => pick(set)), fark = Math.floor(Math.random() * iz.length); const yeni = pick(set.filter((x) => x !== iz[fark])); return { tip: "farkbul", soru: "İki resim arasındaki farkı bul! Sağdaki resimde farklı olana dokun.", okunacak: "İki resim arasındaki farkı bul!", izgara: iz, sut, fark, yeni, cozum: "" }; };
   const SAHNE = [["☀️", "☁️", "🌈", "🌳", "🏠", "🌳", "🌷", "🐶", "🌷"], ["🌙", "⭐", "✨", "🏔️", "🏕️", "🌲", "🦉", "🔥", "🦊"], ["🐦", "☁️", "☀️", "🌴", "⛵", "🌴", "🐚", "🦀", "🐠"], ["🎈", "🎉", "🎈", "🎂", "🎁", "🍰", "🧒", "🥳", "👧"], ["🍎", "🍐", "🍊", "🥕", "🥦", "🌽", "🧀", "🥛", "🍞"]];
