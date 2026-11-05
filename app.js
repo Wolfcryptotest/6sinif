@@ -144,7 +144,7 @@ function anaSayfa() {
     const b = document.createElement("button");
     b.className = "kart ders" + (var_ ? "" : " pasif");
     b.style.setProperty("--renk", d.renk);
-    b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${d.ad}</b><span class="rozet">${var_ ? ICERIK[d.key].uniteler.length + " ünite" : "Yakında"}</span>`;
+    b.innerHTML = `<span class="ikon">${d.ikon}</span><b>${d.ad}</b><span class="rozet">${var_ ? ICERIK[d.key].uniteler.length + " ünite" + (window.USTALIK ? USTALIK.dersOzet(d.key) : "") : "Yakında"}</span>`;
     b.onclick = () => var_ ? git(() => uniteler(d.key), d.ad) : alert("Bu dersin içeriği henüz eklenmedi.");
     kutu.appendChild(b);
   });
@@ -249,7 +249,7 @@ function uniteler(dersKey) {
   ders.uniteler.forEach((u, i) => {
     const b = document.createElement("button");
     b.className = "kart";
-    b.innerHTML = `<span><b>${i + 1}. ${esc(u.ad)}</b></span><span class="rozet">${u.konular.length} konu</span>`;
+    b.innerHTML = `<span><b>${i + 1}. ${esc(u.ad)}</b>${window.USTALIK ? USTALIK.uniteCubuk(u) : ""}</span><span class="rozet">${window.USTALIK ? USTALIK.uniteOzet(u) : u.konular.length + " konu"}</span>`;
     b.onclick = () => git(() => konular(u), u.ad);
     $("l").appendChild(b);
   });
@@ -268,7 +268,7 @@ function konular(unite) {
     const c = kayit.cozulen[k.id];
     const b = document.createElement("button");
     b.className = "kart";
-    b.innerHTML = `<b>${esc(k.ad)}</b><span class="rozet">${c ? "Son test: " + c.dogru + "/" + c.toplam : "Sınırsız soru"}</span>`;
+    b.innerHTML = `<b>${window.USTALIK ? USTALIK.cip(k.id) : ""}${esc(k.ad)}</b><span class="rozet">${window.USTALIK ? USTALIK.konuYazi(k.id) : c ? "Son test: " + c.dogru + "/" + c.toplam : "Sınırsız soru"}</span>`;
     b.onclick = () => git(() => konuSayfa(k), k.ad);
     $("l").appendChild(b);
   });
@@ -502,7 +502,7 @@ function test(kaynak, ad, tekrarModu, konuId) {
       <div class="not">Soru ${i + 1} / ${sorular.length}</div>
       <div class="ilerleme"><div style="width:${(i / sorular.length) * 100}%"></div></div>
       <div class="soru">${esc(s.soru)}</div>
-      <div id="sec"></div><div id="alt"></div>`;
+      <div id="sec"></div>${window.USTALIK ? `<div id="ipucuKutu"></div>` : ""}<div id="alt"></div>`;
     // Şıkları her gösterimde karıştır, doğru cevap hep aynı harfte olmasın
     sira = s.secenekler.map((_, j) => j);
     for (let a = sira.length - 1; a > 0; a--) { const b = Math.floor(Math.random() * (a + 1)); [sira[a], sira[b]] = [sira[b], sira[a]]; }
@@ -513,6 +513,7 @@ function test(kaynak, ad, tekrarModu, konuId) {
       b.onclick = () => cevapla(p);
       $("sec").appendChild(b);
     });
+    if (window.USTALIK) USTALIK.ipucuKur(s, sira, $("sec"), $("ipucuKutu"));
   }
   function cevapla(p) {
     const s = sorular[i];
@@ -521,6 +522,7 @@ function test(kaynak, ad, tekrarModu, konuId) {
     btns.forEach((b) => (b.disabled = true));
     btns[sira.indexOf(s.dogru)].classList.add("dogru");
     const ok = j === s.dogru;
+    if (window.USTALIK) USTALIK.ipucuBitti();
     soruKaydet(s.konuId, ok, (Date.now() - t0) / 1000);
     const anahtar = (y) => y.konuId === s.konuId && y.soru === s.soru && y.secenekler[y.dogru] === s.secenekler[s.dogru];
     if (ok) {

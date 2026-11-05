@@ -108,15 +108,18 @@
     .sort((a, b) => hamSeviye(a[1]) - hamSeviye(b[1]) || a[1].sonraki - b[1].sonraki)
     .map(([id]) => konuBul(id));
   function tekrarEkrani() {
-    const l = tekrarListesi();
-    if (!l.length) { ekran.innerHTML = `<div class="ozet">✅</div><p style="text-align:center">Bugün tekrar zamanı gelen konu yok. Yeni konular çalıştıkça burada, tam unutmaya başlayacağın zamanda karşına çıkacaklar.</p>`; return; }
-    ekran.innerHTML = `<p class="not">Bunlar unutmaya başlamadan tekrar etmen gereken konular. Her biri 5 soru sürer. Bildiğin konunun aralığı uzar (3 → 7 → 14 → 30 gün), zorlandığın konu daha sık gelir.</p><div class="liste" id="tl"></div>`;
+    const l = tekrarListesi(), sn = window.ARALIKLI_BUGUN ? ARALIKLI_BUGUN() : 0;
+    const soruKutu = window.ARALIKLI_AC ? `<button class="kart" id="tkSoru" style="margin-bottom:14px"><b>🔁 Yanlış yaptığın sorular</b><span class="rozet">${sn ? `Bugün ${sn} soru` : "Bugün yok ✅"}</span></button>` : "";
+    const bagla = () => { const t = document.getElementById("tkSoru"); if (t) t.onclick = () => window.ARALIKLI_AC(); };
+    if (!l.length) { ekran.innerHTML = soruKutu + `<div class="ozet">✅</div><p style="text-align:center">Bugün tekrar zamanı gelen konu yok. Yeni konular çalıştıkça burada, tam unutmaya başlayacağın zamanda karşına çıkacaklar.</p>`; bagla(); return; }
+    ekran.innerHTML = soruKutu + `<h2>📚 Tekrar zamanı gelen konular</h2><p class="not">Bunlar unutmaya başlamadan tekrar etmen gereken konular. Her biri 5 soru sürer. Bildiğin konunun aralığı uzar (3 → 7 → 14 → 30 gün), zorlandığın konu daha sık gelir.</p><div class="liste" id="tl"></div>`;
     l.slice(0, 8).forEach(({ ders, konu }) => {
       const b = document.createElement("button"); b.className = "kart";
       b.innerHTML = `<b>${cip(konu.id)}${esc(konu.ad)}</b><span class="rozet">${esc(ICERIK[ders].ad)} · ${U[konu.id].p}/100</span>`;
       b.onclick = () => { kayit.tekrarSay++; kaydet(); git(() => test(() => soruHazirla(konu, 5), "Tekrar: " + konu.ad, false, konu.id), "🧠 " + konu.ad); };
       $("tl").appendChild(b);
     });
+    bagla();
   }
 
   // ---------- Rozetler ve haftalık hedef ----------
@@ -161,9 +164,11 @@
   st.textContent = `.ozel-kart.tekrarK{background:linear-gradient(135deg,#0ea5e9,#7c3aed)}.ozel-kart.rozetK{background:linear-gradient(135deg,#f59e0b,#dc2626)}.karo small{display:block}`;
   document.head.appendChild(st);
   window.ANA_KARTLAR = window.ANA_KARTLAR || [];
+  // Tek tekrar kartı: soru tekrarı (takip.js) bu kartın içine alınır
+  for (let i = window.ANA_KARTLAR.length - 1; i >= 0; i--) if (/ozel-kart aralikli/.test(String(window.ANA_KARTLAR[i]))) window.ANA_KARTLAR.splice(i, 1);
   window.ANA_KARTLAR.unshift((kutu) => {
-    const n = tekrarListesi().length, b = document.createElement("button"); b.className = "ozel-kart tekrarK";
-    b.innerHTML = `<span class="ikon">🧠</span><span><b>Bugünün Konu Tekrarı</b><small>${n ? `${n} konu unutulmadan tekrar bekliyor` : "Bugün tekrar zamanı gelen konu yok ✅"}</small></span>`;
+    const n = tekrarListesi().length, sn = window.ARALIKLI_BUGUN ? ARALIKLI_BUGUN() : 0, b = document.createElement("button"); b.className = "ozel-kart tekrarK";
+    b.innerHTML = `<span class="ikon">🧠</span><span><b>Unutmadan Tekrar Et</b><small>${n || sn ? [n ? `${n} konu` : "", sn ? `${sn} yanlış soru` : ""].filter(Boolean).join(" · ") + " seni bekliyor" : "Bugün tekrar bekleyen yok ✅"}</small></span>`;
     b.onclick = () => git(tekrarEkrani, "🧠 Konu Tekrarı"); kutu.prepend(b);
   });
   window.ANA_KARTLAR.push((kutu) => {
