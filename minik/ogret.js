@@ -55,7 +55,7 @@
     return { tip: "ogret", soru: b.soru, gorsel: b.gorsel, okunacak: b.okunacak || b.soru, temel: b, iddia, cozum: b.cozum || "" };
   };
   for (const dk of Object.keys(DERS)) {
-    const D = DERS[dk]; if (!D || !Array.isArray(D.temalar) || dk === "akil" || D.temalar.some((t) => t.id === "ogret-" + dk)) continue;
+    const D = DERS[dk]; if (!D || !Array.isArray(D.temalar) || dk === "akil" || dk === "zeka" || D.temalar.some((t) => t.id === "ogret-" + dk)) continue;
     D.temalar.push({ id: "ogret-" + dk, ad: "🦉 Baykuşa Öğret", konular: [{ id: "ogret-" + dk, ad: "Baykuş Doğru mu Söylüyor?", ikon: "🦉",
       bilgi: [["🦉", "Baykuş sorulara cevap verecek ama bazen yanılıyor!"], ["✅", "Doğruysa \"Doğru\" de, yanlışsa doğrusunu ona öğret."]], uret: ogretG(dk) }] });
   }

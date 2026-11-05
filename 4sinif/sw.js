@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders4-";
-const SURUM = ONEK + "4dcf8d9e";
-const DOSYALAR = ["soru-bank3.js", "soru-bank2.js", "soru-ek.js", "soru-bank.js", "soru-bank-sosyal.js", "soru-bank-fen.js", "ogret.js", "hikayeler-klasik.js", "veli-karne.js", "yedek.js", "kitap-oku.js", "okuma-atolyesi.js", "./", "app.js", "apple-touch-icon.png", "ayar.js", "din.js", "fen.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce.js", "islem-alani.js", "kelime-havuzu.js", "kitaplar.js", "manifest.webmanifest", "matematik.js", "ortak.js", "oyunlar.js", "ses.js", "sosyal.js", "turkce.js", "videolar.js"];
+const SURUM = ONEK + "84ef6f3c";
+const DOSYALAR = ["zeka-oyunlari.js", "oyun-ek.js", "soru-bank3.js", "soru-bank2.js", "soru-ek.js", "soru-bank.js", "soru-bank-sosyal.js", "soru-bank-fen.js", "ogret.js", "hikayeler-klasik.js", "veli-karne.js", "yedek.js", "kitap-oku.js", "okuma-atolyesi.js", "./", "app.js", "apple-touch-icon.png", "ayar.js", "din.js", "fen.js", "hikayeler.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce.js", "islem-alani.js", "kelime-havuzu.js", "kitaplar.js", "manifest.webmanifest", "matematik.js", "ortak.js", "oyunlar.js", "ses.js", "sosyal.js", "turkce.js", "videolar.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));

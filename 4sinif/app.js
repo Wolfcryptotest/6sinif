@@ -194,7 +194,7 @@
     ekran.appendChild($(`<div style="text-align:center"><div style="font-size:80px;line-height:1.1">${k.ikon || D.ikon}</div><h2 style="margin:4px 0">${esc(k.ad)}</h2>${yildizYaz(s.en || 0, 30)}<div class="not">${s.oyna ? `${s.oyna} kez oynadın` : "Henüz oynamadın"}</div></div>`));
     const b1 = $(`<button class="buyukbtn ikincil">📖 Öğren (Bilgin anlatsın)</button>`);
     b1.onclick = () => git(() => ogren(id, k), "📖 " + k.ad);
-    const b2 = $(`<button class="buyukbtn">🎮 Oyna (${S.turGorev} görev)</button>`);
+    const b2 = $(`<button class="buyukbtn">🎮 Oyna (${k.tur || S.turGorev} görev)</button>`);
     b2.onclick = () => git(() => oyna(id, k), "🎮 " + k.ad);
     ekran.appendChild(b1); ekran.appendChild(b2);
     if (k.video) {
@@ -236,7 +236,7 @@
   // ---------- Oyun ----------
   function oyna(id, k) {
     const D = DERS[id];
-    const gorevler = OYUN.hazirla([k.uret], S.turGorev);
+    const gorevler = OYUN.hazirla([k.uret], k.tur || S.turGorev);
     gorevler.forEach((g) => g.konu = k.id);
     OYUN.tur({ gorevler, renk: D.renk, bitti: (s) => sonuc(s, { id, k, tekrar: () => { yigin.pop(); git(() => oyna(id, k), "🎮 " + k.ad); } }) });
   }

@@ -303,6 +303,10 @@
   const EN = [["🐱", "cat"], ["🐶", "dog"], ["🍎", "apple"], ["🚗", "car"], ["☀️", "sun"], ["🐟", "fish"], ["🏠", "house"], ["⚽", "ball"], ["📚", "book"], ["🌳", "tree"], ["🐦", "bird"], ["🥛", "milk"]];
   const enHafizaG = () => ({ tip: "hafiza", soru: "Resmi İngilizce adıyla eşleştir! Match the picture and the word.", ciftler: sec(EN, Y5() ? 4 : 3), cozum: "" });
 
+  // 2–4. sınıflar bu dosyayı yalnızca oyun motoru ve üreteçler için yükler (zeka-oyunlari.js kullanır); ders eklemesi yapılmaz
+  window.OYUN_EK = { hafizaG, labirentG, farkG, yapbozG, golgeG, desenG, farkliG, sudokuG, kelimeG, heceG, SETLER };
+  if ((S.no || 0) >= 2) return;
+
   // ============ DERS'e ekle ============
   const tema = (id, ad, konular) => ({ id, ad, konular });
   const ekleDers = (key, ders) => { if (!DERS[key]) { DERS[key] = ders; if (Array.isArray(S.dersler) && !S.dersler.includes(key)) S.dersler.push(key); } };
