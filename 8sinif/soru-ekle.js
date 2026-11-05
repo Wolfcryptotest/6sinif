@@ -116,8 +116,11 @@
         const bos = s.m.slice(0, i) + "____" + s.m.slice(i + bul.length);
         if (ekle(k, { soru: `Boşluğa hangisi gelmelidir? "${tamYazi(bos)}"`, secenekler: [s.m.slice(i, i + bul.length), ...sec.map((x) => /^[A-ZÇĞİÖŞÜ]/.test(s.m.slice(i, i + 1)) ? x : x.charAt(0).toLocaleLowerCase("tr") + x.slice(1))], dogru: 0, cozum: tamYazi(s.m), otomatik: true })) sayac++;
       }
-      // 2) Kavram–tanım
+      // 2) Kavram–tanım (+ yazılı provası için açık uçlu "… nedir?" sorusu)
       for (const t of tanimlar.filter((x) => x.k === k)) {
+        k.acik = k.acik || [];
+        const as = `${t.kavram} nedir? Kısaca açıklayınız.`;
+        if (!k.acik.some((x) => x.soru === as)) k.acik.push({ soru: as, cevap: t.tanim, otomatik: true });
         const kucuk = (z) => z.toLocaleLowerCase("tr"), ic = (x) => kucuk(x).includes(kucuk(t.kavram)) || kucuk(t.kavram).includes(kucuk(x));
         const uygun = tanimlar.filter((x) => !ic(x.kavram) && !/göre$|özelliği|'n[iı]n\b/.test(x.kavram));
         const ayniKonu = karistir(uygun.filter((x) => x.k === k).map((x) => x.kavram)), diger = karistir(uygun.filter((x) => x.k !== k).map((x) => x.kavram));

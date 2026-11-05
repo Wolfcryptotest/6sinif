@@ -220,8 +220,8 @@
     for (let tur = 0; sec.length < n && tur < 6; tur++)
       for (const h of havuzlar) {
         if (sec.length >= n) break;
-        const t = h.test[tur];
-        if (t) sec.push({ soru: t.soru + " (Cevabını işlem/gerekçesiyle yaz.)", cevap: t.secenekler[t.dogru] + (t.cozum ? " — " + t.cozum : ""), konuId: h.k.id });
+        const t = h.test.filter((x) => !/hangisi|aşağıdaki/i.test(x.soru.replace(/^Boşluğa hangisi gelmelidir\?/, "")))[tur];
+        if (t) sec.push({ soru: t.soru.replace(/^Boşluğa hangisi gelmelidir\? /, "Boşluğu doldurunuz: ") + (/^Boşluğa/.test(t.soru) ? "" : " (Cevabını işlem/gerekçesiyle yaz.)"), cevap: t.secenekler[t.dogru] + (t.cozum ? " — " + t.cozum : ""), konuId: h.k.id });
       }
     // puanlar: toplam 100
     const p = Math.floor(100 / sec.length);
