@@ -176,70 +176,85 @@ function anaSayfa() {
 function ilerlemePaneli() {
   const konuDers = {};
   for (const [dk, D] of Object.entries(window.ICERIK || {})) for (const u of D.uniteler) for (const k of u.konular) konuDers[k.id] = { ders: dk, konu: k };
-  const st = kayit.istatistik, gunler = Object.values(kayit.gunluk);
-  const topS = gunler.reduce((a, g) => a + g.soru, 0), topD = gunler.reduce((a, g) => a + g.dogru, 0);
-  const topK = gunler.reduce((a, g) => a + g.kelime, 0), topSure = gunler.reduce((a, g) => a + g.sure, 0);
+  const st = kayit.istatistik;
   const yuzde = (d, s) => (s ? Math.round((d / s) * 100) : 0);
+  const gun = (i) => { const t = new Date(); t.setDate(t.getDate() - i); return { t, g: kayit.gunluk[gunAnahtar(t)] || { soru: 0, dogru: 0, kelime: 0, sure: 0 } }; };
+  const topla = (bas, son) => { const r = { gun: 0, soru: 0, dogru: 0, sure: 0, kelime: 0 }; for (let i = bas; i <= son; i++) { const { g } = gun(i); if (g.soru || g.kelime) r.gun++; r.soru += g.soru; r.dogru += g.dogru; r.sure += g.sure; r.kelime += g.kelime || 0; } return r; };
+  const buHafta = topla(0, 6), gecen = topla(7, 13);
+  const fark = (a, b, birim) => { const f = a - b; return f === 0 || !b ? "" : `<small class="pn-fark ${f > 0 ? "art" : "az"}">${f > 0 ? "▲" : "▼"} geçen haftaya göre ${f > 0 ? "+" : ""}${f}${birim || ""}</small>`; };
 
-  // Son 7 gün
-  const yedi = [];
-  for (let i = 6; i >= 0; i--) { const t = new Date(); t.setDate(t.getDate() - i); yedi.push({ t, g: kayit.gunluk[gunAnahtar(t)] || { soru: 0, dogru: 0, kelime: 0, sure: 0 } }); }
+  // 1) Bu hafta — tek cümle + 4 kutu
+  const cumle = !buHafta.soru && !buHafta.kelime ? "Bu hafta henüz çalışmadın. Bir konu seçip ilk testini çöz; ilerlemen burada görünecek."
+    : `Son 7 günde <b>${buHafta.gun} gün</b> çalıştın, <b>${buHafta.soru} soru</b> çözdün ve bunların <b>%${yuzde(buHafta.dogru, buHafta.soru)}</b>'ini doğru yaptın.${buHafta.soru > gecen.soru && gecen.soru ? " Geçen haftadan daha çok çalıştın 👏" : ""}`;
+  const kutular = `<div class="pn-kutular">
+      <div><span>📅 Çalıştığın gün</span><b>${buHafta.gun}/7</b>${fark(buHafta.gun, gecen.gun, " gün")}</div>
+      <div><span>✏️ Çözdüğün soru</span><b>${buHafta.soru}</b>${fark(buHafta.soru, gecen.soru)}</div>
+      <div><span>✅ Doğru oranı</span><b>%${yuzde(buHafta.dogru, buHafta.soru)}</b>${buHafta.soru && gecen.soru ? fark(yuzde(buHafta.dogru, buHafta.soru), yuzde(gecen.dogru, gecen.soru), " puan") : ""}</div>
+      <div><span>⏱️ Çalışma süresi</span><b>${sureYaz(buHafta.sure)}</b><small>🔥 Seri: ${seriHesapla()} gün</small></div></div>`;
+
+  // 2) Son 7 gün grafiği
+  const yedi = []; for (let i = 6; i >= 0; i--) yedi.push(gun(i));
   const enCok = Math.max(kayit.hedef.soru, ...yedi.map((x) => x.g.soru), 1);
   const grafik = yedi.map(({ t, g }, i) => {
-    const gun = i === 6 ? "Bugün" : t.toLocaleDateString("tr-TR", { weekday: "short" });
-    const ipucu = `${t.toLocaleDateString("tr-TR", { day: "numeric", month: "long" })}: ${g.soru} soru (%${yuzde(g.dogru, g.soru)} doğru), ${g.kelime} kelime, ${sureYaz(g.sure)}`;
-    return `<div class="gun" tabindex="0" title="${esc(ipucu)}" aria-label="${esc(ipucu)}">
-      <div class="gun-deger">${g.soru || ""}</div>
+    const ad = i === 6 ? "Bugün" : t.toLocaleDateString("tr-TR", { weekday: "short" });
+    const ipucu = `${t.toLocaleDateString("tr-TR", { day: "numeric", month: "long" })}: ${g.soru} soru (%${yuzde(g.dogru, g.soru)} doğru), ${sureYaz(g.sure)}`;
+    return `<div class="gun" tabindex="0" title="${esc(ipucu)}" aria-label="${esc(ipucu)}"><div class="gun-deger">${g.soru || ""}</div>
       <div class="gun-alan"><div class="hedef-iz" style="bottom:${(kayit.hedef.soru / enCok) * 100}%"></div><div class="gun-bar ${hedefTamam(g) ? "tamam" : ""}" style="height:${(g.soru / enCok) * 100}%"></div></div>
-      <div class="gun-ad">${gun}${hedefTamam(g) ? " ✓" : ""}</div></div>`;
+      <div class="gun-ad">${ad}${hedefTamam(g) ? " ✓" : ""}</div></div>`;
   }).join("");
 
-  // Ders bazında
+  // 3) Derslerim — konu durumu
+  const U = window.USTALIK;
   const dersSatir = DERSLER.filter((d) => window.ICERIK[d.key]).map((d) => {
-    let s = 0, dg = 0, calisilan = 0, toplam = 0;
-    for (const u of ICERIK[d.key].uniteler) for (const k of u.konular) { toplam++; const x = st[k.id]; if (x && x.s) { s += x.s; dg += x.d; calisilan++; } }
-    return `<div class="ders-satir">
-      <div class="ders-ad"><span>${d.ikon}</span> ${d.ad}</div>
-      <div class="ders-cubuk" title="Konuların %${Math.round((calisilan / toplam) * 100)}'ü çalışıldı"><div style="width:${(calisilan / toplam) * 100}%;background:${d.renk}"></div></div>
-      <div class="ders-bilgi">${calisilan}/${toplam} konu · ${s} soru · ${s ? "%" + yuzde(dg, s) + " doğru" : "henüz yok"}</div>
-    </div>`;
+    let s = 0, dg = 0, calisilan = 0, toplam = 0; const c = [0, 0, 0, 0];
+    for (const u of ICERIK[d.key].uniteler) for (const k of u.konular) { toplam++; const x = st[k.id]; if (x && x.s) { s += x.s; dg += x.d; calisilan++; } if (U) c[U.seviye(k.id)]++; }
+    const bar = U ? `<div class="pn-bar">${[[3, "#7c3aed"], [2, "#16a34a"], [1, "#f59e0b"]].map(([sv, r]) => `<i style="width:${(c[sv] / toplam) * 100}%;background:${r}"></i>`).join("")}</div>`
+      : `<div class="pn-bar"><i style="width:${(calisilan / toplam) * 100}%;background:${d.renk}"></i></div>`;
+    const yazi = U ? `${c[3] ? `🏆 ${c[3]} usta · ` : ""}${c[2] ? `🟢 ${c[2]} iyi · ` : ""}${c[1] ? `🟡 ${c[1]} başladı · ` : ""}⚪ ${c[0]} başlanmadı` : `${calisilan}/${toplam} konu çalışıldı`;
+    return `<button class="pn-ders" data-d="${d.key}"><span class="pn-ad">${d.ikon} <b>${d.ad}</b><small>${s ? `${s} soru · %${yuzde(dg, s)} doğru` : "henüz soru çözülmedi"}</small></span>${bar}<span class="pn-yazi">${yazi}</span></button>`;
   }).join("");
 
-  // Konu sıralamaları (en az 5 soru çözülmüş konular)
+  // 4) Şimdi ne yapmalıyım?
   const konular = Object.entries(st).filter(([id, x]) => x.s >= 5 && konuDers[id]).map(([id, x]) => ({ id, ...x, p: yuzde(x.d, x.s), ...konuDers[id] }));
-  const zor = konular.filter((k) => k.p < 80).sort((a, b) => a.p - b.p).slice(0, 5);
-  const iyi = konular.filter((k) => k.p >= 80).sort((a, b) => b.p - a.p || b.s - a.s).slice(0, 5);
-  const konuListe = (l, bos) => l.length ? l.map((k) => {
-    const d = DERSLER.find((x) => x.key === k.ders);
-    return `<button class="kart konu-satir" data-id="${k.id}"><span><b>${esc(k.konu.ad)}</b><br><span class="not">${d.ikon} ${d.ad} · ${k.s} soru</span></span><span class="yuzde ${k.p < 50 ? "dusuk" : k.p < 80 ? "orta" : "yuksek"}">%${k.p}</span></button>`;
-  }).join("") : `<p class="not">${bos}</p>`;
+  const zor = konular.filter((k) => k.p < 80).sort((a, b) => a.p - b.p).slice(0, 4);
+  const iyi = konular.filter((k) => k.p >= 80).sort((a, b) => b.p - a.p || b.s - a.s).slice(0, 4);
+  const tekrar = U ? Object.keys(U.U).filter((id) => U.U[id].n && U.U[id].sonraki <= Date.now() && konuDers[id] && !zor.some((z) => z.id === id)).slice(0, 3) : [];
+  const oneri = [
+    ...zor.map((k) => ({ id: k.id, ikon: "💪", yazi: `<b>${esc(k.konu.ad)}</b> konusunu tekrar çalış`, alt: `${k.s} sorunun %${k.p}'ini doğru yaptın; hedef %80` })),
+    ...tekrar.map((id) => ({ id, ikon: "🧠", yazi: `<b>${esc(konuDers[id].konu.ad)}</b> — unutmadan tekrar et`, alt: "Tekrar zamanı geldi, 5 soru yeter" }))
+  ].slice(0, 5);
+  const oneriHTML = oneri.length ? oneri.map((o) => `<button class="kart konu-satir" data-id="${o.id}"><span>${o.ikon} ${o.yazi}<br><span class="not">${o.alt}</span></span><span class="pn-git">Çalış →</span></button>`).join("")
+    : `<p class="pn-bos">${konular.length ? "Harika! Şu an tekrar etmen gereken zayıf bir konu yok. Yeni bir konuya geç." : "Henüz yeterli veri yok. Bir konuda en az 5 soru çözdüğünde sana ne çalışman gerektiğini burada söyleyeceğim."}</p>`;
+  const iyiHTML = iyi.length ? iyi.map((k) => `<span class="pn-cip">⭐ ${esc(k.konu.ad)} <b>%${k.p}</b></span>`).join("") : `<p class="pn-bos">En az 5 soru çözdüğün ve %80'in üstünde başarılı olduğun konular burada görünür.</p>`;
+
+  // 5) Okuma gelişimi (Okuma Atölyesi ölçümleri)
+  let okuma = ""; try { const v = JSON.parse(localStorage.getItem("okuma-atolyesi-" + (window.SINIF && SINIF.anahtar)) || "{}"); const o = (v.olcum || []).slice(-1)[0], ilk = (v.olcum || [])[0];
+    okuma = o ? `Son ölçüm: <b>${o.hiz}</b> kelime/dk, anlama <b>%${o.anlama}</b>${v.olcum.length > 1 ? ` · ilk ölçümden beri <b>${o.hiz - ilk.hiz >= 0 ? "+" : ""}${o.hiz - ilk.hiz}</b> kelime/dk` : ""}.` : "Okuma hızını henüz ölçmedin. Okuma Atölyesi'nden \"Okuma Hızımı Ölç\" ile başla."; } catch (e) {}
 
   const secim = (ad, alan, degerler) => `<div class="secim"><span>${ad}</span>${degerler.map((v) => `<button class="cip ${kayit.hedef[alan] === v ? "secili" : ""}" data-alan="${alan}" data-v="${v}">${v === 0 ? "Yok" : v}</button>`).join("")}</div>`;
-
   ekran.innerHTML = `
-    <div class="karolar">
-      <div class="karo"><span>Çözülen soru</span><b>${topS}</b></div>
-      <div class="karo"><span>Doğruluk</span><b>%${yuzde(topD, topS)}</b></div>
-      <div class="karo"><span>Öğrenilen kelime</span><b>${topK}</b></div>
-      <div class="karo"><span>Çalışma süresi</span><b>${sureYaz(topSure)}</b></div>
-      <div class="karo"><span>Seri (en uzun: ${enUzunSeri()})</span><b>🔥 ${seriHesapla()} gün</b></div>
-    </div>
-    <h2>Son 7 Gün</h2>
-    <div class="grafik-kart"><div class="grafik-baslik">Günlük çözülen soru · kesikli çizgi: soru hedefi (${kayit.hedef.soru}) · ✓ hedefin tamamlandığı günler · ayrıntı için çubuğa dokun</div><div class="grafik">${grafik}</div></div>
-    <h2>Derslere Göre</h2>
-    <div class="grafik-kart">${dersSatir}</div>
-    <div class="iki-sutun">
-      <div><h2>💪 Tekrar Etmesi Gerekenler</h2>${konuListe(zor, "En az 5 soru çözülen konularda başarı %80'in altına düşerse burada görünür.")}</div>
-      <div><h2>⭐ En İyi Olduğu Konular</h2>${konuListe(iyi, "En az 5 soru çözülen ve %80'in üzerinde başarı olan konular burada görünür.")}</div>
-    </div>
-    ${window.SES ? `<h2>🗣️ Ses ve Konuşma Hızı</h2><div class="grafik-kart" id="sesAyar">${SES.ayarHTML()}</div>` : ""}
-    <h2>🎯 Günlük Hedef Ayarı</h2>
-    <div class="grafik-kart">
-      ${secim("Soru hedefi", "soru", [10, 20, 30, 50])}
+    <h2>📅 Bu Hafta</h2>
+    <p class="pn-cumle">${cumle}</p>
+    ${kutular}
+    <div class="grafik-kart"><div class="grafik-baslik">Her gün çözdüğün soru sayısı. Kesikli çizgi günlük hedefin (${kayit.hedef.soru} soru); ✓ hedefi tamamladığın gün.</div><div class="grafik">${grafik}</div></div>
+    <h2>🎯 Şimdi Ne Çalışmalıyım?</h2>
+    ${oneriHTML}
+    <h2>📚 Derslerim</h2>
+    <p class="pn-aciklama">${U ? "Renkli çubuk konuların durumunu gösterir: 🏆 mor usta, 🟢 yeşil iyi, 🟡 sarı başladı, gri başlanmadı." : "Çubuk, dersin konularından kaçını çalıştığını gösterir."} Derse dokunarak açabilirsin.</p>
+    <div class="pn-dersler">${dersSatir}</div>
+    <h2>⭐ İyi Olduğun Konular</h2>
+    <div class="pn-cipler">${iyiHTML}</div>
+    <h2>📖 Okuma</h2>
+    <p class="pn-cumle">${okuma}${window.OKUMA_ATOLYESI_AC ? ` <button class="btn2" id="pnOkuma" style="margin-top:8px">📖 Okuma Atölyesi</button>` : ""}</p>
+    <details class="grafik-kart pn-ayar"><summary><b>⚙️ Ayarlar</b> — günlük hedef${window.SES ? ", ses" : ""}</summary>
+      ${secim("Günlük soru hedefi", "soru", [10, 20, 30, 50])}
       ${secim("İngilizce kelime hedefi", "kelime", [0, 10, 20, 30])}
-    </div>`;
+      ${window.SES ? `<div id="sesAyar" style="margin-top:10px">${SES.ayarHTML()}</div>` : ""}
+    </details>`;
   ekran.querySelectorAll(".konu-satir").forEach((b) => (b.onclick = () => { const k = konuDers[b.dataset.id].konu; git(() => konuSayfa(k), k.ad); }));
-  ekran.querySelectorAll(".cip").forEach((b) => (b.onclick = () => { kayit.hedef[b.dataset.alan] = +b.dataset.v; kaydet(); git(ilerlemePaneli, "İlerleme Paneli", false); }));
+  ekran.querySelectorAll(".pn-ders").forEach((b) => (b.onclick = () => { const d = DERSLER.find((x) => x.key === b.dataset.d); git(() => uniteler(d.key), d.ad); }));
+  ekran.querySelectorAll(".cip[data-alan]").forEach((b) => (b.onclick = () => { kayit.hedef[b.dataset.alan] = +b.dataset.v; kaydet(); git(ilerlemePaneli, "İlerleme Paneli", false); }));
+  if ($("pnOkuma")) $("pnOkuma").onclick = () => window.OKUMA_ATOLYESI_AC();
   if (window.SES && $("sesAyar")) { SES.ayarBagla($("sesAyar")); SES.rehberGoster($("sesAyar")); }
 }
 

@@ -37,10 +37,54 @@
 @media (prefers-color-scheme:dark){.deney{background:linear-gradient(135deg,#0b2a22,#0b1f3a);border-color:#14532d;color:#e2e8f0}.deney .dn-not{color:#94a3b8}}`;
   document.head.appendChild(st);
   const url = (s) => `https://phet.colorado.edu/sims/html/${s}/latest/${s}_all.html?locale=tr`;
+  // Diğer sınıflar: konu adına göre eşleştirme (yalnız fen ve matematik dersleri)
+  const G = (ad) => [`"${ad}" simülasyonunu aç ve konudaki kavramı ekranda bul.`, "Bir değeri değiştir: ne değişti? Neden böyle olduğunu düşün.", "Öğrendiğini kendi cümlenle bir kez söyle ya da yaz."];
+  const KURAL = [
+    [/elektrik|devre|direnç|iletken|yalıtkan|ampul|akım/i, "circuit-construction-kit-dc", "Elektrik Devresi Kur"],
+    [/kaldırma kuvveti|yüzme|batma/i, "buoyancy-basics", "Kaldırma Kuvveti"],
+    [/yoğunluk/i, "density", "Yoğunluk"],
+    [/sürtünme|kuvvet|hareket|sürat|newton|ivme/i, "forces-and-motion-basics", "Kuvvet ve Hareket"],
+    [/erime|donma|kaynama|hal değişim|hâl değişim|maddenin hal|maddenin hâl|tanecik|genleşme|ısı ve sıcaklık/i, "states-of-matter-basics", "Maddenin Hâlleri"],
+    [/mercek|ayna/i, "geometric-optics-basics", "Aynalar ve Mercekler"],
+    [/renk/i, "color-vision", "Renk Görme"],
+    [/ışık|yansıma|kırılma/i, "bending-light", "Işığın Kırılması ve Yansıması"],
+    [/\bses\b|ses dalga|sesin/i, "waves-intro", "Dalgalara Giriş"],
+    [/dalga/i, "wave-on-a-string", "İpte Dalga"],
+    [/güneş sistemi|gezegen|yörünge/i, "my-solar-system", "Güneş Sistemim"],
+    [/kütle çekim|yer çekimi|çekim kuvveti/i, "gravity-force-lab-basics", "Kütle Çekim Laboratuvarı"],
+    [/sarkaç/i, "pendulum-lab", "Sarkaç Laboratuvarı"],
+    [/yay|esneklik/i, "masses-and-springs-basics", "Kütleler ve Yaylar"],
+    [/enerji/i, "energy-forms-and-changes", "Enerji Biçimleri"],
+    [/molekül|bileşik|kimyasal bağ/i, "build-a-molecule", "Molekül Oluştur"],
+    [/gaz/i, "gas-properties", "Gazların Özellikleri"],
+    [/çözelti|derişim|molarite|çözünürlük/i, "molarity", "Molarite"],
+    [/sera|iklim/i, "greenhouse-effect", "Sera Etkisi"],
+    [/sinir|nöron/i, "neuron", "Sinir Hücresi"],
+    [/vektör/i, "vector-addition", "Vektör Toplama"],
+    [/kesir/i, "fractions-intro", "Kesirlere Giriş"],
+    [/oran|orantı/i, "ratio-and-proportion", "Oran ve Orantı"],
+    [/olasılık/i, "plinko-probability", "Olasılık Tahtası"],
+    [/ortalama|merkezi eğilim|açıklık/i, "center-and-variability", "Merkez ve Yayılım"],
+    [/dörtgen|paralelkenar|yamuk|eşkenar dörtgen/i, "quadrilateral", "Dörtgen"],
+    [/\balan\b|alan ölç|alanı/i, "area-builder", "Alan Oluştur"],
+    [/denklem|eşitlik/i, "equality-explorer", "Eşitlik Kâşifi"],
+    [/cebirsel|terim|ifade/i, "expression-exchange", "Cebirsel İfadeler"],
+    [/eğim|doğrusal/i, "graphing-slope-intercept", "Doğru Grafiği"],
+    [/ikinci derece|parabol|karesel/i, "graphing-quadratics", "Parabol Grafiği"],
+    [/fonksiyon|örüntü/i, "function-builder-basics", "Fonksiyon Makinesi"],
+    [/tam sayı|sayı doğrusu|mutlak değer/i, "number-line-distance", "Sayı Doğrusu"]
+  ];
+  const DERS_UYGUN = /fen|fizik|kimya|biyoloji|matematik/;
+  function bul(k) {
+    if (D[k.id] && parseInt((window.SINIF && SINIF.anahtar) || document.title, 10) === 6) return D[k.id];
+    const b = typeof konuBul === "function" ? konuBul(k.id) : null; if (!b || !DERS_UYGUN.test(b.ders)) return null;
+    for (const [re, sim, ad] of KURAL) if (re.test(k.ad)) return [sim, ad, G(ad)];
+    return null;
+  }
   const asil = window.konuSayfa;
   window.konuSayfa = function (k) {
     const r = asil.apply(this, arguments);
-    const d = k && D[k.id]; if (!d) return r;
+    const d = k && bul(k); if (!d) return r;
     const yer = ekran.querySelector(".konu-v") || ekran;
     const kutu = document.createElement("section"); kutu.className = "deney";
     kutu.innerHTML = `<h2>🧪 Deneyi Kendin Yap: ${esc(d[1])}</h2>

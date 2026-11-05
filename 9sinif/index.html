@@ -186,6 +186,24 @@ body .izgara{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 <style id="konu-ek">.ornekler{display:grid;gap:8px;margin-bottom:12px}.ornek{background:var(--kart);border:1px solid var(--sinir);border-left:5px solid var(--ana);border-radius:12px;padding:10px 14px}.ornek summary{cursor:pointer;line-height:1.5}.ornek .cozum-ic{margin-top:8px;padding-top:8px;border-top:1px dashed var(--sinir);line-height:1.55}.hatalar{background:color-mix(in srgb,#f59e0b 10%,var(--kart));border:1px solid color-mix(in srgb,#f59e0b 45%,var(--sinir));border-radius:14px;padding:10px 16px;margin:4px 0 12px}.hatalar h3{margin:0 0 4px;font-size:17px}.hatalar ul{margin:0;padding-left:20px}.video-ara{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#dc2626,#ea580c);color:#fff;text-decoration:none;border-radius:14px;padding:12px 16px}.video-ara>span:first-child{font-size:28px}.video-ara small{display:block;opacity:.92;font-size:13px;margin-top:2px}</style>
+<style id="panel-v2">
+.pn-cumle{font-size:19px;line-height:1.55;margin:0 0 14px}
+.pn-kutular{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.pn-kutular>div{background:var(--kart);border:1px solid var(--sinir);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.pn-kutular span{font-size:15px;color:var(--soluk)}.pn-kutular b{font-size:30px;line-height:1.2}.pn-kutular small{font-size:13.5px;color:var(--soluk)}
+.pn-fark.art{color:#16a34a!important}.pn-fark.az{color:#dc2626!important}
+.pn-aciklama{font-size:15.5px;color:var(--soluk);margin:-4px 0 10px}
+.pn-dersler{display:grid;gap:10px;margin-bottom:20px}
+.pn-ders{display:grid;gap:6px;text-align:left;background:var(--kart);border:1px solid var(--sinir);border-radius:16px;padding:12px 14px;color:var(--yazi);width:100%}
+.pn-ad{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:18px;flex-wrap:wrap}.pn-ad small{font-size:15px;color:var(--soluk)}
+.pn-bar{display:flex;height:12px;border-radius:8px;overflow:hidden;background:var(--sinir)}.pn-bar i{display:block;height:100%}
+.pn-yazi{font-size:15px;color:var(--soluk)}
+.pn-git{font-weight:700;color:var(--ana);white-space:nowrap}
+.pn-bos{font-size:16.5px;color:var(--soluk);background:var(--kart);border:1px dashed var(--sinir);border-radius:14px;padding:12px 14px}
+.pn-cipler{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.pn-cip{background:color-mix(in srgb,#16a34a 12%,var(--kart));border:1px solid color-mix(in srgb,#16a34a 40%,var(--sinir));border-radius:999px;padding:6px 12px;font-size:16px}
+.pn-ayar summary{cursor:pointer;font-size:17px;padding:4px 0}
+.grafik-baslik{font-size:15px!important}
+</style>
 </head>
 <body>
 <header><button class="geri" id="geri" hidden>← Geri</button><h1 id="baslik">9. Sınıf Çalışma Merkezi</h1><button class="yukle-btn" id="yukle" hidden>📲 Uygulamayı Yükle</button></header>
@@ -207,6 +225,10 @@ body .izgara{grid-template-columns:repeat(2,1fr)}
 <script src="hazirlik.js"></script>
 <script src="program.js"></script>
 <script src="takip.js"></script>
+<script src="ustalik.js"></script>
+<script src="deney.js"></script>
+<script src="oyun.js"></script>
+<script src="isinma.js"></script>
 <script src="okuma-atolyesi.js"></script>
 <script>
 git(anaSayfa, SINIF.baslik, false);
