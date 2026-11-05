@@ -152,9 +152,11 @@
   function sar() {
     if (typeof window.soruHazirla !== "function" || window.soruHazirla._sarili) return;
     const asil = window.soruHazirla;
-    const sonlar = () => { try { const k = window.kayit; if (!k) return {}; return (k.sonSoru = k.sonSoru || {}); } catch (e) { return {}; } };
+    // kayit, app.js'te "let" ile tanımlı (window özelliği değil); çağrı anında global adla okunur. Yoksa oturum içi bellek kullanılır.
+    const bellek = {}, uretGor = {};
+    const sonlar = () => { try { const k = typeof kayit !== "undefined" ? kayit : null; if (!k) return bellek; return (k.sonSoru = k.sonSoru || {}); } catch (e) { return bellek; } };
     const yeni = function (k, n) {
-      if (!k || !Array.isArray(k.sorular) || k.sorular.length < 6) return asil.apply(this, arguments);
+      if (!k || !Array.isArray(k.sorular) || (k.sorular.length < 6 && !(window.URETEC && window.URETEC[k.id]))) return asil.apply(this, arguments);
       const S = sonlar(), son = new Set(S[k.id] || []), tum = k.sorular, adet = n || 10;
       let kullan = karistir(tum.filter((s) => !son.has(s.soru)));
       if (kullan.length < adet) {
@@ -164,13 +166,20 @@
       if (kullan.length < Math.min(adet, tum.length)) kullan = tum;
       let liste;
       const uretecli = !!(window.URETEC && window.URETEC[k.id]);
-      if (uretecli && tum.length >= 12) {
-        // Üreteçli konu: yarısı sabit (elle yazılmış + metinden) sorular, yarısı üreteçten
-        const sabitPay = Math.ceil(adet / 2);
-        const sabit = kullan.slice(0, sabitPay).map((s) => ({ ...s, konuId: k.id }));
+      if (uretecli) {
+        // Üreteçli konu: sabit soru çoksa yarısı sabitten, azsa en fazla 4 sabit; kalanı üreteçten (yakında görülmeyenler)
+        const sabitPay = tum.length >= 12 ? Math.ceil(adet / 2) : Math.min(4, Math.ceil(adet / 3), tum.length);
+        // Üreteç varken görülmüş sabit soruyu tekrar etmeye gerek yok: yalnız görülmemiş sabitler, eksik kalan üreteçten
+        const sabit = kullan.filter((s) => !son.has(s.soru)).slice(0, sabitPay).map((s) => ({ ...s, konuId: k.id }));
         k.sorular = [];
         let ur = [];
-        try { ur = asil.call(this, k, adet - sabit.length); } finally { k.sorular = tum; }
+        const gerek = adet - sabit.length, gecmis = (uretGor[k.id] = uretGor[k.id] || []);
+        try { ur = asil.call(this, k, gerek * 3); } finally { k.sorular = tum; }
+        // Üreteç sorularından yakın zamanda görülmeyenler öne alınır
+        const yeniU = ur.filter((s) => !gecmis.includes(s.soru)), eskiU = ur.filter((s) => gecmis.includes(s.soru));
+        ur = yeniU.concat(eskiU).slice(0, gerek);
+        for (const s of ur) gecmis.push(s.soru);
+        if (gecmis.length > 80) gecmis.splice(0, gecmis.length - 80);
         liste = karistir(sabit.concat(ur.filter((s) => !sabit.some((x) => x.soru === s.soru))));
         for (const s of kullan.slice(sabitPay)) { if (liste.length >= adet) break; liste.push({ ...s, konuId: k.id }); }
       } else {
