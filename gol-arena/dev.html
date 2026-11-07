@@ -1098,7 +1098,7 @@ function sendOff(p){const t=p.team;t.players=t.players.filter(x=>x!==p);G.player
   if(G.ball.owner===p)G.ball.owner=null;for(const h of G.humans)if(h.p===p){h.p=null;p.human=null;const c=nearestTo(t,G.ball,h);if(c)setCtrl(h,c)}}
 function card(p){if(Math.random()>.45)return;p.yc++;G.stats[p.ti].yc++;const red=p.yc>=2,min=Math.min(90,Math.floor(G.time/60)+1);
   G.events.push({team:p.ti,card:red?'R':'Y',name:p.sn,min});G.msg={t:red?'Kırmızı kart!':'Sarı kart',s:p.name+(red?' (ikinci sarı)':''),T:2.4,card:red?'R':'Y'};say(red?'rc':'yc',{n:p.name},2);if(red)sendOff(p)}
-function rumble(h,s,w,ms){try{const a=h&&h.pad.gp&&h.pad.gp.vibrationActuator;if(a)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:w})}catch(e){}}
+function rumble(h,s,w,ms){if(!SET.rum)return;try{const a=h&&h.pad.gp&&h.pad.gp.vibrationActuator;if(a)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:w})}catch(e){}}
 function isOff(p,r){const t=p.team,pr=prog(t,r.x);if(pr<=.5||pr<=prog(t,G.ball.x)+.002)return false;const ops=oppT(t).players.map(o=>prog(t,o.x)).sort((a,c)=>c-a);return pr>(ops[1]??1)+.004}
 function offside(p){sWhistle(1,.3);const t=oppT(p.team);startSet('fk',t,clamp(p.x,1,FL-1),clamp(p.y,1,FW-1),true);G.msg={t:'Ofsayt',s:p.name,T:2};say('off',{n:p.name},2);for(const q of G.players)q.offT=0}
 function kitOf(def,alt){const k=alt?def.a:def.k;return{shirt:k[0],trim:k[1],pat:k[2],shorts:k[3]}}
@@ -1236,7 +1236,7 @@ function keepAway(force){
 /* ================= KICKS ================= */
 function travel(v0,ve){if(v0<=ve)return 0;const a=3.0,k=.15,A=a/k,e=(ve+A)/(v0+A),T=-Math.log(e)/k;return(v0+A)*(1-e)/k-A*T}
 function speedFor(d,ve){let lo=ve,hi=45;for(let i=0;i<24;i++){const m=(lo+hi)/2;if(travel(m,ve)<d)lo=m;else hi=m}return lo}
-function kick(p,vx,vy,vz,z0){const b=G.ball,hs0=hyp(vx,vy);if(p.human&&p.human.pad&&!G.demo)rumble(p.human.pad,hs0>22?120:60,hs0>22?.55:.15,hs0>22?.4:.3);p.kf=0;p.kT=.42;p.kPow=clamp(hs0/30,.15,1);p.kType=p.jumpT>0?'head':(G.state==='set'&&G.set&&G.set.type==='ti')?'throw':vz>3.5?'lob':'low';if(hs0>24&&!(p.jumpT>0))G.shake=Math.max(G.shake||0,.25);
+function kick(p,vx,vy,vz,z0){const b=G.ball,hs0=hyp(vx,vy);p.kf=0;p.kT=.42;p.kPow=clamp(hs0/30,.15,1);p.kType=p.jumpT>0?'head':(G.state==='set'&&G.set&&G.set.type==='ti')?'throw':vz>3.5?'lob':'low';if(hs0>24&&!(p.jumpT>0))G.shake=Math.max(G.shake||0,.25);
   if(p.i===0&&b.owner===p&&!p.feet)b.gkRel=p;else if(b.gkRel&&b.gkRel!==p)b.gkRel=null;if(p.i===0)p.feet=false;b.kBy=p;b.kTy=p.kType;
   b.owner=null;b.curl=0;b.cross=null;b.vx=vx;b.vy=vy;b.vz=vz;if(z0!==undefined)b.z=z0;b.last=p;p.kickCd=.32;
   sKick(clamp(hyp(vx,vy)/28,.2,1));if(G.state==='set'){G.state='play';G.set=null}}
@@ -1376,7 +1376,6 @@ function stun(p,t,k){p.st='stun';p.stT=t;p.stT0=t;p.stK=k||(t>=.9?'fall':'stumbl
 function tackle(p){
   const b=G.ball,o=b.owner;p.tackCd=p.human?.38:p.team.prm.tackCd*rnd(.8,1.3);
   if(!o||o.team===p.team||(o.i===0&&inOwnBox(o)))return;
-  if(!G.demo){if(p.human&&p.human.pad)rumble(p.human.pad,90,.35,.2);if(o.human&&o.human.pad)rumble(o.human.pad,160,.7,.3)}
   const d=d2(p,o);if(d>1.8)return;
   const fx=Math.cos(o.face),fy=Math.sin(o.face),front=((p.x-o.x)*fx+(p.y-o.y)*fy)/(d||1);
   const still=o.spd<1.5,shield=(o.spd>4?.06:0)+((o.phy||70)-70)/260+(hasT(o,'t')?.06:0)+(hasT(o,'d')?.04:0)-((p.phy||70)-70)/400;
@@ -1679,7 +1678,7 @@ function headers(){
 function goal(t){
   if(G.so){soRecord(true);return}
   if(G.train){if(t.idx!==0){G.state='trw';G.train.wait=1.5;G.train.live=false;return}G.train.live=true;trainResult(true);return}
-  const b=G.ball,sc=b.last;if(!G.demo)rumble(null,420,1,.8);G.score[t.idx]++;G.stats[t.idx].on++;
+  const b=G.ball,sc=b.last;G.score[t.idx]++;G.stats[t.idx].on++;
   const own=sc&&sc.team!==t;const min=Math.min(90,Math.floor(G.time/60)+1);
   G.events.push({team:t.idx,name:sc?sc.sn:'?',min,own});
   G.state='goal';G.st=0;G.scorer=own?null:sc;G.goalTeam=t;G.koTeam=1-t.idx;
@@ -1856,6 +1855,7 @@ function glStands(){
   const stepMat=new THREE.MeshLambertMaterial({color:'#39414c'}),riserMat=new THREE.MeshLambertMaterial({color:'#252b33'});
   const bodyG=new THREE.BoxGeometry(.44,.62,.3);bodyG.translate(0,.36,0);
   const headG=new THREE.IcosahedronGeometry(.125,0);headG.translate(0,.8,.02);
+  const bodyN=new THREE.CylinderGeometry(.19,.15,.6,lowQ?6:9);bodyN.translate(0,.36,0);const headN=new THREE.IcosahedronGeometry(.125,lowQ?0:1);headN.translate(0,.8,.02);
   const bodyM=new THREE.MeshLambertMaterial({color:0xffffff}),headM=new THREE.MeshLambertMaterial({color:0xffffff});
   GL.fans=[];const PH=4,_m=new THREE.Matrix4(),_c=new THREE.Color();
   // stand: u0..u1 uzunluk, rows sıra, run/rise basamak, h0 ilk yükseklik, w0 sahadan uzaklık
@@ -1876,15 +1876,16 @@ function glStands(){
     mk(tP,stepMat);mk(rP,riserMat);
     // seyirciler
     const spots=[];for(let i=0;i<rows;i++){const h=h0+i*rise,w=i*run+run*.55;const gap=cfg.gaps;
-      for(let u=u0+.4;u<u1-.3;u+=sp){if(Math.random()<cfg.empty)continue;if(gap&&gap.some(([a,b])=>u>a&&u<b))continue;spots.push([u+rnd(-.06,.06),h,-w,Math.random()])}}
-    const n=spots.length,per=Math.ceil(n/PH);
-    for(let k=0;k<PH;k++){const sub=spots.slice(k*per,(k+1)*per);if(!sub.length)continue;
+      for(let u=u0+.4;u<u1-.3;u+=sp){if(Math.random()<cfg.empty)continue;if(gap&&gap.some(([a,b])=>u>a&&u<b))continue;spots.push([u+rnd(-.06,.06),h,-w,Math.random(),i])}}
+    spots.sort(()=>Math.random()-.5);
+    for(const[list,BG,HG]of[[spots.filter(s=>s[4]<7),bodyN,headN],[spots.filter(s=>s[4]>=7),bodyG,headG]]){const n=list.length,per=Math.ceil(n/PH);
+    for(let k=0;k<PH;k++){const sub=list.slice(k*per,(k+1)*per);if(!sub.length)continue;
       const g2=new THREE.Group();grp.add(g2);
-      const bm=new THREE.InstancedMesh(bodyG,bodyM,sub.length),hm=new THREE.InstancedMesh(headG,headM,sub.length);
+      const bm=new THREE.InstancedMesh(BG,bodyM,sub.length),hm=new THREE.InstancedMesh(HG,headM,sub.length);
       sub.forEach((s,i)=>{const sc=.9+s[3]*.22;_m.makeScale(sc,sc*(.92+Math.random()*.16),sc);_m.setPosition(s[0],s[1],s[2]);bm.setMatrixAt(i,_m);hm.setMatrixAt(i,_m);
-        hm.setColorAt(i,_c.set(SKINS[(Math.random()*SKINS.length)|0]));bm.setColorAt(i,_c.set('#888'))});
+        hm.setColorAt(i,_c.set(SKINS[(Math.random()*SKINS.length)|0]).convertSRGBToLinear());bm.setColorAt(i,_c.set('#888'))});
       bm.instanceMatrix.needsUpdate=hm.instanceMatrix.needsUpdate=true;g2.add(bm,hm);
-      GL.fans.push({g:g2,bm,n:sub.length,side:cfg.side,ph:k*1.7+Math.random(),seed:sub.map(s=>s[3])})}
+      GL.fans.push({g:g2,bm,n:sub.length,side:cfg.side,ph:k*1.7+Math.random(),seed:sub.map(s=>s[3])})}}
     return{grp,top,back}}
   const far=stand(new THREE.Vector3(0,0,-(FW+7.5)),0,-24,FL+24,lowQ?26:36,.82,.56,1.1,{side:-1,empty:.07,gaps:[[FL/2-3.2,FL/2+3.2]]});
   const lft=stand(new THREE.Vector3(-8.5,0,0),Math.PI/2,-16,FW+16,lowQ?20:28,.82,.56,1.0,{side:0,empty:.05});
@@ -1923,7 +1924,7 @@ function glFanColors(){if(!GL.fans||!G||!G.teams)return;const T=G.teams,c=new TH
   for(const f of GL.fans){for(let i=0;i<f.n;i++){const r=f.seed[i];let col;
       const home=f.side===-1?r<.55:f.side===0?r<.85:r<.12,away=!home&&(f.side===1?r<.88:f.side===-1?r<.8:false);
       if(home)col=Math.random()<.7?T[0].kit.shirt:T[0].kit.trim;else if(away)col=Math.random()<.7?T[1].kit.shirt:T[1].kit.trim;else col=P[(Math.random()*P.length)|0];
-      c.set(col).multiplyScalar(.78+Math.random()*.3);f.bm.setColorAt(i,c)}f.bm.instanceColor.needsUpdate=true}}
+      c.set(col).convertSRGBToLinear().multiplyScalar(.7+Math.random()*.35);f.bm.setColorAt(i,c)}f.bm.instanceColor.needsUpdate=true}}
 function glFans(t){if(!GL.fans)return;const ch=G&&!G.demo?Math.min(1,G.cheer||0):0;
   for(const f of GL.fans){const k=f.side===-1?1:(G&&G.lastGoalT!=null?1:1);const j=ch>0?Math.max(0,Math.sin(t*10.5+f.ph))*.42*ch*k:Math.max(0,Math.sin(t*1.3+f.ph))*.02;f.g.position.y=j}}
 
@@ -2342,7 +2343,7 @@ function glFlash(v,dt){if(!GL.flash)return;const on=(G.cheer>0||G.state==='goal'
 function glCamera(v,dt,t){const C=GL.camera;let fov=2*Math.atan((H/2)/(cam.F*1.18))*180/Math.PI,px=cam.cx,py=cam.cy,pz=cam.cz,lx=cam.x,ly=cam.y+3,lz=0;
   const[bx,by,bz]=v.ball;
   if(v.replay&&G.rp){const k=G.rp.t*30/Math.max(1,G.rp.frames.length-1),gx=G.net?G.net.gx:(bx>FL/2?FL:0),sg=gx>FL/2?1:-1;
-    if(k<.5){px=bx-sg*7.5;py=-5.5;pz=3.3;fov=30}else{px=gx+sg*12.5;py=FW/2+(by-FW/2)*.3;pz=3.5;fov=38}
+    if(k<.5){px=bx-sg*7.5;py=-5.5;pz=3.3;fov=30}else{px=gx+sg*5.2;py=FW/2+(by-FW/2)*.3;pz=4.2;fov=50}
     const R0=GL.rcam||(GL.rcam={x:bx,y:by,z:bz}),kk=Math.min(1,dt*6);R0.x+=(bx-R0.x)*kk;R0.y+=(by-R0.y)*kk;R0.z+=(Math.max(.6,bz*.7)-R0.z)*kk;lx=R0.x;ly=R0.y;lz=R0.z}
   else{GL.rcam=null;
     if(G.state==='goal'&&G.scorer){const sc=G.scorer,a=Math.atan2(FW/2-sc.y,FL/2-sc.x)+Math.sin(G.st*.45)*.7,al=G.alpha??1,sx=lerp(sc._x??sc.x,sc.x,al),sy=lerp(sc._y??sc.y,sc.y,al);
@@ -2354,6 +2355,7 @@ function glCamera(v,dt,t){const C=GL.camera;let fov=2*Math.atan((H/2)/(cam.F*1.1
       px=lerp(px,g.x-ux*D-uy*1.4,k);py=lerp(py,g.y-uy*D+ux*1.4,k);pz=lerp(pz,g.pen?2.6:3.0,k);lx=lerp(lx,g.gx,k);ly=lerp(ly,FW/2,k);lz=lerp(lz,1.1,k);fov=lerp(fov,g.pen?32:40,k)}}
   if(G.shake>0){G.shake=Math.max(0,G.shake-dt*1.4);const a=G.shake*G.shake*.5;px+=Math.sin(t*41)*a;pz+=Math.sin(t*37+1)*a*.6;py+=Math.cos(t*29)*a*.5}
   if(Math.abs(fov-C.fov)>.01){C.fov=fov;C.updateProjectionMatrix()}
+  if(pz<30){px=clamp(px,-5.2,FL+5.2);py=Math.min(py,FW+5.2)}
   C.position.set(px,pz,-py);C.lookAt(lx,lz,-ly);C.updateMatrixWorld()}
 function glPost(){GL.postTried=true;if(!THREE.EffectComposer||!THREE.UnrealBloomPass||!THREE.RenderPass)return;
   try{const R=GL.R,sz=R.getDrawingBufferSize(new THREE.Vector2());
@@ -2635,7 +2637,7 @@ const SETM=[
   {l:'Spiker',v:()=>['Sesli','Sadece yazı','Kapalı'][SET.com],lr:d=>{SET.com=(SET.com+d+3)%3;store('ga_com',SET.com);if(SET.com===0&&G){G.demo?0:0}}},
   {l:'Yorgunu otomatik değiştir',v:()=>SET.autoSub?'Açık':'Kapalı',lr:()=>{SET.autoSub=!SET.autoSub;store('ga_as',SET.autoSub)}},
   {l:'Kol düzeni',v:()=>SET.pad?'eFootball (R1 depar)':'FC (R2 depar)',lr:()=>{SET.pad=SET.pad?0:1;store('ga_pad',SET.pad)}},
-  {l:'Kol titreşimi',v:()=>SET.rum?'Açık':'Kapalı',lr:()=>{SET.rum=!SET.rum;store('ga_rum',SET.rum);if(SET.rum)rumble(null,180,.6,.6)}},
+  {l:'Kol titreşimi',v:()=>SET.rum?'Açık':'Kapalı',lr:()=>{SET.rum=!SET.rum;store('ga_rum',SET.rum);if(SET.rum)rumbleP(null,180,.6,.6)}},
   {l:'Oyuncu isimleri',v:()=>['Topa yakın','Hepsi','Kapalı'][SET.names],lr:d=>{SET.names=(SET.names+d+3)%3;store('ga_nm',SET.names)}},
   {l:'Geri',go:()=>{show('main');renderMain()}}];
 const TNAME={pen:'Penaltı',ci:'Korner',fk:'Serbest vuruş',ti:'Taç',free:'Serbest oyun'};
@@ -2830,7 +2832,7 @@ function dtInput(){const f=[...document.querySelectorAll('#dtBox [data-f]')];let
 @media (max-height:540px){.scr{justify-content:flex-start!important;overflow-y:auto}.scr .brand{font-size:44px!important;margin:0 0 4px!important}.scr .tag{margin-bottom:8px!important}.mi{padding-block:3px}#scr-dt .box{padding:10px}.dtpitch{min-height:260px}}
 @media (max-width:560px){.dtc{width:52px;height:70px}.dtc b{font-size:18px}.dtc span{font-size:10px;max-width:50px}.dtgp{font-size:22px}}`;document.head.appendChild(st);
   const sec=document.createElement('section');sec.id='scr-dt';sec.className='scr dim2';sec.hidden=true;sec.innerHTML='<div class="box" id="dtBox"></div>';$('#ui').appendChild(sec)})();
-function rumble(pad,ms,s,w){if(!SET.rum)return;try{const L=pad?[pad.gp]:padList;for(const g of L){const a=g&&g.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:w}).catch(()=>{})}}catch(e){}}
+function rumbleP(pad,ms,s,w){if(!SET.rum)return;try{const L=pad?[pad.gp]:padList;for(const g of L){const a=g&&g.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:w}).catch(()=>{})}}catch(e){}}
 function helpPadCells(){for(const td of document.querySelectorAll('#scr-help table.ctl td')){if(td.dataset.o==null)td.dataset.o=td.textContent;const o=td.dataset.o;td.textContent=SET.pad?o.replace(/R1|R2/g,m=>m==='R1'?'R2':'R1'):o}
   const h=document.querySelector('#scr-help .ts-head');if(h)h.textContent='Kontroller · '+(SET.pad?'eFootball düzeni':'FC düzeni')+' (Ayarlar → Kol düzeni)'}
 function renderHelp(){helpPadCells();$('#helpMenu').innerHTML='<div class="mi on" id="helpBack"><span>Geri</span></div>';$('#helpBack').onclick=()=>{show('main');renderMain()}}
@@ -3078,5 +3080,5 @@ startDemo();renderMain();requestAnimationFrame(frame);
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;upd();});addEventListener('appinstalled',()=>{dp=null;b.remove();});
   b.onclick=async()=>{if(dp){dp.prompt();try{await dp.userChoice;}catch(e){}dp=null;upd();}else if(ios)alert('Safari\'de Paylaş ⬆ düğmesine bas → "Ana Ekrana Ekle"');};
   document.body.appendChild(b);setInterval(upd,800);})();
-window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumble,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch,TCH};
+window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumbleP,goal,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch,TCH};
 </script>
