@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Gol Arena</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="ikon-192.png"><meta name="theme-color" content="#0b1a10"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Gol Arena">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -565,6 +566,7 @@ class Pad{
       {const rx=g.axes[2]||0,ry=g.axes[3]||0;c.rs=hyp(rx,ry)>.75;if(c.rs){this.rsx=rx;this.rsy=ry}}
       c.up=c.up||b(12)||gy<-.6;c.down=c.down||b(13)||gy>.6;c.left=c.left||b(14)||gx<-.6;c.right=c.right||b(15)||gx>.6;
     }
+    if(this.slot===0&&TCH.on){for(const k in TCH.b)if(TCH.b[k])c[k]=true;ax+=TCH.ax;ay+=TCH.ay}
     const m=hyp(ax,ay);if(m>1){ax/=m;ay/=m}
     for(const k in c)if(c[k]&&!this.cur[k])this.edge[k]=true;
     if(m>.2||Object.values(c).some(v=>v))this.lastAct=performance.now();
@@ -574,6 +576,7 @@ class Pad{
   held(k){return!!this.cur[k]}
   clear(){this.edge={}}
 }
+const TCH={on:false,ax:0,ay:0,b:{}};
 const P1=new Pad(KM1,0),P2=new Pad(KM2,1);
 function pollPads(){
   try{const gs=navigator.getGamepads?navigator.getGamepads():[];padList=[];for(const g of gs)if(g&&g.connected)padList.push(g)}catch(e){padList=[];padBlocked=true}
@@ -2646,7 +2649,7 @@ function renderSettings(){$('#setMenu').innerHTML=SETM.map((it,i)=>`<div class="
 function renderMain(){const m=$('#mainMenu');m.innerHTML=MAIN.map((it,i)=>`<div class="mi${i===UI.mi?' on':''}" data-i="${i}"><span>${it.l}</span>${it.v?`<span class="val">◀ ${it.v()} ▶</span>`:`<small>${it.d||''}</small>`}</div>`).join('');
   m.querySelectorAll('.mi').forEach(el=>{el.onclick=e=>{audioInit();const i=+el.dataset.i;UI.mi=i;const it=MAIN[i];if(it.lr){const r=el.getBoundingClientRect();it.lr(e.clientX>r.left+r.width/2?1:-1)}else it.go();if(UI.scr==='main')renderMain()}})
   const ch=$('#padChips');const n=padList.length;
-  ch.innerHTML=`<span class="chip"><b>1P</b> ${n>0?'PS kolu 1':'Klavye W A S D'}</span><span class="chip p2"><b>2P</b> ${n>1?'PS kolu 2':'Klavye ok tuşları'}</span>${padBlocked?'<span class="chip">Kol erişimi kapalı</span>':''}`}
+  ch.innerHTML=`<span class="chip"><b>1P</b> ${n>0?'PS kolu 1':(('ontouchstart' in window)||navigator.maxTouchPoints>0)?'Dokunmatik ekran':'Klavye W A S D'}</span><span class="chip p2"><b>2P</b> ${n>1?'PS kolu 2':'Klavye ok tuşları'}</span>${padBlocked?'<span class="chip">Kol erişimi kapalı</span>':''}`}
 function menuInput(){
   if(UI.scr==='main'){let ch=false;if(anyHit('up')){UI.mi=(UI.mi+MAIN.length-1)%MAIN.length;ch=true}if(anyHit('down')){UI.mi=(UI.mi+1)%MAIN.length;ch=true}
     const it=MAIN[UI.mi];if(it.lr){if(anyHit('left')){it.lr(-1);ch=true}if(anyHit('right')){it.lr(1);ch=true}}
@@ -2824,6 +2827,7 @@ function dtInput(){const f=[...document.querySelectorAll('#dtBox [data-f]')];let
 .dtflip{animation:dtfl .7s both;text-align:center}.dtnote{font-family:var(--fd);font-weight:700;color:var(--gold)}
 @keyframes dtfl{0%{opacity:0;transform:rotateY(90deg) scale(.6)}60%{opacity:1;transform:rotateY(-12deg) scale(1.08)}100%{transform:none}}
 .dtres{margin:10px auto 0;text-align:center;font-family:var(--fd);font-size:18px}.dtres b{color:var(--gold);font-size:26px}
+@media (max-height:540px){.scr{justify-content:flex-start!important;overflow-y:auto}.scr .brand{font-size:44px!important;margin:0 0 4px!important}.scr .tag{margin-bottom:8px!important}.mi{padding-block:3px}#scr-dt .box{padding:10px}.dtpitch{min-height:260px}}
 @media (max-width:560px){.dtc{width:52px;height:70px}.dtc b{font-size:18px}.dtc span{font-size:10px;max-width:50px}.dtgp{font-size:22px}}`;document.head.appendChild(st);
   const sec=document.createElement('section');sec.id='scr-dt';sec.className='scr dim2';sec.hidden=true;sec.innerHTML='<div class="box" id="dtBox"></div>';$('#ui').appendChild(sec)})();
 function rumble(pad,ms,s,w){if(!SET.rum)return;try{const L=pad?[pad.gp]:padList;for(const g of L){const a=g&&g.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:s,weakMagnitude:w}).catch(()=>{})}}catch(e){}}
@@ -3017,6 +3021,53 @@ function frame(now){
   render();requestAnimationFrame(frame)}
 addEventListener('gamepadconnected',()=>{audioInit();if(UI.scr==='main')renderMain()});
 startDemo();renderMain();requestAnimationFrame(frame);
+/* ================= DOKUNMATİK KONTROL (telefon / tablet) ================= */
+(function(){
+  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;if(!isTouch)return;
+  const st=document.createElement('style');st.textContent=`
+#tc{position:fixed;inset:0;z-index:40;pointer-events:none;display:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#tc.on{display:block}
+#tcJoy{position:absolute;left:0;top:64px;bottom:0;width:48%;pointer-events:auto;touch-action:none}
+#tcBase{position:absolute;width:128px;height:128px;margin:-64px 0 0 -64px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(0,0,0,.18);display:none}
+#tcKnob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+#tcHint{position:absolute;left:calc(40px + env(safe-area-inset-left,0px));bottom:30px;width:110px;height:110px;border-radius:50%;border:2px dashed rgba(255,255,255,.25);color:rgba(255,255,255,.45);font:700 12px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.tcb{position:absolute;pointer-events:auto;touch-action:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font:800 11px 'Saira Condensed','Arial Narrow',system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;background:rgba(10,20,14,.42);border:2px solid rgba(255,255,255,.45);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.tcb i{font-style:normal;font-size:22px;line-height:1;margin-bottom:1px}
+.tcb.dn{background:rgba(255,255,255,.4);transform:scale(.93)}
+#tcPause{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:46px;height:34px;border-radius:9px;font-size:16px}
+#tcRot{position:fixed;inset:0;z-index:41;display:none;align-items:center;justify-content:center;background:rgba(3,9,6,.9);color:#fff;font:700 20px system-ui,sans-serif;text-align:center;padding:30px}
+`;document.head.appendChild(st);
+  const R='env(safe-area-inset-right,0px)';
+  const B=[ // k, etiket, sembol, boyut, sağ, alt, renk
+    ['shoot','Şut','□',84,22,74,'#ff6fb0'],['pass','Pas','✕',76,116,22,'#7fb2ff'],
+    ['thru','Ara pas','△',62,124,118,'#4fe0a0'],['lob','Orta','○',62,46,178,'#ff7070'],
+    ['sprint','Depar','»',66,210,26,'#f2c230'],['sw','Değiş','⇄',56,214,112,'#ddd']];
+  const root=document.createElement('div');root.id='tc';
+  root.innerHTML='<div id="tcJoy"><div id="tcHint">Sol başparmağını<br>buraya koy</div><div id="tcBase"><div id="tcKnob"></div></div></div>'+
+    B.map(([k,l,s,z,r,b,c])=>`<div class="tcb" data-k="${k}" style="width:${z}px;height:${z}px;right:calc(${r}px + ${R});bottom:calc(${b}px + env(safe-area-inset-bottom,0px));border-color:${c}"><i style="color:${c}">${s}</i>${l}</div>`).join('')+
+    '<div class="tcb" id="tcPause" data-k="pause">❚❚</div>';
+  document.body.appendChild(root);
+  const rot=document.createElement('div');rot.id='tcRot';rot.innerHTML='📱↻<br>Oynamak için telefonu yan çevir';document.body.appendChild(rot);
+  const buz=()=>{try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}};
+  for(const el of root.querySelectorAll('.tcb')){const k=el.dataset.k;
+    const dn=e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}TCH.b[k]=true;el.classList.add('dn');buz();audioInit()};
+    const up=e=>{e.preventDefault();TCH.b[k]=false;el.classList.remove('dn')};
+    el.addEventListener('pointerdown',dn);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);
+    el.addEventListener('contextmenu',e=>e.preventDefault())}
+  const joy=root.querySelector('#tcJoy'),base=root.querySelector('#tcBase'),knob=root.querySelector('#tcKnob'),hint=root.querySelector('#tcHint');let jid=null,ox=0,oy=0;const RAD=56;
+  const jset=(x,y)=>{let dx=x-ox,dy=y-oy;const d=Math.hypot(dx,dy);if(d>RAD){dx*=RAD/d;dy*=RAD/d}knob.style.transform=`translate(${dx}px,${dy}px)`;TCH.ax=dx/RAD;TCH.ay=dy/RAD};
+  joy.addEventListener('pointerdown',e=>{e.preventDefault();if(jid!==null)return;jid=e.pointerId;try{joy.setPointerCapture(jid)}catch(_){}const r=joy.getBoundingClientRect();ox=e.clientX;oy=e.clientY;
+    base.style.left=(ox-r.left)+'px';base.style.top=(oy-r.top)+'px';base.style.display='block';hint.style.display='none';jset(ox,oy);audioInit()});
+  joy.addEventListener('pointermove',e=>{if(e.pointerId===jid){e.preventDefault();jset(e.clientX,e.clientY)}});
+  const jend=e=>{if(e.pointerId!==jid)return;jid=null;TCH.ax=TCH.ay=0;base.style.display='none';knob.style.transform=''};
+  joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);joy.addEventListener('lostpointercapture',jend);
+  let used=false;
+  setInterval(()=>{const play=!UI.scr&&G&&!G.demo&&!padList.length;const port=innerHeight>innerWidth*1.05;
+    TCH.on=play&&!port;root.classList.toggle('on',TCH.on);rot.style.display=play&&port?'flex':'none';
+    if(TCH.ax||TCH.ay)used=true;if(used)hint.style.display='none';
+    if(!TCH.on){TCH.ax=TCH.ay=0;for(const k in TCH.b)TCH.b[k]=false;for(const el of root.querySelectorAll('.dn'))el.classList.remove('dn')}},150);
+})();
+
 (function(){if(location.protocol!=='https:'||!/github\.io$/.test(location.hostname))return;
   try{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
   const stand=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone;if(stand())return;
@@ -3027,5 +3078,5 @@ startDemo();renderMain();requestAnimationFrame(frame);
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;upd();});addEventListener('appinstalled',()=>{dp=null;b.remove();});
   b.onclick=async()=>{if(dp){dp.prompt();try{await dp.userChoice;}catch(e){}dp=null;upd();}else if(ios)alert('Safari\'de Paylaş ⬆ düğmesine bas → "Ana Ekrana Ekle"');};
   document.body.appendChild(b);setInterval(upd,800);})();
-window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumble,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch};
+window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumble,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch,TCH};
 </script>
