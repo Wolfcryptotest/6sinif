@@ -1,0 +1,998 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>Netpusula YKS</title></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: tek sütun uygulama, optik form estetiği (kırmızı baskı + kurşun kalem dolgulu baloncuklar), altta sabit sekme çubuğu */
+:root{
+  --paper:#F3F5F8; --sheet:#FFFFFF; --ink:#1D222A; --muted:#5C6573; --line:#D8DDE4;
+  --form:#CF3550; --form-soft:#FBE7EB; --lead:#252A32; --lead-ink:#FFFFFF;
+  --ok:#1C8556; --ok-soft:#E1F3EA; --bad:#D2611F; --bad-soft:#FCEBDD; --blank:#8A93A0;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111318; --sheet:#1A1D23; --ink:#E7EAEE; --muted:#9AA3AF; --line:#2B3039;
+  --form:#F06A82; --form-soft:#3A1E26; --lead:#E7EAEE; --lead-ink:#14161B;
+  --ok:#4CC38A; --ok-soft:#173528; --bad:#F2924F; --bad-soft:#3A2617; --blank:#7D8693; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111318; --sheet:#1A1D23; --ink:#E7EAEE; --muted:#9AA3AF; --line:#2B3039;
+  --form:#F06A82; --form-soft:#3A1E26; --lead:#E7EAEE; --lead-ink:#14161B;
+  --ok:#4CC38A; --ok-soft:#173528; --bad:#F2924F; --bad-soft:#3A2617; --blank:#7D8693; color-scheme:dark}
+html,body{background:var(--paper)}
+body{color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--form);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(96px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800;font-stretch:78%;letter-spacing:-.01em}
+h2{font-size:1.25rem;font-weight:750;font-stretch:85%}
+h3{font-size:1.02rem;font-weight:700;font-stretch:90%}
+.eyebrow{font-family:var(--f-display);font-stretch:110%;font-weight:700;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--form)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.sec{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+/* Zamanlama işaretleri: optik formun kenarındaki siyah çubuklar */
+.ticks{height:8px;background:repeating-linear-gradient(90deg,var(--ink) 0 14px,transparent 14px 26px);opacity:.85;border-radius:1px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-top:8px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand b{font-family:var(--f-display);font-stretch:70%;font-weight:800;font-size:1.5rem;letter-spacing:.01em}
+.brand b i{font-style:normal;color:var(--form)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:9px 16px;font-weight:600;min-height:42px}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--form);border-color:var(--form);color:#fff}
+.btn.ink{background:var(--lead);border-color:var(--lead);color:var(--lead-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.9rem}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:6px 13px;font-size:.92rem;font-weight:600}
+.chip.on{background:var(--lead);color:var(--lead-ink);border-color:var(--lead)}
+label.fld{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:.9rem}
+select,input[type=number],textarea{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-height:42px;width:100%}
+textarea{min-height:110px;font-family:var(--f-mono);font-size:.78rem}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Hero geri sayım */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.count{font-family:var(--f-display);font-stretch:62%;font-weight:800;font-size:4.6rem;line-height:.85;color:var(--form);font-variant-numeric:tabular-nums}
+.count small{display:block;font-size:.9rem;font-stretch:100%;font-weight:700;color:var(--ink);letter-spacing:.04em;margin-top:6px}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kv div{display:flex;flex-direction:column}
+.kv b{font-family:var(--f-mono);font-size:1.3rem;font-variant-numeric:tabular-nums}
+.kv span{font-size:.78rem;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--form);border-radius:4px}
+.bar.ok i{background:var(--ok)}.bar.bad i{background:var(--bad)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-height:96px}
+.tile:hover{border-color:var(--form)}
+.tile h3{font-size:1.05rem}
+.tile span{font-size:.86rem;color:var(--muted)}
+.tile .tag{font-family:var(--f-mono);font-size:.72rem;color:var(--form);font-weight:700}
+/* Soru kartı */
+.q-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem}
+.pill{border-radius:999px;padding:2px 9px;font-weight:700;font-size:.74rem;border:1px solid var(--line);color:var(--muted)}
+.pill.f{border-color:var(--form);color:var(--form)}
+.q-text{font-size:1.06rem;line-height:1.6;margin:10px 0 14px;overflow-wrap:anywhere}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;width:100%;text-align:left;background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:8px 12px 8px 8px;min-height:50px}
+.opt:hover{border-color:var(--muted)}
+.bub{width:32px;height:32px;border-radius:50%;border:2px solid var(--form);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-stretch:90%;color:var(--form);font-size:.95rem;transition:background .15s}
+.opt.sel .bub{background:var(--lead);border-color:var(--lead);color:var(--lead-ink)}
+.opt.sel{border-color:var(--lead)}
+.opt.elim .otx{text-decoration:line-through;opacity:.4}
+.opt.elim .bub{opacity:.35}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.right .bub{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.wrong .bub{background:var(--bad);border-color:var(--bad);color:#fff}
+.otx{overflow-wrap:anywhere}
+.sol{border-left:3px solid var(--form);background:var(--form-soft);padding:12px 14px;border-radius:0 8px 8px 0;font-size:.97rem}
+.sol b{font-weight:700}
+.verdict{font-family:var(--f-display);font-weight:800;font-stretch:85%;font-size:1.1rem}
+.verdict.ok{color:var(--ok)}.verdict.bad{color:var(--bad)}
+/* Sınav ekranı */
+.qhead{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-top:8px;padding-bottom:8px;display:flex;flex-direction:column;gap:8px}
+.qhead .row{justify-content:space-between}
+.timer{font-family:var(--f-mono);font-weight:700;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.timer.warn{color:var(--bad)}
+.qnav{display:flex;gap:8px;justify-content:space-between;margin-top:16px}
+.optik{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
+.oc{border:1.5px solid var(--form);border-radius:6px;background:var(--sheet);font-family:var(--f-mono);font-size:.8rem;padding:6px 0;position:relative;color:var(--ink)}
+.oc.ans{background:var(--lead);color:var(--lead-ink);border-color:var(--lead)}
+.oc.cur{outline:2px solid var(--form);outline-offset:1px}
+.oc.flag::after{content:"";position:absolute;top:2px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--bad)}
+.oc.r-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.oc.r-bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.oc.r-blank{border-color:var(--blank);color:var(--blank)}
+.tool{border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:6px 10px;font-size:.85rem;font-weight:600;min-height:36px}
+.tool.on{background:var(--form);color:#fff;border-color:var(--form)}
+/* Sonuç tablosu */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-display);font-stretch:100%;font-weight:700;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+th.n{text-align:right}
+.big-net{font-family:var(--f-display);font-stretch:62%;font-weight:800;font-size:3.6rem;line-height:.9}
+.rev{border-top:1px solid var(--line);padding:12px 0}
+.rev summary{cursor:pointer;display:flex;gap:10px;align-items:center;list-style:none}
+.rev summary::-webkit-details-marker{display:none}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.blank{border:2px solid var(--blank)}
+.box-badge{font-family:var(--f-mono);font-size:.74rem;padding:2px 7px;border-radius:5px;background:var(--form-soft);color:var(--form);font-weight:700}
+/* Isı haritası */
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:14px;height:14px;border-radius:3px;background:var(--line);display:block}
+.heat i.l1{background:color-mix(in srgb,var(--form) 30%,var(--line))}
+.heat i.l2{background:color-mix(in srgb,var(--form) 55%,var(--line))}
+.heat i.l3{background:color-mix(in srgb,var(--form) 80%,var(--line))}
+.heat i.l4{background:var(--form)}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+/* Alt sekmeler */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+nav.tabs .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 9px;text-decoration:none;color:var(--muted);font-size:.7rem;font-weight:700;position:relative}
+nav.tabs a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+nav.tabs a.on{color:var(--form)}
+nav.tabs a.on::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--form);border-radius:0 0 3px 3px}
+nav.tabs a .badge{position:absolute;top:4px;right:calc(50% - 20px);background:var(--form);color:#fff;font-size:.6rem;border-radius:999px;padding:0 5px;font-family:var(--f-mono)}
+.scrim{position:fixed;inset:0;background:rgba(10,12,16,.5);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--sheet);width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:20px max(18px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;max-height:85vh;overflow:auto}
+@media (min-width:600px){.scrim{align-items:center}.modal{border-radius:16px}}
+.modal.wide{max-width:900px}
+.vlink{display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;background:var(--lead);color:var(--lead-ink);text-decoration:none}
+.vlink small{display:block;opacity:.75;font-size:.82rem}
+.vplay{width:48px;height:48px;border-radius:50%;background:var(--form);color:#fff;display:grid;place-items:center;font-size:1.2rem;flex:none}
+.vframe{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;background:#000;border-radius:10px;overflow:hidden}
+.vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--lead);color:var(--lead-ink);padding:9px 16px;border-radius:999px;font-weight:600;z-index:60;font-size:.92rem}
+.ring{width:84px;height:84px;flex:none}
+.ring circle{fill:none;stroke-width:9}
+.empty{border:1.5px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;color:var(--muted)}
+.pomo{font-family:var(--f-mono);font-size:3.4rem;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.note{font-size:.84rem;color:var(--muted)}
+a.btn{text-decoration:none;color:inherit}
+.list-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.list-row>div{min-width:0}
+sup,sub{font-size:.72em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div id="app"></div>
+<nav class="tabs" id="tabs"></nav>
+<div id="layer"></div>
+
+<script>
+"use strict";
+/* ============ Yardımcılar ============ */
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+const tr=n=>{if(typeof n!=="number")return n;const s=Number.isInteger(n)?String(n):String(+n.toFixed(3));return s.replace("-","−").replace(".",",")};
+const fr=(n,d)=>{const g=gcd(n,d);n/=g;d/=g;if(d<0){n=-n;d=-d}return d===1?tr(n):(n<0?"−":"")+Math.abs(n)+"/"+d};
+const SG=v=>(v>=0?"+ ":"− ")+Math.abs(v);
+const SUB=n=>String(n).replace(/\d/g,c=>"₀₁₂₃₄₅₆₇₈₉"[c]);
+const LET="ABCDE";
+function nums(ans,wrongs,unit){
+  unit=unit||"";const set=[ans];const intOnly=Number.isInteger(ans);
+  const add=v=>{if(v===undefined||v===null||!isFinite(v))return;v=+(+v).toFixed(4);if(intOnly&&!Number.isInteger(v))return;if(ans>=0&&v<0)return;if(!set.some(x=>Math.abs(x-v)<1e-9))set.push(v)};
+  shuf(wrongs||[]).forEach(w=>{if(set.length<5)add(w)});
+  const step=intOnly?Math.max(1,Math.round(Math.abs(ans)/8)):Math.max(0.1,+(Math.abs(ans)/4).toFixed(2));
+  let k=1;while(set.length<5&&k<60){add(ans+k*step);if(set.length<5)add(ans-k*step);k++}
+  const o=shuf(set);return{o:o.map(v=>tr(v)+unit),a:o.indexOf(ans)};
+}
+function strs(ans,wrongs){const set=[ans];shuf(wrongs).forEach(w=>{if(set.length<5&&!set.includes(w))set.push(w)});const o=shuf(set);return{o,a:o.indexOf(ans)}}
+const todayKey=(d)=>(d||new Date()).toLocaleDateString("sv-SE");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ============ Dersler ============ */
+const DERS={
+  tur:{ad:"Türkçe",g:"Türkçe"}, mat:{ad:"Matematik",g:"Matematik"}, geo:{ad:"Geometri",g:"Matematik"},
+  tar:{ad:"Tarih",g:"Sosyal"}, cog:{ad:"Coğrafya",g:"Sosyal"}, fel:{ad:"Felsefe",g:"Sosyal"}, din:{ad:"Din Kültürü",g:"Sosyal"},
+  fiz:{ad:"Fizik",g:"Fen"}, kim:{ad:"Kimya",g:"Fen"}, bio:{ad:"Biyoloji",g:"Fen"}, edb:{ad:"Edebiyat",g:"Edebiyat"}
+};
+const ALAN={
+  SAY:["tur","mat","geo","fiz","kim","bio"],
+  EA:["tur","mat","geo","tar","cog","edb"],
+  SOZ:["tur","tar","cog","fel","din","edb"],
+  TUM:Object.keys(DERS)
+};
+
+/* ============ Soru bankası (özgün sorular) ============ */
+const BANK_RAW=[
+/* TÜRKÇE */
+["tur","Sözcükte Anlam","TYT",1,"“Toplantıda söylediği sözler hepimizin <b>içini ısıttı</b>.” cümlesindeki altı çizili söz hangi anlamda kullanılmıştır?",["Mutluluk ve umut vermek","Öfkelendirmek","Endişeye düşürmek","Utandırmak","Şaşkına çevirmek"],0,"“İçini ısıtmak” deyimi mecaz anlamda <b>sevindirmek, umut ve huzur vermek</b> demektir."],
+["tur","Yazım Kuralları","TYT",1,"Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?",["Bu konuyu hiç kimse bilmiyordu.","Herşey yolunda gibi görünüyordu.","Birkaç gün sonra döneceğim.","Hiçbir şey söylemeden çıktı.","Bu kitabı da okudum."],1,"“Her şey” ayrı yazılır. “Hiçbir, birkaç, hiç kimse” ise kurala uygundur."],
+["tur","Yazım Kuralları","TYT",1,"Aşağıdaki cümlelerin hangisinde “de” bağlacının yazımı yanlıştır?",["Sen de bizimle gel.","Kitabı masada bıraktım.","Evde kimse yoktu.","Bende bu konuyu düşünmüştüm.","Okulda tören vardı."],3,"Bağlaç olan “de” ayrı yazılır: <b>Ben de</b> bu konuyu düşünmüştüm. Diğerlerinde “-de” bulunma hâli ekidir."],
+["tur","Cümlede Anlam","TYT",2,"Aşağıdaki cümlelerin hangisinde <b>amaç-sonuç</b> ilişkisi vardır?",["Sınavı kazanmak için her gün çalışıyor.","Hastalandığı için okula gelmedi.","Yorgun olduğundan erken yattı.","Kar yağınca yollar kapandı.","Geç kaldığından otobüsü kaçırdı."],0,"“Sınavı kazanmak için” bir hedef bildirir: <b>amaç-sonuç</b>. Diğerleri gerçekleşmiş bir nedene bağlı neden-sonuç cümleleridir."],
+["tur","Paragrafta Ana Düşünce","TYT",2,"Okumak yalnızca bilgi edinmenin değil, başkalarının hayatlarına konuk olmanın da yoludur. Bir romanın kahramanıyla birlikte üzülen, onun kararlarını sorgulayan okur, farkında olmadan empati kurmayı öğrenir. Bu yüzden okuma alışkanlığı kazanmış insanlar, farklı görüşlere karşı genellikle daha anlayışlıdır.<br><br>Bu paragrafın ana düşüncesi aşağıdakilerden hangisidir?",["Okumak, insanın empati yeteneğini geliştirir.","Romanlar en faydalı edebî türdür.","Okur, kahramanların kararlarını eleştirmelidir.","Bilgi edinmenin tek yolu okumaktır.","Farklı görüşlere karşı temkinli olunmalıdır."],0,"Paragraf okurun başkalarının yaşamını içeriden görerek <b>empati kurmayı öğrendiğini</b> ve bu yüzden daha anlayışlı olduğunu söylüyor."],
+["tur","Paragrafta Yardımcı Düşünce","TYT",2,"Bal arıları, bir kovanda binlerce bireyin iş bölümüyle yaşadığı sosyal canlılardır. İşçi arılar çiçeklerden nektar toplarken bitkilerin tozlaşmasına da yardım eder. Uzmanlar, tarım ilaçlarının bilinçsiz kullanımının arı popülasyonunu azalttığını belirtiyor.<br><br>Bu paragrafta aşağıdakilerden hangisine <b>değinilmemiştir</b>?",["İşçi arıların ortalama ömrüne","Arıların sosyal yaşadığına","Arıların tozlaşmaya katkısına","Tarım ilaçlarının arılara etkisine","Kovanda iş bölümü olduğuna"],0,"Paragrafta arıların ne kadar yaşadığından hiç söz edilmez. Diğer dört bilgi metinde açıkça geçer."],
+["tur","Ses Bilgisi","TYT",1,"Aşağıdaki sözcüklerin hangisinde ünsüz yumuşaması vardır?",["kitabı","evde","kalemi","masada","gözlük"],0,"kitap + ı → kita<b>b</b>ı: p ünsüzü ünlüyle başlayan ek alınca b’ye dönüşmüştür."],
+["tur","Sözcük Türleri","TYT",1,"“<b>Güzel</b> bir gün geçirdik.” cümlesinde altı çizili sözcüğün türü nedir?",["Sıfat","Zarf","İsim","Fiil","Zamir"],0,"“Güzel”, “gün” ismini nitelediği için <b>niteleme sıfatıdır</b>."],
+["tur","Cümlenin Ögeleri","TYT",2,"“Dün akşam annem <b>bize</b> çorba yaptı.” cümlesinde altı çizili sözcük hangi ögedir?",["Dolaylı tümleç","Özne","Belirtisiz nesne","Zarf tümleci","Yüklem"],0,"“Kime yaptı?” sorusunun cevabıdır ve -e hâl eki almıştır: <b>dolaylı tümleç</b>. “Çorba” ise belirtisiz nesnedir."],
+["tur","Fiilimsiler","TYT",2,"Aşağıdaki cümlelerin hangisinde <b>sıfat-fiil</b> vardır?",["Koşan çocuk yere düştü.","Gülerek içeri girdi.","Okumayı çok sever.","Eve gelince seni aradı.","Yüzmek sağlıklı bir spordur."],0,"“Koşan” sözcüğü “çocuk” ismini nitelediği için sıfat-fiildir. “Gülerek, gelince” zarf-fiil; “okumayı, yüzmek” isim-fiildir."],
+["tur","Anlatım Bozuklukları","TYT",2,"Aşağıdaki cümlelerin hangisinde gereksiz sözcük kullanımından kaynaklanan anlatım bozukluğu vardır?",["Aşağı yukarı yaklaşık on kişi toplantıya geldi.","Toplantıya on kişi katıldı.","Yaklaşık on kişi gelmişti.","Akşama doğru hava serinledi.","Kardeşim bu yıl üniversiteyi kazandı."],0,"“Aşağı yukarı” ile “yaklaşık” aynı anlamdadır; biri gereksizdir."],
+["tur","Paragrafta Akış","TYT",2,"(I) Kahve, ilk olarak Etiyopya’da keşfedildiği düşünülen bir bitkinin çekirdeklerinden elde edilir. (II) Osmanlı döneminde kahvehaneler sohbetin ve haberleşmenin merkezi hâline gelmiştir. (III) Bu mekânlarda şiirler okunur, gündem konuşulurdu. (IV) Çay bitkisi ise en çok nemli ve eğimli arazilerde yetişir. (V) Böylece kahve, yalnızca bir içecek değil, toplumsal bir buluşma aracı olmuştur.<br><br>Numaralanmış cümlelerden hangisi düşüncenin akışını bozmaktadır?",["I","II","III","IV","V"],3,"Paragraf kahvenin toplumsal rolünü anlatırken IV. cümle konuyu çay bitkisinin yetiştiği araziye kaydırmaktadır.",true],
+["tur","Yapı Bilgisi","TYT",1,"Aşağıdaki sözcüklerden hangisi yapım eki almıştır?",["gözlükçü","evler","kalemin","okulda","masayı"],0,"göz + <b>lük</b> + <b>çü</b>: iki yapım eki almıştır. Diğerlerindeki ekler çekim ekidir."],
+["tur","Sözcükte Anlam","TYT",1,"Aşağıdaki sözcük çiftlerinden hangisi eş anlamlı <b>değildir</b>?",["ince - kalın","siyah - kara","cevap - yanıt","ak - beyaz","uzak - ırak"],0,"“İnce” ile “kalın” zıt anlamlıdır; diğer çiftler eş anlamlıdır."],
+["tur","Paragrafta Yazarın Tutumu","TYT",2,"Şehirlerde yeşil alanlar her geçen gün azalıyor. Oysa bir parkın sağladığı serinlik, hiçbir klimanın sunamayacağı kadar doğal ve ücretsizdir. Yerel yönetimler, yeni binalara izin verirken yeşil alan ayrılmasını artık bir tercih olarak değil, zorunluluk olarak görmelidir.<br><br>Yazarın bu paragraftaki temel amacı aşağıdakilerden hangisidir?",["Yeşil alan için yerel yönetimlerin zorunlu düzenleme yapması gerektiğini savunmak","Klimaların zararlarını anlatmak","Parkların tarihini açıklamak","Şehir nüfusunun artış nedenlerini sıralamak","Yeni binaların mimari özelliklerini övmek"],0,"Son cümle yazarın önerisini açıkça ortaya koyar: yerel yönetimler yeşil alanı <b>zorunlu</b> tutmalıdır."],
+["tur","Ses Bilgisi","TYT",1,"Aşağıdaki sözcüklerden hangisi büyük ünlü uyumuna <b>uymaz</b>?",["kitap","çiçek","okul","masa","gözlük"],0,"Büyük ünlü uyumu kalınlık-incelik uyumudur. ki<b>ta</b>p: ince “i” ile kalın “a” bir arada olduğu için uymaz."],
+["tur","Cümle Türleri","TYT",2,"“Akşam olunca sokak lambaları yandı.” cümlesi yapısına göre hangi türdedir?",["Birleşik cümle","Basit cümle","Sıralı cümle","Bağlı cümle","Eksiltili cümle"],0,"“olunca” zarf-fiili yan cümlecik kurar; cümle yan ve temel cümleden oluştuğu için <b>birleşik</b>tir."],
+/* MATEMATİK (statik) */
+["mat","Rasyonel Sayılar","TYT",1,"(1/2 + 1/3) : (5/6) işleminin sonucu kaçtır?",["1","5/6","6/5","25/36","2"],0,"1/2 + 1/3 = 5/6. (5/6) : (5/6) = <b>1</b>."],
+["mat","Sayı Basamakları","TYT",2,"AB ve BA iki basamaklı doğal sayılardır. AB + BA = 121 ve A − B = 3 olduğuna göre AB kaçtır?",["74","47","83","65","92"],0,"AB + BA = 11(A + B) = 121 → A + B = 11. A − B = 3 ile A = 7, B = 4. AB = <b>74</b>."],
+["mat","Bölünebilme","TYT",2,"Dört basamaklı 4a7b sayısı 5 ve 9 ile tam bölünebilmektedir. a’nın alabileceği değerlerin toplamı kaçtır?",["9","7","2","11","5"],0,"5 ile bölünme için b = 0 veya 5. b = 0: 11 + a, 9’un katı → a = 7. b = 5: 16 + a → a = 2. Toplam <b>9</b>."],
+["mat","Kümeler","TYT",2,"40 kişilik bir sınıfta 25 öğrenci İngilizce, 18 öğrenci Almanca biliyor. 7 öğrenci bu dillerin hiçbirini bilmediğine göre her iki dili bilen kaç öğrenci vardır?",["10","8","7","12","15"],0,"En az bir dil bilen: 40 − 7 = 33. 25 + 18 − x = 33 → x = <b>10</b>."],
+["mat","Sayı Problemleri","TYT",1,"Bir sayının 3 katının 5 fazlası, aynı sayının 2 katının 12 fazlasına eşittir. Bu sayı kaçtır?",["7","5","17","12","3"],0,"3x + 5 = 2x + 12 → x = <b>7</b>."],
+["mat","Kesir Problemleri","TYT",2,"Bir kitabın önce 1/3’ü, sonra kalan kısmın 1/4’ü okunuyor. Geriye 60 sayfa kaldığına göre kitap kaç sayfadır?",["120","90","144","180","240"],0,"İlk adımda 2/3 kalır. Bunun 1/4’ü = 1/6 okunur. Kalan 2/3 − 1/6 = 1/2. Kitabın yarısı 60 ise tamamı <b>120</b>."],
+["mat","Mantık","TYT",1,"p ⇒ q koşullu önermesi aşağıdaki durumların hangisinde yanlıştır?",["p doğru, q yanlış","p yanlış, q doğru","p ve q doğru","p ve q yanlış","Her durumda doğrudur"],0,"Koşullu önerme yalnızca <b>doğrudan yanlış</b> çıkınca, yani p doğru ve q yanlış iken yanlıştır.",true],
+["mat","Ondalık Sayılar","TYT",1,"(0,25 · 0,4) / 0,02 işleminin sonucu kaçtır?",["5","0,5","50","2","20"],0,"0,25 · 0,4 = 0,1. 0,1 / 0,02 = 10/2 = <b>5</b>."],
+/* GEOMETRİ (statik) */
+["geo","Üçgende Alan","TYT",2,"Bir kenarı 6 cm olan eşkenar üçgenin alanı kaç cm²’dir?",["9√3","18√3","36","6√3","12√3"],0,"Eşkenar üçgende Alan = a²√3/4 = 36√3/4 = <b>9√3</b>."],
+["geo","Özel Üçgenler","TYT",1,"İkizkenar bir üçgenin tepe açısı 40° olduğuna göre taban açılarından biri kaç derecedir?",["70°","40°","50°","140°","80°"],0,"Taban açıları eşittir: (180° − 40°)/2 = <b>70°</b>."],
+["geo","Dörtgenler","TYT",1,"Bir paralelkenarın bir iç açısı 65° olduğuna göre bu açıya komşu iç açı kaç derecedir?",["115°","65°","125°","25°","135°"],0,"Paralelkenarda komşu açılar bütünlerdir: 180° − 65° = <b>115°</b>."],
+["geo","Çokgenler","TYT",1,"Düzgün altıgenin bir iç açısı kaç derecedir?",["120°","108°","135°","60°","144°"],0,"İç açılar toplamı (6 − 2)·180° = 720°. Bir açı 720°/6 = <b>120°</b>."],
+["geo","Dörtgenler","TYT",1,"Köşegen uzunluğu 6√2 cm olan karenin alanı kaç cm²’dir?",["36","72","18","24","12√2"],0,"Karede köşegen a√2 → a = 6. Alan = <b>36</b> cm²."],
+/* TARİH */
+["tar","Türk-İslam Tarihi","TYT",1,"1071 Malazgirt Savaşı’nın en önemli sonucu aşağıdakilerden hangisidir?",["Anadolu’nun kapılarının Türklere açılması","İstanbul’un fethedilmesi","Haçlı Seferleri’nin sona ermesi","Osmanlı Devleti’nin kurulması","Büyük Selçuklu’nun yıkılması"],0,"Malazgirt’te Bizans’ın yenilmesiyle <b>Anadolu’nun kapıları Türklere açılmıştır</b>."],
+["tar","Türk-İslam Tarihi","TYT",1,"İslamiyet’i resmî din olarak kabul eden ilk Türk devleti hangisidir?",["Karahanlılar","Gazneliler","Büyük Selçuklular","Tolunoğulları","Göktürkler"],0,"Satuk Buğra Han döneminde İslamiyet’i resmî din olarak kabul eden ilk Türk devleti <b>Karahanlılar</b>dır."],
+["tar","Osmanlı Yenileşme","TYT",1,"Tanzimat Fermanı (1839) hangi padişah döneminde ilan edilmiştir?",["Abdülmecid","II. Mahmud","Abdülaziz","II. Abdülhamid","III. Selim"],0,"Gülhane Hatt-ı Hümayunu olarak da bilinen Tanzimat Fermanı <b>Abdülmecid</b> döneminde ilan edildi."],
+["tar","Kurtuluş Savaşı","TYT",2,"Kurtuluş Savaşı’nın gerekçesinin, amacının ve yönteminin ilk kez belirtildiği belge aşağıdakilerden hangisidir?",["Amasya Genelgesi","Erzurum Kongresi kararları","Sivas Kongresi kararları","Misak-ı Millî","Havza Genelgesi"],0,"22 Haziran 1919 tarihli <b>Amasya Genelgesi</b>, “Milletin bağımsızlığını yine milletin azim ve kararı kurtaracaktır.” diyerek bunları ilk kez açıkladı."],
+["tar","Kurtuluş Savaşı","TYT",1,"Türkiye Büyük Millet Meclisi hangi tarihte açılmıştır?",["23 Nisan 1920","29 Ekim 1923","30 Ağustos 1922","19 Mayıs 1919","3 Mart 1924"],0,"TBMM <b>23 Nisan 1920</b>’de Ankara’da açıldı."],
+["tar","Lozan Barış Antlaşması","TYT",2,"Lozan Barış Antlaşması’nda çözüme kavuşturulamayıp İngiltere ile ikili görüşmelere bırakılan sorun hangisidir?",["Musul","Boğazlar","Kapitülasyonlar","Savaş tazminatı","Yunanistan sınırı"],0,"<b>Musul</b> meselesi Lozan’da çözülemedi; sonraki yıllarda Türkiye-İngiltere görüşmelerine bırakıldı."],
+["tar","Atatürk İlkeleri","TYT",2,"Halifeliğin kaldırılması (1924) Atatürk ilkelerinden en çok hangisiyle ilgilidir?",["Laiklik","Halkçılık","Devletçilik","Milliyetçilik","İnkılapçılık"],0,"Din ve devlet işlerinin ayrılması yönünde atılmış bir adım olduğu için <b>laiklik</b> ilkesiyle ilgilidir."],
+["tar","Atatürk İnkılapları","TYT",1,"Türk kadınına milletvekili seçme ve seçilme hakkı hangi yıl tanınmıştır?",["1934","1930","1926","1923","1946"],0,"Kadınlara 1930’da belediye, <b>1934</b>’te milletvekili seçme ve seçilme hakkı verildi."],
+["tar","Atatürk İnkılapları","TYT",1,"Yeni Türk harflerinin kabulü hangi yıl gerçekleşmiştir?",["1928","1925","1932","1934","1924"],0,"Harf İnkılabı <b>1 Kasım 1928</b>’de yürürlüğe girdi."],
+["tar","İlk ve Orta Çağ","TYT",2,"Aşağıdakilerden hangisi Kavimler Göçü’nün (375) sonuçlarından biri <b>değildir</b>?",["Osmanlı Devleti’nin Balkanlara geçmesi","Batı Roma İmparatorluğu’nun yıkılma sürecine girmesi","Avrupa’nın etnik yapısının değişmesi","Avrupa’da feodalitenin ortaya çıkması","Avrupa’da yeni devletlerin kurulması"],0,"Osmanlı’nın Balkanlara geçişi 14. yüzyıldadır; Kavimler Göçü ile ilgisi yoktur."],
+/* COĞRAFYA */
+["cog","Yerel Saat","TYT",2,"Türkiye 26° ve 45° doğu meridyenleri arasında yer alır. Türkiye’nin en doğusu ile en batısı arasındaki yerel saat farkı kaç dakikadır?",["76","72","80","60","84"],0,"Meridyen farkı 45 − 26 = 19. Her meridyen 4 dakika: 19·4 = <b>76</b> dakika."],
+["cog","Yerel Saat","TYT",1,"Yerel saatin 12.00 olduğu bir merkezin 15° doğusundaki merkezde yerel saat kaçtır?",["13.00","11.00","12.15","12.30","15.00"],0,"Doğudaki yerler ileridedir. 15° · 4 dk = 60 dk → <b>13.00</b>.",true],
+["cog","İklim ve Bitki Örtüsü","TYT",1,"Akdeniz ikliminin doğal bitki örtüsü aşağıdakilerden hangisidir?",["Maki","Bozkır","Tayga","Savan","Tundra"],0,"Yazları sıcak-kurak, kışları ılık-yağışlı Akdeniz ikliminde doğal bitki örtüsü <b>maki</b>dir."],
+["cog","Nüfus","TYT",2,"Tabanı geniş, tepesi dar bir nüfus piramidine sahip ülkede aşağıdakilerden hangisi beklenir?",["Doğum oranının yüksek olması","Yaşlı nüfus oranının yüksek olması","Ortalama yaşam süresinin çok uzun olması","Nüfus artış hızının negatif olması","Bağımlı nüfusun az olması"],0,"Geniş taban çok sayıda çocuğu gösterir: <b>doğum oranı yüksektir</b>, genç nüfus fazladır."],
+["cog","Kayaçlar","TYT",1,"Mermer hangi kayaç grubunda yer alır?",["Başkalaşım (metamorfik)","Derinlik (püskürük)","Yüzey (püskürük)","Kimyasal tortul","Organik tortul"],0,"Mermer, kireç taşının yüksek sıcaklık ve basınç altında değişmesiyle oluşan <b>başkalaşım</b> kayacıdır."],
+["cog","İç ve Dış Kuvvetler","TYT",1,"Aşağıdakilerden hangisi iç kuvvetlerin bir sonucudur?",["Deprem","Kumul","Delta","Peri bacası","Lapya"],0,"Deprem yer kabuğu hareketleriyle oluşur: <b>iç kuvvet</b>. Diğerleri rüzgâr, akarsu ve çözünme gibi dış kuvvetlerin ürünüdür."],
+["cog","Harita Bilgisi","TYT",1,"1/500.000 ölçekli bir haritada 4 cm olarak gösterilen uzaklık gerçekte kaç km’dir?",["20","2","200","40","5"],0,"4 · 500.000 = 2.000.000 cm = <b>20</b> km."],
+["cog","Dünya’nın Hareketleri","TYT",1,"Aşağıdakilerden hangisi Dünya’nın günlük hareketinin sonucudur?",["Gece ve gündüzün birbirini izlemesi","Mevsimlerin oluşması","Güneş ışınlarının düşme açısının yıl içinde değişmesi","Kutuplarda altı ay gece yaşanması","Gece-gündüz sürelerinin yıl boyunca değişmesi"],0,"Kendi ekseni etrafındaki dönüş <b>gece ile gündüzün ardışıklığını</b> sağlar. Diğerleri yıllık hareket ve eksen eğikliğiyle ilgilidir."],
+["cog","Doğal Afetler","TYT",1,"Türkiye’de heyelan olaylarının en sık görüldüğü bölge hangisidir?",["Karadeniz","İç Anadolu","Güneydoğu Anadolu","Ege","Marmara"],0,"Eğimli arazi, killi zemin ve bol yağış birleştiği için <b>Karadeniz</b>’de heyelan sıktır."],
+/* FELSEFE */
+["fel","Bilgi Felsefesi","TYT",1,"Doğru bilginin kaynağının akıl olduğunu savunan görüş hangisidir?",["Rasyonalizm","Empirizm","Pragmatizm","Septisizm","Entüisyonizm"],0,"Akılcılık, yani <b>rasyonalizm</b>; temsilcileri arasında Descartes ve Leibniz vardır."],
+["fel","Bilgi Felsefesi","TYT",1,"Kesin bilgiye ulaşmanın mümkün olmadığını, her konuya kuşkuyla yaklaşmak gerektiğini savunan görüş hangisidir?",["Septisizm","Rasyonalizm","Pozitivizm","Fenomenoloji","Kritisizm"],0,"Şüphecilik, yani <b>septisizm</b>; temsilcisi Pyrrhon’dur."],
+["fel","Ahlak Felsefesi","TYT",2,"“Bir eylemin ahlaki değeri, en çok sayıda insana en fazla mutluluğu sağlamasına bağlıdır.” görüşü hangi yaklaşıma aittir?",["Faydacılık","Hazcılık","Ödev ahlakı","Nihilizm","Egoizm"],0,"Bentham ve Mill’in <b>faydacılık</b> (utilitarizm) anlayışı toplumsal yararı ölçüt alır."],
+["fel","Felsefeye Giriş","TYT",2,"Aşağıdakilerden hangisi felsefi düşüncenin özelliklerinden biri <b>değildir</b>?",["Deney ve gözlemle kesin sonuçlara ulaşması","Sorgulayıcı olması","Eleştirel olması","Refleksif (düşünce üzerine düşünme) olması","Tutarlı ve sistemli olması"],0,"Deney ve gözlemle sınanabilir sonuçlara ulaşmak <b>bilimin</b> özelliğidir."],
+["fel","Varlık Felsefesi","TYT",1,"“Varlığın özü maddedir.” diyen görüş hangisidir?",["Materyalizm","İdealizm","Düalizm","Fenomenalizm","Nihilizm"],0,"<b>Materyalizm</b> (maddecilik) her şeyin temelinde madde olduğunu savunur."],
+["fel","Bilgi Felsefesi","TYT",2,"“İnsan zihni doğuşta boş bir levha gibidir; bütün bilgiler deneyimle yazılır.” düşüncesi hangi filozofa aittir?",["John Locke","Descartes","Platon","Leibniz","Spinoza"],0,"“Tabula rasa” kavramıyla <b>John Locke</b> empirizmin temsilcisidir."],
+/* DİN KÜLTÜRÜ */
+["din","İslam ve İbadet","TYT",1,"Aşağıdakilerden hangisi İslam’ın şartlarından biri <b>değildir</b>?",["Meleklere iman","Kelime-i şehadet","Namaz kılmak","Oruç tutmak","Zekât vermek"],0,"Meleklere iman <b>imanın şartlarındandır</b>. İslam’ın şartları: şehadet, namaz, oruç, zekât, hac."],
+["din","İslam ve İbadet","TYT",1,"Hac ibadeti hangi ayda yerine getirilir?",["Zilhicce","Ramazan","Muharrem","Recep","Şaban"],0,"Hac, hicri takvimin son ayı olan <b>Zilhicce</b>de yapılır."],
+["din","Vahiy ve Akıl","TYT",1,"Kur’an-ı Kerim’in ilk inen ayetleri hangi surededir?",["Alak","Fatiha","Bakara","İhlas","Yasin"],0,"İlk vahiy “Oku!” emriyle başlayan <b>Alak</b> suresinin ilk ayetleridir."],
+["din","İslam ve İbadet","TYT",2,"Aşağıdakilerden hangisine zekât <b>verilemez</b>?",["Kişinin kendi anne ve babasına","Fakirlere","Borçlulara","Yolda kalmışlara","Miskinlere"],0,"Kişi bakmakla yükümlü olduğu <b>anne-baba, çocuk ve eşine</b> zekât veremez."],
+["din","İnanç","TYT",1,"Allah’ın bir ve tek olduğuna inanmayı ifade eden kavram hangisidir?",["Tevhid","Şirk","Nifak","Tevekkül","Kader"],0,"<b>Tevhid</b> Allah’ın birliğine inanmaktır; şirk bunun zıddıdır."],
+/* FİZİK */
+["fiz","Fizik Bilimine Giriş","TYT",1,"Aşağıdakilerden hangisi vektörel bir büyüklüktür?",["Kuvvet","Kütle","Sıcaklık","Enerji","Zaman"],0,"<b>Kuvvetin</b> büyüklüğü ile birlikte yönü de vardır. Diğerleri skalerdir."],
+["fiz","Isı ve Sıcaklık","TYT",1,"Deniz seviyesinde 100 °C’de kaynayan su, yüksek bir dağın zirvesinde nasıl kaynar?",["100 °C’den daha düşük sıcaklıkta","100 °C’den daha yüksek sıcaklıkta","Tam 100 °C’de","Hiç kaynamaz","Önce donar sonra kaynar"],0,"Yükseklik arttıkça açık hava basıncı azalır, bu yüzden kaynama noktası <b>düşer</b>.",true],
+["fiz","Optik","TYT",2,"Düz aynada oluşan görüntü için aşağıdakilerden hangisi <b>yanlıştır</b>?",["Görüntü gerçektir, perdeye düşürülebilir.","Görüntü cisimle aynı boydadır.","Görüntünün aynaya uzaklığı cismin uzaklığına eşittir.","Görüntü sağ-sol ters görünür.","Görüntü düzdür."],0,"Düz aynada görüntü <b>sanaldır</b>; ışınların uzantılarıyla oluşur ve perdeye düşmez."],
+["fiz","Basınç","TYT",2,"Durgun bir sıvının içindeki bir noktadaki sıvı basıncı aşağıdakilerden hangisine bağlı <b>değildir</b>?",["Kabın taban alanına","Noktanın derinliğine","Sıvının özkütlesine","Yer çekimi ivmesine","Sıvının cinsine"],0,"P = h·d·g. Sıvı basıncı kabın şekline ve <b>taban alanına bağlı değildir</b>."],
+["fiz","Elektrostatik","TYT",1,"Aynı cins yükle yüklü iki cisim birbirine yaklaştırıldığında ne olur?",["Birbirini iter","Birbirini çeker","Etkileşmez","Yükleri sıfırlanır","Önce çeker sonra iter"],0,"Aynı cins yükler <b>birbirini iter</b>, zıt cins yükler çeker.",true],
+["fiz","Dalgalar","TYT",1,"Ses dalgaları ile ilgili aşağıdakilerden hangisi doğrudur?",["Boşlukta yayılamaz.","Işık hızıyla yayılır.","Enine dalgadır.","Katılarda en yavaş yayılır.","Yayılmak için ortama ihtiyaç duymaz."],0,"Ses mekanik ve boyuna bir dalgadır; <b>maddesel ortam gerektirir</b>, boşlukta yayılamaz."],
+/* KİMYA */
+["kim","Periyodik Sistem","TYT",1,"Periyodik sistemde aynı grupta yukarıdan aşağıya inildikçe atom yarıçapı nasıl değişir?",["Artar","Azalır","Değişmez","Önce artar sonra azalır","Önce azalır sonra artar"],0,"Aşağı inildikçe katman sayısı arttığı için atom yarıçapı <b>artar</b>.",true],
+["kim","Kimyasal Bağlar","TYT",1,"Aşağıdaki maddelerin hangisinde iyonik bağ vardır?",["NaCl","H₂O","CH₄","O₂","NH₃"],0,"Metal (Na) ile ametal (Cl) arasında elektron alışverişi olur: <b>iyonik bağ</b>. Diğerleri kovalent bağlıdır."],
+["kim","Fiziksel ve Kimyasal Değişim","TYT",1,"Aşağıdakilerden hangisi kimyasal bir değişimdir?",["Demirin paslanması","Buzun erimesi","Şekerin suda çözünmesi","Camın kırılması","Suyun buharlaşması"],0,"Paslanmada demir oksijenle tepkimeye girip <b>yeni bir madde</b> (demir oksit) oluşur."],
+["kim","Karışımlar","TYT",1,"Aşağıdakilerden hangisi heterojen bir karışımdır?",["Zeytinyağı - su","Tuzlu su","Hava","Pirinç (alaşım)","Şekerli su"],0,"Zeytinyağı ile su birbiri içinde çözünmez, iki faz oluşur: <b>heterojen</b>."],
+["kim","Asitler ve Bazlar","TYT",1,"Asitlerin turnusol kâğıdına etkisi hangisidir?",["Mavi turnusolu kırmızıya çevirir","Kırmızı turnusolu maviye çevirir","Turnusolu sarıya çevirir","Turnusola etki etmez","Turnusolu siyaha çevirir"],0,"Asitler <b>mavi turnusolu kırmızıya</b>, bazlar kırmızı turnusolu maviye çevirir."],
+["kim","Mol Kavramı","TYT",1,"1 mol maddedeki tanecik sayısını veren Avogadro sayısı yaklaşık kaçtır?",["6,02·10²³","3,01·10²³","6,02·10²²","1,66·10⁻²⁴","22,4"],0,"Avogadro sayısı N<sub>A</sub> ≈ <b>6,02·10²³</b>tür. 22,4 ise normal koşullarda 1 mol gazın litre cinsinden hacmidir."],
+/* BİYOLOJİ */
+["bio","Hücre","TYT",1,"Aşağıdaki yapılardan hangisi bitki hücresinde bulunup hayvan hücresinde bulunmaz?",["Hücre duvarı","Mitokondri","Ribozom","Golgi cisimciği","Hücre zarı"],0,"Selülozdan oluşan <b>hücre duvarı</b> (ve kloroplast) bitki hücresine özgüdür."],
+["bio","Hücre","TYT",1,"Oksijenli solunumla ATP üretiminin en fazla gerçekleştiği organel hangisidir?",["Mitokondri","Ribozom","Lizozom","Golgi cisimciği","Koful"],0,"<b>Mitokondri</b> hücrenin enerji santralidir."],
+["bio","Hücre","TYT",1,"Protein sentezinin gerçekleştiği organel hangisidir?",["Ribozom","Lizozom","Sentrozom","Koful","Kloroplast"],0,"Amino asitler <b>ribozomda</b> peptit bağlarıyla birleştirilir."],
+["bio","Canlıların Ortak Özellikleri","TYT",1,"Aşağıdakilerden hangisi tüm canlılarda ortak <b>değildir</b>?",["Fotosentez yapma","Hücresel yapı","Metabolizma","Üreme","Kalıtım materyali olarak DNA taşıma"],0,"Fotosentezi yalnızca bitkiler, algler ve bazı bakteriler yapar; <b>tüm canlılarda ortak değildir</b>."],
+["bio","Kalıtım","TYT",2,"Aa genotipli iki birey çaprazlandığında aa genotipli birey oluşma olasılığı kaçtır?",["1/4","1/2","3/4","1/8","0"],0,"Aa × Aa → AA, Aa, Aa, aa. aa olasılığı <b>1/4</b>."],
+["bio","Kalıtım","TYT",2,"Kahverengi göz (B) mavi göze (b) baskındır. Bb × bb çaprazlamasından mavi gözlü çocuk olma olasılığı kaçtır?",["1/2","1/4","3/4","1","0"],0,"Bb × bb → Bb, Bb, bb, bb. Mavi (bb) olasılığı <b>1/2</b>."],
+["bio","Ekosistem","TYT",2,"Bir besin zincirinde bir beslenme basamağından bir üst basamağa aktarılan enerji yaklaşık yüzde kaçtır?",["10","50","90","1","25"],0,"Enerjinin büyük kısmı solunum ve ısı olarak kaybolur; üst basamağa yaklaşık <b>%10</b> aktarılır."],
+["bio","Canlıların Sınıflandırılması","TYT",1,"Aşağıdakilerden hangisi mantarların özelliklerinden biri <b>değildir</b>?",["Kloroplast taşıyıp fotosentez yapmaları","Ökaryot hücre yapısına sahip olmaları","Hücre duvarlarında kitin bulunması","Heterotrof beslenmeleri","Sporla üreyebilmeleri"],0,"Mantarlar <b>kloroplast taşımaz</b>, fotosentez yapamaz; heterotroftur."],
+["bio","Hücre Bölünmeleri","TYT",2,"2n = 46 kromozomlu bir hücre mitoz bölünme geçirdiğinde oluşan yavru hücrelerin her birinde kaç kromozom bulunur?",["46","23","92","44","22"],0,"Mitozda kromozom sayısı korunur: <b>46</b>. Mayozda yarıya iner (23)."],
+["bio","Canlıların Temel Bileşenleri","TYT",2,"Enzimlerle ilgili aşağıdakilerden hangisi <b>yanlıştır</b>?",["Tepkimeden sonra yapıları bozularak tükenirler.","Protein yapılıdır.","Tepkimeleri hızlandırır.","Sıcaklık ve pH’dan etkilenir.","Substrata özgü çalışır."],0,"Enzimler tepkimeden <b>değişmeden çıkar</b> ve tekrar kullanılabilir."],
+/* EDEBİYAT (AYT) */
+["edb","Tanzimat Edebiyatı","AYT",1,"Türk edebiyatının ilk yerli romanı kabul edilen eser hangisidir?",["Taaşşuk-ı Talat ve Fitnat","Şair Evlenmesi","İntibah","Araba Sevdası","Mai ve Siyah"],0,"Şemsettin Sami’nin <b>Taaşşuk-ı Talat ve Fitnat</b> (1872) adlı eseri ilk yerli roman kabul edilir."],
+["edb","Tanzimat Edebiyatı","AYT",1,"“Şair Evlenmesi” adlı tiyatro eserinin yazarı kimdir?",["Şinasi","Namık Kemal","Ziya Paşa","Ahmet Mithat Efendi","Recaizade Mahmut Ekrem"],0,"İlk yerli tiyatro eseri sayılan <b>Şair Evlenmesi</b> Şinasi’nindir."],
+["edb","Divan Edebiyatı","AYT",1,"Divan şiirinde nazım birimi genellikle hangisidir?",["Beyit","Dörtlük","Bent","Kıta","Mısra"],0,"Divan şiirinde şiirlerin çoğu iki dizelik <b>beyit</b> birimiyle kurulur."],
+["edb","Servetifünun Edebiyatı","AYT",1,"“Mai ve Siyah” romanının yazarı kimdir?",["Halit Ziya Uşaklıgil","Mehmet Rauf","Hüseyin Rahmi Gürpınar","Tevfik Fikret","Ömer Seyfettin"],0,"<b>Halit Ziya Uşaklıgil</b>, Servetifünun’un en önemli romancısıdır."],
+["edb","Millî Edebiyat","AYT",2,"“Yeni Lisan” makalesi hangi dergide yayımlanmıştır?",["Genç Kalemler","Servetifünun","Dergâh","Varlık","Hisar"],0,"1911’de Selanik’te çıkan <b>Genç Kalemler</b> dergisinde yayımlanmıştır."],
+["edb","Halk Edebiyatı","AYT",1,"Âşık edebiyatında koşma genellikle kaçlı hece ölçüsüyle yazılır?",["11’li","7’li","8’li","14’lü","16’lı"],0,"Koşma çoğunlukla <b>11’li</b> hece ölçüsüyle (6+5 ya da 4+4+3 duraklı) yazılır.",true],
+["edb","Söz Sanatları","AYT",2,"Birbirine karşıt kavramların aynı söz içinde bir arada kullanılmasına ne ad verilir?",["Tezat","Teşbih","İntak","Tecahül-i arif","Mübalağa"],0,"Ağlamak-gülmek, gece-gündüz gibi karşıtlıkların bir arada kullanılması <b>tezat</b>tır."],
+["edb","Cumhuriyet Dönemi","AYT",1,"“Kuyucaklı Yusuf” romanının yazarı kimdir?",["Sabahattin Ali","Yaşar Kemal","Orhan Kemal","Sait Faik Abasıyanık","Kemal Tahir"],0,"<b>Sabahattin Ali</b>’nin 1937’de yayımlanan romanıdır."],
+["edb","Cumhuriyet Dönemi","AYT",2,"Aşağıdakilerden hangisi Garip akımının kurucularındandır?",["Orhan Veli Kanık","Necip Fazıl Kısakürek","Ahmet Haşim","Yahya Kemal Beyatlı","Nazım Hikmet"],0,"Garip akımını 1941’de <b>Orhan Veli</b>, Oktay Rifat ve Melih Cevdet birlikte başlattı."],
+];
+const BANK=BANK_RAW.map((r,i)=>({id:"s"+i,d:r[0],k:r[1],s:r[2],z:r[3],q:r[4],o:r[5],a:r[6],c:r[7],fixed:!!r[8]}));
+
+/* ============ Sonsuz soru üreticileri ============ */
+const GEN=[
+{id:"yuzde",d:"mat",k:"Yüzde ve Kâr-Zarar",s:"TYT",z:2,f(){let P,r,r2,ans;do{P=pick([200,400,500,800,1000,1200,1500,2000]);r=pick([10,20,25,40,50]);r2=pick([10,20,25,40,50]);ans=P*(100+r)*(100-r2)/10000}while(!Number.isInteger(ans));const z=P*(100+r)/100;
+ return{q:`Bir ürünün fiyatı ${P} TL’dir. Bu fiyata önce %${r} zam, ardından yeni fiyat üzerinden %${r2} indirim yapılıyor. Ürünün son fiyatı kaç TL olur?`,...nums(ans,[P*(100+r-r2)/100,z,P,P*(100-r2)/100]),c:`Zamlı fiyat: ${P} · ${tr((100+r)/100)} = ${tr(z)} TL. İndirimden sonra: ${tr(z)} · ${tr((100-r2)/100)} = <b>${tr(ans)} TL</b>. İkinci işlem yeni fiyat üzerinden yapıldığı için yüzdeler doğrudan toplanıp çıkarılmaz.`}}},
+{id:"denklem",d:"mat",k:"Birinci Dereceden Denklemler",s:"TYT",z:1,f(){const a=R(2,9),x=R(-9,12),b=R(-20,20)||5,c=a*x+b;
+ return{q:`${a}x ${SG(b)} = ${tr(c)} denklemini sağlayan x değeri kaçtır?`,...nums(x,[x+1,x-1,-x,(c+b)/a,x+2]),c:`${a}x = ${tr(c)} ${SG(-b)} = ${tr(c-b)}. Her iki taraf ${a} ile bölünür: x = <b>${tr(x)}</b>.`}}},
+{id:"usler",d:"mat",k:"Üslü İfadeler",s:"TYT",z:2,f(){const a=pick([2,3,5]);let m,n,p,e;do{m=R(2,7);n=R(2,7);p=R(2,8);e=m+n-p}while(e<1||e>(a===2?6:a===3?4:3));const ans=a**e,S=x=>`<sup>${x}</sup>`;
+ return{q:`(${a}${S(m)} · ${a}${S(n)}) / ${a}${S(p)} işleminin sonucu kaçtır?`,...nums(ans,[a**(e+1),a**Math.max(0,e-1),a*e,e,a**(m*n-p)]),c:`Aynı tabanlı üslerin çarpımında üsler toplanır, bölümünde çıkarılır: ${a}${S(`${m}+${n}−${p}`)} = ${a}${S(e)} = <b>${ans}</b>.`}}},
+{id:"ebobekok",d:"mat",k:"EBOB - EKOK",s:"TYT",z:2,f(){const [x,y]=pick([[2,3],[3,4],[2,5],[3,5],[4,5],[5,6],[3,7],[4,7],[5,7],[2,7]]);const g=R(2,6),A=g*x,B=g*y;
+ if(Math.random()<.5){const ans=g*x*y;return{q:`Kenarları ${A} cm ve ${B} cm olan özdeş dikdörtgen kartonlar aynı yönde, arada boşluk kalmayacak şekilde yan yana ve üst üste dizilerek bir kare oluşturuluyor. Oluşturulabilecek en küçük karenin bir kenarı kaç cm’dir?`,...nums(ans,[g,A*B,A+B,2*ans]),c:`Karenin kenarı ${A} ve ${B} sayılarının ortak katı olmalıdır. En küçüğü EKOK(${A}, ${B}) = <b>${ans}</b> cm.`}}
+ return{q:`${A} litre ve ${B} litre zeytinyağı, birbirine karıştırılmadan ve hiç artmadan eş hacimli şişelere doldurulacaktır. En az sayıda şişe kullanmak için her şişe kaç litrelik olmalıdır?`,...nums(g,[g*x*y,x+y,x*y,2*g]),c:`Şişe hacmi iki miktarı da tam bölmeli ve en büyük olmalıdır: EBOB(${A}, ${B}) = <b>${g}</b> litre. Bu durumda ${x+y} şişe gerekir.`}}},
+{id:"ardisik",d:"mat",k:"Ardışık Sayılar",s:"TYT",z:1,f(){const n=R(10,40),t=R(0,2);
+ if(t===0){const ans=n*(n+1)/2;return{q:`1 + 2 + 3 + … + ${n} toplamı kaçtır?`,...nums(ans,[n*n,n*(n+1),n*(n-1)/2,ans+n]),c:`İlk n doğal sayının toplamı n(n+1)/2: ${n}·${n+1}/2 = <b>${ans}</b>.`}}
+ if(t===1){const ans=n*(n+1);return{q:`2 + 4 + 6 + … + ${2*n} toplamı kaçtır?`,...nums(ans,[n*(n+1)/2,n*n,2*n*n,ans+2*n]),c:`Toplamda ${n} terim var: 2(1 + 2 + … + ${n}) = 2·${n}·${n+1}/2 = <b>${ans}</b>.`}}
+ const ans=n*n;return{q:`1 + 3 + 5 + … + ${2*n-1} toplamı kaçtır?`,...nums(ans,[n*(n+1),n*(n-1),ans+2*n-1,(n+1)*(n+1)]),c:`Terim sayısı (${2*n-1} + 1)/2 = ${n}. Ardışık ilk n tek sayının toplamı n²: ${n}² = <b>${ans}</b>.`}}},
+{id:"yas",d:"mat",k:"Yaş Problemleri",s:"TYT",z:2,f(){let k,m,t,x;do{k=R(3,6);m=R(2,k-1);t=R(2,12);x=t*(m-1)/(k-m)}while(!Number.isInteger(x)||x<2||x>20);
+ return{q:`Bir annenin bugünkü yaşı kızının yaşının ${k} katıdır. ${t} yıl sonra annenin yaşı, kızının yaşının ${m} katı olacaktır. Kızın bugünkü yaşı kaçtır?`,...nums(x,[x+t,k*x,x+1,x-1,t]),c:`Kız x, anne ${k}x yaşında olsun. ${k}x + ${t} = ${m}(x + ${t}) → ${k}x + ${t} = ${m}x + ${m*t} → ${k-m}x = ${m*t-t} → x = <b>${x}</b>.`}}},
+{id:"isci",d:"mat",k:"İşçi ve Havuz Problemleri",s:"TYT",z:2,f(){const [a,b,ans]=pick([[6,3,2],[12,6,4],[10,15,6],[20,30,12],[12,4,3],[30,20,12],[24,12,8],[6,12,4],[9,18,6],[15,10,6],[40,10,8],[36,12,9]]);
+ return{q:`Bir işi Ayşe tek başına ${a} günde, Mehmet tek başına ${b} günde bitirebiliyor. İkisi birlikte çalışırsa bu işi kaç günde bitirirler?`,...nums(ans,[(a+b)/2,Math.abs(a-b),a+b,ans+1]),c:`Bir günde yapılan iş: 1/${a} + 1/${b} = ${fr(a+b,a*b)}. Birlikte geçen süre bunun tersidir: <b>${ans}</b> gün.`}}},
+{id:"hareket",d:"mat",k:"Hareket Problemleri",s:"TYT",z:1,f(){const v1=R(4,10)*10,v2=R(4,10)*10,t=R(2,5),D=(v1+v2)*t;
+ return{q:`Aralarında ${D} km bulunan iki şehirden saatteki hızları ${v1} km ve ${v2} km olan iki araç aynı anda birbirlerine doğru yola çıkıyor. Araçlar kaç saat sonra karşılaşır?`,...nums(t,[t+1,2*t,t-1,D/Math.abs(v1-v2)]),c:`Birbirine doğru giden araçlar aradaki mesafeyi hızları toplamıyla kapatır: ${D} / (${v1} + ${v2}) = <b>${t}</b> saat.`}}},
+{id:"perm",d:"mat",k:"Permütasyon",s:"TYT",z:2,f(){const n=R(4,7),F=x=>x<=1?1:x*F(x-1);
+ if(Math.random()<.5)return{q:`${n} farklı kitap bir rafa yan yana kaç farklı şekilde dizilebilir?`,...nums(F(n),[n*n,F(n-1),n*(n-1),2*F(n-1)]),c:`İlk yere ${n}, ikinciye ${n-1}, … seçenek kalır: ${n}! = <b>${F(n)}</b>.`};
+ const ans=2*F(n-1);return{q:`${n} kişi düz bir sırada oturacaktır. Belirli iki kişinin yan yana olması koşuluyla kaç farklı oturma düzeni oluşturulabilir?`,...nums(ans,[F(n-1),F(n),F(n)-ans,4*F(n-2)]),c:`Yan yana olacak iki kişi tek kişi gibi düşünülür: (${n-1})! = ${F(n-1)}. Kendi aralarında 2! şekilde yer değiştirirler: ${F(n-1)} · 2 = <b>${ans}</b>.`}}},
+{id:"komb",d:"mat",k:"Kombinasyon",s:"TYT",z:2,f(){const n=R(5,10),r=R(2,3),C=r===2?n*(n-1)/2:n*(n-1)*(n-2)/6,P=r===2?n*(n-1):n*(n-1)*(n-2);
+ return{q:`${n} kişilik bir gruptan ${r} kişilik bir komisyon kaç farklı şekilde seçilebilir?`,...nums(C,[P,C+n,n*r,2*C]),c:`Sıra önemli olmadığı için kombinasyon kullanılır: C(${n}, ${r}) = ${r===2?`${n}·${n-1}/2`:`${n}·${n-1}·${n-2}/6`} = <b>${C}</b>.`}}},
+{id:"olas",d:"mat",k:"Olasılık",s:"TYT",z:2,f(){
+ if(Math.random()<.5){const k=R(2,8),m=R(2,8),t=k+m,ans=fr(k,t);return{q:`Bir torbada ${k} kırmızı ve ${m} mavi bilye vardır. Torbadan rastgele çekilen bir bilyenin kırmızı olma olasılığı kaçtır?`,...strs(ans,[fr(m,t),fr(k,m),fr(1,t),fr(k,t+1),fr(k+1,t),fr(k-1,t),fr(k,2*t)]),c:`İstenen durum sayısı ${k}, tüm durumlar ${k} + ${m} = ${t}. Olasılık ${k}/${t} = <b>${ans}</b>.`}}
+ const s=R(3,11),w=6-Math.abs(s-7),ans=fr(w,36);return{q:`İki zar birlikte atıldığında üst yüzlere gelen sayıların toplamının ${s} olma olasılığı kaçtır?`,...strs(ans,[fr(w,12),fr(w+1,36),fr(w+2,36),fr(w,6),fr(Math.max(1,w-1),36),fr(s,36)]),c:`Toplam 6·6 = 36 eş olası durum vardır. Toplamı ${s} yapan sıralı ikili sayısı ${w}. Olasılık ${w}/36 = <b>${ans}</b>.`}}},
+{id:"mutlak",d:"mat",k:"Mutlak Değer",s:"TYT",z:2,f(){const a=R(-8,9)||3,b=R(1,9),ans=2*a;
+ return{q:`|x ${SG(-a)}| = ${b} denklemini sağlayan x değerlerinin toplamı kaçtır?`,...nums(ans,[2*b,a,a+b,0,b-a]),c:`x ${SG(-a)} = ${b} veya x ${SG(-a)} = −${b}. Kökler ${tr(a+b)} ve ${tr(a-b)}; toplamları <b>${tr(ans)}</b>.`}}},
+{id:"fonk",d:"mat",k:"Fonksiyonlar",s:"TYT",z:2,f(){const a=R(-5,6)||2,b=R(-9,9),m=R(-3,3),n=m+R(1,4),r=R(-4,6),f=x=>a*x+b;
+ return{q:`f doğrusal bir fonksiyondur. f(${tr(m)}) = ${tr(f(m))} ve f(${tr(n)}) = ${tr(f(n))} olduğuna göre f(${tr(r)}) kaçtır?`,...nums(f(r),[f(r)+a,f(r)-a,a*r,f(r)+b,-f(r)]),c:`Eğim: (${tr(f(n))} − (${tr(f(m))})) / (${tr(n)} − (${tr(m)})) = ${tr(a)}. Buradan f(x) = ${tr(a)}x ${SG(b)}. f(${tr(r)}) = <b>${tr(f(r))}</b>.`}}},
+{id:"log",d:"mat",k:"Logaritma",s:"AYT",z:2,f(){const a=pick([2,3,5]),b=pick([2,3,5].filter(x=>x!==a)),mx=v=>v===2?6:v===3?4:3,n=R(1,mx(a)),m=R(1,mx(b)),sb={2:"₂",3:"₃",5:"₅"};
+ return{q:`log${sb[a]} ${a**n} + log${sb[b]} ${b**m} işleminin sonucu kaçtır?`,...nums(n+m,[n*m,n+m+1,Math.abs(n-m),n+m+2]),c:`${a**n} = ${a}<sup>${n}</sup> olduğundan log${sb[a]} ${a**n} = ${n}. ${b**m} = ${b}<sup>${m}</sup> olduğundan log${sb[b]} ${b**m} = ${m}. Toplam <b>${n+m}</b>.`}}},
+{id:"turev",d:"mat",k:"Türev",s:"AYT",z:2,f(){const a=R(1,4),b=R(-5,5),c=R(-6,6),k=R(-2,3),ans=3*a*k*k+2*b*k+c;
+ return{q:`f(x) = ${a===1?"":a}x³ ${SG(b)}x² ${SG(c)}x olduğuna göre f′(${tr(k)}) kaçtır?`,...nums(ans,[a*k**3+b*k*k+c*k,3*a*k*k+b*k+c,ans+c,3*a*k+2*b+c]),c:`f′(x) = ${3*a}x² ${SG(2*b)}x ${SG(c)}. x = ${tr(k)} için: ${3*a*k*k} ${SG(2*b*k)} ${SG(c)} = <b>${tr(ans)}</b>.`}}},
+{id:"integral",d:"mat",k:"İntegral",s:"AYT",z:3,f(){const a=R(1,4),b=R(-3,6),k=R(1,4),ans=a*k*k+b*k;
+ return{q:`∫ (${2*a}x ${SG(b)}) dx belirli integralinin 0’dan ${k}’e kadar değeri kaçtır?`,...nums(ans,[2*a*k+b,2*a*k*k+b*k,a*k*k,ans+b]),c:`İlkel fonksiyon F(x) = ${a===1?"":a}x² ${SG(b)}x. F(${k}) − F(0) = ${a*k*k} ${SG(b*k)} = <b>${tr(ans)}</b>.`}}},
+{id:"dizi",d:"mat",k:"Diziler",s:"AYT",z:2,f(){const a1=R(-5,10),d=R(-3,6)||2,A=n=>a1+(n-1)*d,p=R(2,4),q=p+4,r=q+R(2,5);
+ return{q:`(aₙ) aritmetik bir dizidir. a${SUB(p)} = ${tr(A(p))} ve a${SUB(q)} = ${tr(A(q))} olduğuna göre a${SUB(r)} kaçtır?`,...nums(A(r),[A(r)+d,A(r)-d,A(q)+(r-q),A(q)+d]),c:`Ortak fark d = (${tr(A(q))} − (${tr(A(p))})) / ${q-p} = ${tr(d)}. a${SUB(r)} = a${SUB(q)} + ${r-q}·${tr(d)} = <b>${tr(A(r))}</b>.`}}},
+{id:"ucgen",d:"geo",k:"Üçgende Açılar",s:"TYT",z:1,f(){
+ if(Math.random()<.5){const A=R(30,90),B=R(20,180-A-20),C=180-A-B;return{q:`ABC üçgeninde m(Â) = ${A}° ve m(B̂) = ${B}° olduğuna göre m(Ĉ) kaç derecedir?`,...nums(C,[A+B,180-A,180-B,C+10],"°"),c:`İç açılar toplamı 180°: ${A}° + ${B}° + m(Ĉ) = 180° → m(Ĉ) = <b>${C}°</b>.`}}
+ const A=R(30,80),B=R(30,80),ext=A+B;return{q:`ABC üçgeninde m(Â) = ${A}° ve m(B̂) = ${B}° olduğuna göre C köşesindeki dış açı kaç derecedir?`,...nums(ext,[180-A-B,180-A,180-B,ext-10],"°"),c:`Bir dış açı, kendisine komşu olmayan iki iç açının toplamına eşittir: ${A}° + ${B}° = <b>${ext}°</b>.`}}},
+{id:"pisagor",d:"geo",k:"Dik Üçgen ve Pisagor",s:"TYT",z:1,f(){const [a,b,c]=pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25],[6,8,10]]),k=R(1,3),A=a*k,B=b*k,C=c*k;
+ if(Math.random()<.5)return{q:`Dik kenarları ${A} cm ve ${B} cm olan dik üçgenin hipotenüsü kaç cm’dir?`,...nums(C,[A+B,C+k,C-k,B+k]),c:`Pisagor: ${A}² + ${B}² = ${A*A} + ${B*B} = ${C*C}. Hipotenüs √${C*C} = <b>${C}</b> cm.`};
+ return{q:`Hipotenüsü ${C} cm, bir dik kenarı ${A} cm olan dik üçgenin alanı kaç cm²’dir?`,...nums(A*B/2,[A*B,A*C/2,B*C/2,A*B/2+A]),c:`Diğer dik kenar √(${C}² − ${A}²) = √${C*C-A*A} = ${B} cm. Alan = ${A}·${B}/2 = <b>${A*B/2}</b> cm².`}}},
+{id:"daire",d:"geo",k:"Çember ve Daire",s:"TYT",z:1,f(){const r=R(2,12);
+ if(Math.random()<.5)return{q:`Yarıçapı ${r} cm olan dairenin alanı kaç cm²’dir? (π = 3 alınız.)`,...nums(3*r*r,[6*r,3*r,9*r*r,3*r*r+3]),c:`Alan = πr² = 3·${r}² = <b>${3*r*r}</b> cm².`};
+ return{q:`Çevresi ${6*r} cm olan bir çemberin yarıçapı kaç cm’dir? (π = 3 alınız.)`,...nums(r,[2*r,3*r,r+1,r-1]),c:`Çevre = 2πr = 6r. ${6*r} = 6r → r = <b>${r}</b> cm.`}}},
+{id:"dikd",d:"geo",k:"Dörtgenler",s:"TYT",z:1,f(){const a=R(3,15),b=a+R(1,10);
+ return{q:`Çevresi ${2*(a+b)} cm olan bir dikdörtgenin kısa kenarı ${a} cm’dir. Bu dikdörtgenin alanı kaç cm²’dir?`,...nums(a*b,[a*(a+b),a+b,2*a*b,a*(b-1)]),c:`2(${a} + b) = ${2*(a+b)} → b = ${b} cm. Alan = ${a}·${b} = <b>${a*b}</b> cm².`}}},
+{id:"orthiz",d:"fiz",k:"Hareket",s:"TYT",z:2,f(){let v1,v2,t1,t2,ans;do{v1=R(2,12)*5;v2=R(2,12)*5;t1=R(1,4);t2=R(1,4);ans=(v1*t1+v2*t2)/(t1+t2)}while(!Number.isInteger(ans)||v1===v2||t1===t2);
+ return{q:`Bir araç ${t1} saat boyunca ${v1} km/sa, ardından ${t2} saat boyunca ${v2} km/sa sabit süratle gidiyor. Aracın yolculuk boyunca ortalama sürati kaç km/sa’tir?`,...nums(ans,[(v1+v2)/2,v1+v2,ans+5,ans-5]),c:`Toplam yol ${v1}·${t1} + ${v2}·${t2} = ${v1*t1+v2*t2} km, toplam süre ${t1+t2} saat. Ortalama sürat = ${v1*t1+v2*t2}/${t1+t2} = <b>${ans}</b> km/sa. Süratlerin aritmetik ortalaması ancak süreler eşitse doğru sonuç verir.`}}},
+{id:"newton",d:"fiz",k:"Kuvvet ve Hareket",s:"TYT",z:2,f(){const m=R(2,10),a=R(1,5),f=R(1,4)*5,F=m*a+f;
+ return{q:`Kütlesi ${m} kg olan bir cisme yatay düzlemde ${F} N büyüklüğünde yatay kuvvet uygulanıyor. Cisme etki eden sürtünme kuvveti ${f} N olduğuna göre cismin ivmesi kaç m/s²’dir?`,...nums(a,[F/m,(F+f)/m,a+1,a+2]),c:`Net kuvvet ${F} − ${f} = ${F-f} N. F<sub>net</sub> = m·a → a = ${F-f}/${m} = <b>${a}</b> m/s².`}}},
+{id:"isguc",d:"fiz",k:"İş, Güç ve Enerji",s:"TYT",z:2,f(){let F,x,t,W,ans;do{F=R(2,10)*10;x=R(2,10);t=pick([2,4,5,10]);W=F*x;ans=W/t}while(!Number.isInteger(ans));
+ return{q:`Bir cisim ${F} N büyüklüğündeki sabit kuvvetle, kuvvet doğrultusunda ${x} m çekiliyor. Bu iş ${t} saniyede yapıldığına göre harcanan ortalama güç kaç watt’tır?`,...nums(ans,[W,F*t,2*ans,F/t]),c:`İş W = F·x = ${F}·${x} = ${W} J. Güç P = W/t = ${W}/${t} = <b>${ans}</b> W.`}}},
+{id:"ohm",d:"fiz",k:"Elektrik Akımı",s:"TYT",z:2,f(){
+ if(Math.random()<.5){const R1=R(1,8),R2=R(1,8),I=R(1,5),V=I*(R1+R2);return{q:`${R1} Ω ve ${R2} Ω değerindeki iki direnç seri bağlanarak ${V} V gerilimli üretecin uçlarına bağlanıyor. Devreden geçen akım kaç amperdir?`,...nums(I,[V/R1,V/R2,I+1,2*I]),c:`Seri bağlamada eşdeğer direnç ${R1} + ${R2} = ${R1+R2} Ω. I = V/R = ${V}/${R1+R2} = <b>${I}</b> A.`}}
+ const [R1,R2,Re]=pick([[3,6,2],[4,12,3],[6,12,4],[10,15,6],[20,30,12],[6,6,3],[4,4,2]]),I=R(1,4),V=I*Re;return{q:`${R1} Ω ve ${R2} Ω değerindeki iki direnç paralel bağlanarak ${V} V gerilimli üretecin uçlarına bağlanıyor. Üreteçten çekilen toplam akım kaç amperdir?`,...nums(I,[V/(R1+R2),V/R1,V/R2,2*I]),c:`Paralel eşdeğer direnç (${R1}·${R2})/(${R1} + ${R2}) = ${Re} Ω. I = ${V}/${Re} = <b>${I}</b> A.`}}},
+{id:"kinetik",d:"fiz",k:"İş, Güç ve Enerji",s:"TYT",z:1,f(){const m=R(1,10),v=R(1,6)*2,ans=m*v*v/2;
+ return{q:`Kütlesi ${m} kg olan bir cisim ${v} m/s süratle hareket etmektedir. Cismin kinetik enerjisi kaç joule’dür?`,...nums(ans,[m*v,m*v*v,m*v/2,ans+m]),c:`E<sub>k</sub> = ½·m·v² = ½·${m}·${v}² = <b>${ans}</b> J.`}}},
+{id:"yogun",d:"fiz",k:"Madde ve Özellikleri",s:"TYT",z:2,f(){let d1,V1,d2,V2,ans;do{d1=pick([0.8,1,1.2,1.5,2,3]);d2=pick([0.8,1,1.2,1.5,2,3]);V1=R(1,6)*10;V2=R(1,6)*10;ans=Math.round((d1*V1+d2*V2)/(V1+V2)*1e6)/1e6}while(d1===d2||Math.abs(ans*100-Math.round(ans*100))>1e-6);
+ const mass=Math.round((d1*V1+d2*V2)*100)/100;
+ return{q:`Özkütlesi ${tr(d1)} g/cm³ olan sıvıdan ${V1} cm³ ile özkütlesi ${tr(d2)} g/cm³ olan sıvıdan ${V2} cm³ karıştırılarak homojen bir karışım hazırlanıyor. Karışımın özkütlesi kaç g/cm³’tür?`,...nums(ans,[Math.round((d1+d2)/2*100)/100,Math.round((ans+0.2)*100)/100,Math.round((ans-0.1)*100)/100,Math.round((ans+0.1)*100)/100]),c:`Toplam kütle ${tr(d1)}·${V1} + ${tr(d2)}·${V2} = ${tr(mass)} g, toplam hacim ${V1+V2} cm³. d = ${tr(mass)}/${V1+V2} = <b>${tr(ans)}</b> g/cm³.`}}},
+{id:"basinc",d:"fiz",k:"Basınç",s:"TYT",z:1,f(){const h=R(2,10),dd=pick([800,1000,1200]),ans=dd*10*h;
+ return{q:`Özkütlesi ${dd} kg/m³ olan bir sıvının yüzeyinden ${h} m derinlikteki bir noktada sıvı basıncı kaç pascaldır? (g = 10 m/s²; açık hava basıncı ihmal edilecektir.)`,...nums(ans,[dd*h,ans/10,2*ans,dd*10]),c:`P = h·d·g = ${h}·${dd}·10 = <b>${ans}</b> Pa.`}}},
+{id:"mol",d:"kim",k:"Mol Kavramı",s:"TYT",z:1,f(){const [fo,M]=pick([["H₂O",18],["CO₂",44],["CH₄",16],["NH₃",17],["O₂",32],["CaCO₃",100],["NaOH",40],["SO₂",64]]),n=pick([0.25,0.5,1,2,3,4,5]),m=n*M;
+ return{q:`${tr(m)} gram ${fo} kaç moldür? (${fo}: ${M} g/mol)`,...nums(n,[2*n,n/2,n+1,n*4]),c:`n = m / M<sub>A</sub> = ${tr(m)} / ${M} = <b>${tr(n)}</b> mol.`}}},
+{id:"molar",d:"kim",k:"Çözeltiler",s:"AYT",z:2,f(){const M=pick([0.1,0.2,0.5,1,2]),V=pick([250,500,1000,2000]),m=M*V/1000*40;
+ return{q:`${tr(m)} gram NaOH katısı suda çözülerek ${V} mL çözelti hazırlanıyor. Çözeltinin molar derişimi kaç mol/L’dir? (NaOH: 40 g/mol)`,...nums(M,[M*10,M/2,M*2,M*4]),c:`n = ${tr(m)}/40 = ${tr(M*V/1000)} mol, V = ${tr(V/1000)} L. M = n/V = <b>${tr(M)}</b> mol/L.`}}},
+{id:"ph",d:"kim",k:"Asitler ve Bazlar",s:"AYT",z:2,f(){const n=R(1,5);
+ if(Math.random()<.5)return{q:`25 °C’de 1·10<sup>−${n}</sup> M HCl çözeltisinin pH değeri kaçtır?`,...nums(n,[14-n,n+1,7,n+2]),c:`HCl kuvvetli asittir, tamamen iyonlaşır: [H⁺] = 10<sup>−${n}</sup> M. pH = −log[H⁺] = <b>${n}</b>.`};
+ return{q:`25 °C’de 1·10<sup>−${n}</sup> M NaOH çözeltisinin pH değeri kaçtır?`,...nums(14-n,[n,15-n,7,13-n]),c:`NaOH kuvvetli bazdır: [OH⁻] = 10<sup>−${n}</sup> M → pOH = ${n}. 25 °C’de pH + pOH = 14 → pH = <b>${14-n}</b>.`}}},
+{id:"atom",d:"kim",k:"Atomun Yapısı",s:"TYT",z:1,f(){const [s,Z,A,q]=pick([["Na",11,23,1],["Mg",12,24,2],["Al",13,27,3],["Cl",17,35,-1],["Ca",20,40,2],["O",8,16,-2],["S",16,32,-2],["K",19,39,1],["F",9,19,-1]]),ch=`<sup>${Math.abs(q)>1?Math.abs(q):""}${q>0?"+":"−"}</sup>`;
+ if(Math.random()<.5){const e=Z-q;return{q:`Atom numarası ${Z}, kütle numarası ${A} olan ${s} elementinin ${s}${ch} iyonunda kaç elektron bulunur?`,...nums(e,[Z,Z+q,A-Z,A-e]),c:`Elektron sayısı = proton sayısı − iyon yükü = ${Z} − (${q>0?"+":"−"}${Math.abs(q)}) = <b>${e}</b>.`}}
+ return{q:`Atom numarası ${Z}, kütle numarası ${A} olan ${s} atomunun çekirdeğinde kaç nötron vardır?`,...nums(A-Z,[A,Z,A+Z,A-Z+1]),c:`Nötron sayısı = kütle numarası − atom numarası = ${A} − ${Z} = <b>${A-Z}</b>.`}}},
+];
+
+/* ============ Durum ============ */
+const LS="netpusula-yks-v1";
+const fresh=()=>({stats:{},days:{},defter:{},denemeler:[],goal:60,alan:"SAY",focus:{},konu:{},daily:null,ver:1});
+let S=fresh();
+try{const raw=localStorage.getItem(LS);if(raw){S=Object.assign(fresh(),JSON.parse(raw))}}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+
+const TYT_DATE=new Date("2027-06-19T10:15:00+03:00");
+const AYT_DATE=new Date("2027-06-20T10:15:00+03:00");
+const DAY=864e5;
+const BOX_DAYS=[0,1,3,7,15,30];
+
+function key(q){return q.d+"|"+q.k}
+function record(q,ok,ms){
+  const k=key(q);const st=S.stats[k]||(S.stats[k]={t:0,c:0,ms:0});
+  st.t++;if(ok)st.c++;st.ms+=Math.min(ms||0,600000);
+  const t=todayKey();S.days[t]=(S.days[t]||0)+1;
+  if(!ok)toDefter(q);
+}
+function toDefter(q){
+  const e=S.defter[q.id];
+  const clean={id:q.id,d:q.d,k:q.k,s:q.s,z:q.z,q:q.q,o:q.o,a:q.a,c:q.c,fixed:q.fixed};
+  if(e){e.box=1;e.due=Date.now()+DAY;e.wrong=(e.wrong||1)+1;e.q=clean}
+  else S.defter[q.id]={q:clean,box:1,due:Date.now()+DAY,added:Date.now(),wrong:1};
+}
+function dueList(){const now=Date.now();return Object.values(S.defter).filter(e=>e.box<=5&&e.due<=now)}
+function streak(){let n=0;const d=new Date();if(!S.days[todayKey(d)])d.setDate(d.getDate()-1);while(S.days[todayKey(d)]){n++;d.setDate(d.getDate()-1)}return n}
+
+/* ============ Soru seçimi ============ */
+function prep(q){
+  q=JSON.parse(JSON.stringify(q));
+  if(!q.fixed&&!q.gen){const idx=shuf([0,1,2,3,4]);q.o=idx.map(i=>q.o[i]);q.a=idx.indexOf(q.a)}
+  return q;
+}
+function genQ(g){const r=g.f();return{id:"g-"+g.id+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),d:g.d,k:g.k,s:g.s,z:g.z,gen:true,...r}}
+function sources(f){
+  const ok=x=>(!f.d||f.d.includes(x.d))&&(!f.s||x.s===f.s)&&(!f.k||(Array.isArray(f.k)?f.k.includes(x.k):x.k===f.k))&&(!f.z||x.z===f.z);
+  return{st:BANK.filter(ok),gn:GEN.filter(ok)};
+}
+function draw(f,n,used){
+  used=used||new Set();const {st,gn}=sources(f);const out=[];
+  let stl=shuf(st.filter(q=>!used.has(q.id)));
+  for(let i=0;i<n;i++){
+    const useGen=gn.length&&(!stl.length||Math.random()<gn.length/(gn.length+stl.length*0.9));
+    if(useGen)out.push(genQ(pick(gn)));
+    else if(stl.length){const q=stl.pop();used.add(q.id);out.push(prep(q))}
+  }
+  return out;
+}
+function konular(dlist,s){const set=new Map();BANK.concat(GEN).forEach(x=>{if(dlist.includes(x.d)&&(!s||x.s===s))set.set(x.k,x.d)});return [...set.keys()].sort((a,b)=>a.localeCompare(b,"tr"))}
+
+/* ============ Deneme şablonları ============ */
+const DENEME={
+  tyt:{ad:"TYT Mini Deneme",alt:"40 soru · 55 dk · 4 test",sure:55*60,parts:[
+    {d:["tur"],n:13,s:"TYT",g:"Türkçe"},
+    {d:["tar"],n:2,s:"TYT",g:"Sosyal"},{d:["cog"],n:2,s:"TYT",g:"Sosyal"},{d:["fel"],n:2,s:"TYT",g:"Sosyal"},{d:["din"],n:1,s:"TYT",g:"Sosyal"},
+    {d:["mat"],n:10,s:"TYT",g:"Matematik"},{d:["geo"],n:3,s:"TYT",g:"Matematik"},
+    {d:["fiz"],n:3,s:"TYT",g:"Fen"},{d:["kim"],n:2,s:"TYT",g:"Fen"},{d:["bio"],n:2,s:"TYT",g:"Fen"}],
+    olcek:{"Türkçe":40/13,"Sosyal":20/7,"Matematik":40/13,"Fen":20/7}},
+  ayt:{ad:"AYT Sayısal Mini",alt:"30 soru · 65 dk",sure:65*60,parts:[
+    {d:["mat"],n:7,s:"AYT",g:"Matematik"},{d:["mat"],n:5,s:"TYT",g:"Matematik"},{d:["geo"],n:3,g:"Matematik"},
+    {d:["fiz"],n:5,g:"Fizik"},{d:["kim"],n:5,g:"Kimya"},{d:["bio"],n:5,g:"Biyoloji"}]},
+  ea:{ad:"AYT Eşit Ağırlık Mini",alt:"28 soru · 55 dk",sure:55*60,parts:[
+    {d:["edb"],n:8,g:"Edebiyat"},{d:["tar"],n:4,g:"Tarih"},{d:["cog"],n:4,g:"Coğrafya"},
+    {d:["mat"],n:8,g:"Matematik"},{d:["geo"],n:4,g:"Matematik"}]},
+  hiz:{ad:"Hız Testi",alt:"20 soru · 20 dk · karışık",sure:20*60,parts:[
+    {d:["tur"],n:5,s:"TYT",g:"Türkçe"},{d:["mat","geo"],n:7,s:"TYT",g:"Matematik"},
+    {d:["tar","cog","fel","din"],n:4,s:"TYT",g:"Sosyal"},{d:["fiz","kim","bio"],n:4,s:"TYT",g:"Fen"}]}
+};
+/* TYT puan katsayıları: 1 net ≈ puan (yaklaşık, ÖSYM her yıl standart sapmayla yeniden hesaplar) */
+const TYT_K={"Türkçe":3.28,"Sosyal":3.38,"Matematik":3.28,"Fen":3.38};
+
+/* ============ 2027 YKS müfredatı: eksiksiz konu listesi + videolar ============ */
+/* 2027 YKS mevcut sistemle yapılır; MEB'e göre beceri temelli yeni soru modeli 2028'de başlar. */
+/* Konu: [ad, video (YouTube video ID ya da PL ile başlayan oynatma listesi, yoksa 0), soru bankasındaki konu adları] */
+const MUF=[
+{id:"tyt-tur",sinav:"TYT",d:"tur",ad:"Türkçe",soru:"40 soru",not:"Soruların yarıdan fazlası paragraf ve cümlede anlamdan gelir.",pl:"PLVsjxq1KrcgxND0PpnzXxr5gYRTaKEKWC",tekrar:"4DSm4pufTnA",k:[
+ ["Sözcükte Anlam",0,["Sözcükte Anlam"]],["Cümlede Anlam",0,["Cümlede Anlam"]],
+ ["Paragrafta Anlatım Biçimleri ve Düşünceyi Geliştirme Yolları","7temTkqreeI"],
+ ["Paragrafta Konu ve Ana Düşünce","a_tPLZkQlUA",["Paragrafta Ana Düşünce","Paragrafta Yazarın Tutumu"]],
+ ["Paragrafta Yardımcı Düşünce",0,["Paragrafta Yardımcı Düşünce"]],["Paragrafın Yapısı (Akış, Giriş, Sonuç)",0,["Paragrafta Akış"]],
+ ["Ses Bilgisi",0,["Ses Bilgisi"]],["Yazım Kuralları","_V0-1iNV6yQ",["Yazım Kuralları"]],["Noktalama İşaretleri"],
+ ["Sözcükte Yapı ve Ekler",0,["Yapı Bilgisi"]],["İsimler"],["Sıfatlar",0,["Sözcük Türleri"]],["Zamirler"],["Zarflar"],["Edat, Bağlaç ve Ünlem"],
+ ["Fiiller: Kip, Kişi, Yapı"],["Ek Fiil"],["Fiilimsiler","0XhB000G1RI",["Fiilimsiler"]],["Fiilde Çatı"],
+ ["Cümlenin Ögeleri",0,["Cümlenin Ögeleri"]],["Cümle Türleri",0,["Cümle Türleri"]],["Anlatım Bozuklukları",0,["Anlatım Bozuklukları"]]]},
+{id:"tyt-mat",sinav:"TYT",d:"mat",ad:"Temel Matematik",soru:"≈30 soru (40'lık testin içinde)",pl:"PLVoSZ0D0CB3o2skEXLO-FY5ZJvYJn6rhr",k:[
+ ["Temel Kavramlar","bjBNd5EMLRw",["Ardışık Sayılar"]],["Sayı Basamakları",0,["Sayı Basamakları"]],["Bölme ve Bölünebilme",0,["Bölünebilme"]],
+ ["EBOB - EKOK",0,["EBOB - EKOK"]],["Rasyonel Sayılar ve Ondalık Sayılar",0,["Rasyonel Sayılar","Ondalık Sayılar"]],["Basit Eşitsizlikler"],
+ ["Mutlak Değer",0,["Mutlak Değer"]],["Üslü Sayılar","5h6WvCHP89k",["Üslü İfadeler"]],["Köklü Sayılar"],["Çarpanlara Ayırma"],["Oran - Orantı"],
+ ["Denklem Çözme",0,["Birinci Dereceden Denklemler"]],["Sayı ve Kesir Problemleri",0,["Sayı Problemleri","Kesir Problemleri"]],["Yaş Problemleri",0,["Yaş Problemleri"]],
+ ["Hareket Problemleri",0,["Hareket Problemleri"]],["İşçi ve Havuz Problemleri",0,["İşçi ve Havuz Problemleri"]],
+ ["Yüzde, Kâr - Zarar Problemleri","2weiWe90yXM",["Yüzde ve Kâr-Zarar"]],["Karışım Problemleri"],["Grafik ve Rutin Olmayan Problemler"],
+ ["Kümeler ve Kartezyen Çarpım","iPosM0wqoUU",["Kümeler"]],["Mantık","7Zkq8CqNEP4",["Mantık"]],["Fonksiyonlar",0,["Fonksiyonlar"]],
+ ["Polinomlar","BsTDHd4AnIg"],["İkinci Dereceden Denklemler"],["Permütasyon ve Kombinasyon","PLVoSZ0D0CB3rRXypIt9kN9FLmmi0_xH8E",["Permütasyon","Kombinasyon"]],
+ ["Olasılık","PLVoSZ0D0CB3rRXypIt9kN9FLmmi0_xH8E",["Olasılık"]],["Veri ve İstatistik"]]},
+{id:"tyt-geo",sinav:"TYT",d:"geo",ad:"Geometri",soru:"≈10 soru (Temel Matematik testinde)",pl:"PLVoSZ0D0CB3ovGqsyyKyl129FIZEXQm60",k:[
+ ["Doğruda Açılar","rcHkG6BbFc0"],["Üçgende Açılar","cVqvgg1ULvs",["Üçgende Açılar"]],["Dik ve Özel Üçgenler",0,["Dik Üçgen ve Pisagor","Özel Üçgenler"]],
+ ["İkizkenar ve Eşkenar Üçgen"],["Üçgende Açıortay ve Kenarortay","EPDRIUgQ3Fg"],["Üçgende Eşlik ve Benzerlik"],["Üçgende Alan",0,["Üçgende Alan"]],
+ ["Açı - Kenar Bağıntıları"],["Çokgenler",0,["Çokgenler"]],["Dörtgenler ve Özel Dörtgenler",0,["Dörtgenler"]],["Çember ve Daire",0,["Çember ve Daire"]],
+ ["Noktanın ve Doğrunun Analitiği"],["Katı Cisimler"]]},
+{id:"tyt-tar",sinav:"TYT",d:"tar",ad:"Tarih",soru:"5 soru",pl:"PLRbyTgiOSh9nqSw97n5L-ywijENKVkvgs",tekrar:"1qwQ-StVYF4",k:[
+ ["Tarih ve Zaman"],["İnsanlığın İlk Dönemleri"],["Orta Çağ’da Dünya",0,["İlk ve Orta Çağ"]],["İlk ve Orta Çağlarda Türk Dünyası","Lr9aHZ3oZHg"],
+ ["İslam Medeniyetinin Doğuşu"],["Türklerin İslamiyet’i Kabulü ve İlk Türk-İslam Devletleri",0,["Türk-İslam Tarihi"]],
+ ["Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi"],["Beylikten Devlete Osmanlı Siyaseti"],["Devletleşme Sürecinde Savaşçılar ve Askerler","DzczrlHqvyQ"],
+ ["Beylikten Devlete Osmanlı Medeniyeti"],["Dünya Gücü Osmanlı"],["Sultan ve Osmanlı Merkez Teşkilatı"],["Klasik Çağda Osmanlı Toplum Düzeni"],
+ ["Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti"],["Değişim Çağında Avrupa ve Osmanlı"],["Uluslararası İlişkilerde Denge Stratejisi (1774-1914)",0,["Osmanlı Yenileşme"]],
+ ["Devrimler Çağında Değişen Devlet-Toplum İlişkileri"],["Sermaye ve Emek"],["XIX. ve XX. Yüzyılda Değişen Gündelik Hayat"],
+ ["XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya"],["Millî Mücadele",0,["Kurtuluş Savaşı","Lozan Barış Antlaşması"]],["Atatürkçülük ve Türk İnkılabı",0,["Atatürk İlkeleri","Atatürk İnkılapları"]]]},
+{id:"tyt-cog",sinav:"TYT",d:"cog",ad:"Coğrafya",soru:"5 soru",pl:"PLnBnugScc-7LUk8uedC4Vwx2iumUJ3LO5",k:[
+ ["Doğa ve İnsan"],["Dünya’nın Şekli ve Hareketleri",0,["Dünya’nın Hareketleri"]],["Coğrafi Konum ve Yerel Saat",0,["Yerel Saat"]],["Harita Bilgisi",0,["Harita Bilgisi"]],
+ ["Atmosfer ve Sıcaklık"],["Basınç ve Rüzgârlar"],["Nem, Yağış ve Buharlaşma"],["İklim Tipleri ve Bitki Örtüsü",0,["İklim ve Bitki Örtüsü"]],
+ ["Yer’in Yapısı, İç ve Dış Kuvvetler",0,["İç ve Dış Kuvvetler"]],["Kayaçlar",0,["Kayaçlar"]],["Türkiye’nin Yer Şekilleri"],["Su, Toprak ve Bitki Varlığı"],
+ ["Nüfus",0,["Nüfus"]],["Göç ve Yerleşme"],["Ekonomik Faaliyetler"],["Bölgeler ve Uluslararası Ulaşım Hatları"],["Çevre ve Toplum"],["Doğal Afetler",0,["Doğal Afetler"]]]},
+{id:"tyt-fel",sinav:"TYT",d:"fel",ad:"Felsefe",soru:"5 soru",pl:"PL4P7Q5QUoe-hL8lOVn5sdk7CNLlZTDUci",tekrar:"kJVEE012epI",k:[
+ ["Felsefeyi Tanıma","tTGJ8YBJlb8",["Felsefeye Giriş"]],["Bilgi Felsefesi","WeMUy6Q3AY4",["Bilgi Felsefesi"]],["Varlık Felsefesi","MZ_RGLehgRY",["Varlık Felsefesi"]],
+ ["Ahlak Felsefesi","HaHqbwGQsRo",["Ahlak Felsefesi"]],["Sanat Felsefesi"],["Din Felsefesi"],["Siyaset Felsefesi"],["Bilim Felsefesi"]]},
+{id:"tyt-din",sinav:"TYT",d:"din",ad:"Din Kültürü",soru:"5 soru (muaf olanlar yerine felsefe çözer)",pl:"PL5kIOunpmSBNRFZEm0nCEmXuU6nqJtl8D",tekrar:"Ydkr7jUiAQk",k:[
+ ["Bilgi ve İnanç",0,["İnanç"]],["İslam ve İbadet",0,["İslam ve İbadet"]],["Gençlik ve Değerler"],["Allah - İnsan İlişkisi"],["Hz. Muhammed ve Gençlik"],
+ ["Din ve Hayat"],["Ahlaki Tutum ve Davranışlar"],["Vahiy ve Akıl: Kur’an Yorumları",0,["Vahiy ve Akıl"]],["İslam Düşüncesinde Yorumlar (Mezhepler)","_dhtrcd4LkQ"],
+ ["İslam Düşüncesinde Tasavvufi Yorumlar","LKNeSVn73Pc"],["Hint ve Çin Dinleri"]]},
+{id:"tyt-fiz",sinav:"TYT",d:"fiz",ad:"Fizik",soru:"7 soru",pl:"PLwyfvkhKMmwpE7yZdiB0NQl446erQEFpc",k:[
+ ["Fizik Bilimine Giriş","J21ZFa_wop8",["Fizik Bilimine Giriş"]],["Madde ve Özellikleri",0,["Madde ve Özellikleri"]],["Hareket",0,["Hareket"]],
+ ["Kuvvet ve Newton’un Hareket Yasaları",0,["Kuvvet ve Hareket"]],["İş, Güç ve Enerji",0,["İş, Güç ve Enerji"]],["Isı, Sıcaklık ve Genleşme",0,["Isı ve Sıcaklık"]],
+ ["Elektrostatik",0,["Elektrostatik"]],["Elektrik Akımı ve Devreler","Y04CTut7ws8",["Elektrik Akımı"]],["Manyetizma"],
+ ["Basınç ve Kaldırma Kuvveti",0,["Basınç"]],["Dalgalar",0,["Dalgalar"]],["Optik","O-1ghPP6VMQ",["Optik"]]]},
+{id:"tyt-kim",sinav:"TYT",d:"kim",ad:"Kimya",soru:"7 soru",pl:"PLhdWTGJXeYls9y-4pX4eC3VIfi8Sx_5eL",tekrar:"fUvrlP_jw10",k:[
+ ["Kimya Bilimi"],["Atom ve Periyodik Sistem","9yEsLzRpGM4",["Atomun Yapısı","Periyodik Sistem"]],["Kimyasal Türler Arası Etkileşimler","tcC9n_m1WKM",["Kimyasal Bağlar"]],
+ ["Maddenin Hâlleri","kBQrPk69sfg"],["Doğa ve Kimya"],["Kimyanın Temel Kanunları"],["Mol Kavramı","nEJTJjsO7Ew",["Mol Kavramı"]],
+ ["Kimyasal Tepkimeler ve Hesaplamalar",0,["Fiziksel ve Kimyasal Değişim"]],["Karışımlar",0,["Karışımlar"]],["Asitler, Bazlar ve Tuzlar",0,["Asitler ve Bazlar"]],["Kimya Her Yerde"]]},
+{id:"tyt-bio",sinav:"TYT",d:"bio",ad:"Biyoloji",soru:"6 soru",pl:"PLLFjYcKh-t8Qg7GpZmjxPJI1kYr7P9W52",k:[
+ ["Canlıların Ortak Özellikleri","b-kj1PV1JmI",["Canlıların Ortak Özellikleri"]],["Canlıların Temel Bileşenleri",0,["Canlıların Temel Bileşenleri"]],
+ ["Hücre ve Organeller","PLAdrMA6Aq8ImOd9oVK1TuNHDym3EyA1Y5",["Hücre"]],["Hücre Zarından Madde Geçişi"],["Canlıların Sınıflandırılması",0,["Canlıların Sınıflandırılması"]],
+ ["Mitoz ve Eşeysiz Üreme",0,["Hücre Bölünmeleri"]],["Mayoz ve Eşeyli Üreme"],["Kalıtım","PLAdrMA6Aq8Il18m-msl3_Z_SRsnV8lr6N",["Kalıtım"]],
+ ["Ekosistem Ekolojisi",0,["Ekosistem"]],["Güncel Çevre Sorunları"]]},
+{id:"ayt-mat",sinav:"AYT",d:"mat",ad:"Matematik",soru:"≈30 soru (40'lık testin içinde)",pl:"PLVoSZ0D0CB3qm-Z9Qje-3PbtioUgz2Wmz",k:[
+ ["Fonksiyonlar (Bileşke, Ters, Grafik)","1Egaw3LDJXM"],["Polinomlar","BsTDHd4AnIg"],["İkinci Dereceden Denklemler"],["Eşitsizlikler"],["Parabol"],
+ ["Permütasyon, Kombinasyon ve Binom","PLVoSZ0D0CB3rRXypIt9kN9FLmmi0_xH8E"],["Olasılık","PLVoSZ0D0CB3rRXypIt9kN9FLmmi0_xH8E"],["Trigonometri"],
+ ["Logaritma","2ChH_7GlB-A",["Logaritma"]],["Diziler","HnuVB64ackc",["Diziler"]],["Limit ve Süreklilik"],["Türev",0,["Türev"]],["İntegral","JVzo3IdP4Dw",["İntegral"]]]},
+{id:"ayt-geo",sinav:"AYT",d:"geo",ad:"Geometri",soru:"≈10 soru (Matematik testinde)",pl:"PL2wqvRc1FjTnt9ghs98OH5xo2iX0RU0jI",k:[
+ ["Üçgenler (TYT konuları)"],["Çokgenler ve Dörtgenler"],["Çemberde Açı ve Uzunluk"],["Dairede Alan"],["Noktanın ve Doğrunun Analitiği"],
+ ["Dönüşüm Geometrisi"],["Çemberin Analitik İncelenmesi"],["Katı Cisimler"],["Trigonometri ile Geometri (Sinüs ve Kosinüs Teoremi)"]]},
+{id:"ayt-fiz",sinav:"AYT",d:"fiz",ad:"Fizik",soru:"14 soru",pl:"PLw6C1pT6u50_i9Nt81F2PEtd1jeqbJb1F",k:[
+ ["Vektörler","kfa8riSnIps"],["Bağıl Hareket"],["Newton’un Hareket Yasaları"],["Bir Boyutta Sabit İvmeli Hareket"],["İki Boyutta Hareket (Atışlar)"],
+ ["Enerji ve Hareket"],["İtme ve Çizgisel Momentum","rqMXDvIw-Vs"],["Tork ve Denge","pAPJWXiyzOg"],["Kütle Merkezi"],["Basit Makineler"],
+ ["Elektriksel Kuvvet ve Alan"],["Elektriksel Potansiyel, Paralel Levhalar ve Sığa"],["Manyetizma ve Elektromanyetik İndüksiyon"],["Alternatif Akım ve Transformatörler"],
+ ["Düzgün Çembersel Hareket"],["Basit Harmonik Hareket"],["Dalga Mekaniği"],["Atom Fiziğine Giriş ve Radyoaktivite"],["Modern Fizik ve Teknolojideki Uygulamaları"]]},
+{id:"ayt-kim",sinav:"AYT",d:"kim",ad:"Kimya",soru:"13 soru",pl:"PL682JCpcERIqaTUfErXaCqRfexFs0WPbC",k:[
+ ["Modern Atom Teorisi"],["Gazlar"],["Sıvı Çözeltiler ve Çözünürlük",0,["Çözeltiler"]],["Kimyasal Tepkimelerde Enerji","sVYr9oJLQZg"],
+ ["Kimyasal Tepkimelerde Hız","sVYr9oJLQZg"],["Kimyasal Denge","sVYr9oJLQZg"],["Asit-Baz Dengesi","Mex3dBpIW4A",["Asitler ve Bazlar"]],["Çözünürlük Dengesi"],
+ ["Kimya ve Elektrik","U9dUv4ab89Y"],["Karbon Kimyasına Giriş","ta-gzpoJqEk"],["Organik Bileşikler","ta-gzpoJqEk"],["Enerji Kaynakları ve Bilimsel Gelişmeler","ta-gzpoJqEk"]]},
+{id:"ayt-bio",sinav:"AYT",d:"bio",ad:"Biyoloji",soru:"13 soru",pl:"m5o1DhGVNJ8",k:[
+ ["Sinir Sistemi","hvu69U1zkQo"],["Endokrin Sistem"],["Duyu Organları"],["Destek ve Hareket Sistemi"],["Sindirim Sistemi"],["Dolaşım ve Bağışıklık Sistemi","w_61XhPhqbU"],
+ ["Solunum Sistemi"],["Boşaltım Sistemi"],["Üreme Sistemi ve Embriyonik Gelişim"],["Komünite ve Popülasyon Ekolojisi"],
+ ["Nükleik Asitler, Genetik Şifre ve Protein Sentezi"],["Canlılarda Enerji Dönüşümleri (Fotosentez, Kemosentez, Solunum)","NgQG6m-MmCM"],["Bitki Biyolojisi","4oMU5aEkxXg"],["Canlılar ve Çevre"]]},
+{id:"ayt-edb",sinav:"AYT",d:"edb",ad:"Edebiyat",soru:"24 soru",pl:"PL5mDkhVq27AFwtsMjjZ65s99d__aOUyJP",k:[
+ ["Edebiyat, Sanat ve Metin Türleri"],["Şiir Bilgisi (Nazım Birimi, Ölçü, Uyak, Redif)","279kqvzo0MU"],["Söz Sanatları",0,["Söz Sanatları"]],["Hikâye ve Roman Bilgisi"],
+ ["Tiyatro"],["Öğretici Metinler (Deneme, Makale, Fıkra, Söyleşi…)"],["İslamiyet Öncesi Türk Edebiyatı"],["Geçiş Dönemi Türk Edebiyatı"],
+ ["Halk Edebiyatı",0,["Halk Edebiyatı"]],["Divan Edebiyatı",0,["Divan Edebiyatı"]],["Tanzimat Edebiyatı",0,["Tanzimat Edebiyatı"]],
+ ["Servetifünun ve Fecriati",0,["Servetifünun Edebiyatı"]],["Millî Edebiyat","IZhg4a6OraM",["Millî Edebiyat"]],["Cumhuriyet Dönemi Türk Edebiyatı","LhqpxSZ3B8M",["Cumhuriyet Dönemi"]],
+ ["Edebî Akımlar"],["Dünya Edebiyatı"]]},
+{id:"ayt-tar",sinav:"AYT",d:"tar",ad:"Tarih (Tarih-1 ve Tarih-2)",soru:"10 + 11 soru",not:"TYT tarih konularının tamamı AYT'de de sorulur.",pl:"PLRbyTgiOSh9nRfPfKGP0ataXT5vDQjnNf",k:[
+ ["TYT tarih konularının tamamı"],["XX. Yüzyıl Başlarında Osmanlı ve Dünya"],["İki Savaş Arasındaki Dönemde Türkiye ve Dünya","_FmAI9GpPRs"],
+ ["II. Dünya Savaşı Sürecinde Türkiye ve Dünya","WNkMZvHvfpg"],["II. Dünya Savaşı Sonrası ve Soğuk Savaş","XFf6yQWiV3o"],["Toplumsal Devrim Çağında Dünya ve Türkiye (Yumuşama)"],
+ ["XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],["Türk Kültür ve Medeniyet Tarihi (Devlet, Toplum, Ekonomi)"]]},
+{id:"ayt-cog",sinav:"AYT",d:"cog",ad:"Coğrafya (Coğrafya-1 ve Coğrafya-2)",soru:"6 + 11 soru",pl:"PLnBnugScc-7KqyfSotZ2KEZC5Ofggdiny",k:[
+ ["Ekosistemlerin İşleyişi ve Biyoçeşitlilik"],["Nüfus Politikaları","OWRp7BotMpE"],["Şehirlerin Fonksiyonları ve Kır Yerleşmeleri","-XqYOCnkh-Q"],
+ ["Doğal Kaynaklar ve Ekonomi","bR_fAIGGqS8"],["Türkiye’de Tarım, Hayvancılık, Madenler ve Enerji"],["Türkiye’de Sanayi, Ulaşım, Ticaret ve Turizm","WhKJJGDCD_s"],
+ ["İşlevsel Bölgeler ve Kalkınma Projeleri","ncrUSxkL_sY"],["Kültür Bölgeleri ve Küresel Ortam","E_pkowaVlQM"],["Türkiye’nin Jeopolitik Konumu","0B03bDjZHDk"],
+ ["Çevre ve Toplum, Ekstrem Doğa Olayları","fl1hXBibMnQ"],["Küresel ve Bölgesel Örgütler"]]},
+{id:"ayt-fel",sinav:"AYT",d:"fel",ad:"Felsefe Grubu",soru:"12 soru (Felsefe, Psikoloji, Sosyoloji, Mantık)",pl:"PL2pYy9HbVAD-EI1zH9ua2oTBxj1hH-TAi",k:[
+ ["MÖ 6. yy – MS 2. yy Felsefesi"],["MS 2. yy – MS 15. yy Felsefesi"],["15. – 17. yy Felsefesi"],["18. – 19. yy Felsefesi"],["20. yy Felsefesi","5UW1KWzKeNk"],
+ ["Psikoloji Bilimini Tanıyalım","Z59yGamwfbs"],["Psikolojinin Temel Süreçleri"],["Öğrenme, Bellek ve Düşünme"],["Ruh Sağlığının Temelleri"],
+ ["Sosyolojiye Giriş","JwQsIJtiOYQ"],["Birey ve Toplum"],["Toplumsal Yapı"],["Toplumsal Değişme ve Gelişme"],["Toplum ve Kültür"],["Toplumsal Kurumlar"],
+ ["Mantığa Giriş","AVgVrODxaNs"],["Klasik Mantık"],["Mantık ve Dil"],["Sembolik Mantık"]]},
+{id:"ayt-din",sinav:"AYT",d:"din",ad:"Din Kültürü",soru:"6 soru",pl:"PL5kIOunpmSBNRFZEm0nCEmXuU6nqJtl8D",k:[
+ ["Dünya ve Ahiret"],["Kur’an’a Göre Hz. Muhammed"],["Kur’an’da Bazı Kavramlar"],["İnançla İlgili Meseleler"],["Yahudilik ve Hristiyanlık"],
+ ["İslam ve Bilim"],["Anadolu’da İslam"],["İslam Düşüncesinde Tasavvufi Yorumlar","LKNeSVn73Pc"],["Güncel Dinî Meseleler"],["Hint ve Çin Dinleri"]]}
+];
+
+/* ============ Dersler ve videolar ============ */
+let dersSel=null;
+const kKey=(m,k)=>m.id+"|"+k[0];
+function kStat(m,k){let t=0,c=0;(k[2]||[]).forEach(n=>{const s=S.stats[m.d+"|"+n];if(s){t+=s.t;c+=s.c}});return{t,c}}
+function hasQ(m,k){return (k[2]||[]).some(n=>BANK.some(b=>b.d===m.d&&b.k===n)||GEN.some(g=>g.d===m.d&&g.k===n))}
+function mProg(m){const done=m.k.filter(k=>(S.konu[kKey(m,k)]||{}).d).length;return{done,tot:m.k.length}}
+const ytSrc=v=>v.startsWith("PL")?`https://www.youtube-nocookie.com/embed/videoseries?list=${v}&rel=0`:`https://www.youtube-nocookie.com/embed/${v}?rel=0`;
+const ytLink=v=>v.startsWith("PL")?`https://www.youtube.com/playlist?list=${v}`:`https://www.youtube.com/watch?v=${v}`;
+const ytSearch=q=>`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+function dersler(){
+  if(dersSel){const m=MUF.find(x=>x.id===dersSel);if(m)return dersDetay(m)}
+  const card=m=>{const p=mProg(m);return`<button class="tile" onclick="A.ders('${m.id}')"><span class="tag">${m.soru.toUpperCase()}</span><h3>${m.ad}</h3><span>${p.done}/${p.tot} konu tamamlandı</span><div class="bar" style="width:100%;margin-top:6px"><i style="width:${p.done/p.tot*100}%"></i></div></button>`};
+  return header("Dersler ve Konular","2027 YKS · eksiksiz konu listesi ve videolar")+`
+  <div class="sheet stack" style="margin-top:14px">
+   <h2>2027 sınav sistemi</h2>
+   <div class="note">2027 YKS mevcut sistemle yapılır. MEB, yeni müfredata uygun beceri temelli soru modelinin 2028’de başlayacağını açıkladı.</div>
+   <div class="tbl-wrap"><table><thead><tr><th>Oturum</th><th>Test</th><th class="n">Soru</th></tr></thead><tbody>
+    <tr><td rowspan="4"><b>TYT</b><div class="note">19 Haziran 2027<br>120 soru · 165 dk</div></td><td>Türkçe</td><td class="n">40</td></tr>
+    <tr><td>Sosyal Bilimler: Tarih 5, Coğrafya 5, Felsefe 5, Din 5</td><td class="n">20</td></tr>
+    <tr><td>Temel Matematik (geometri ≈10)</td><td class="n">40</td></tr>
+    <tr><td>Fen Bilimleri: Fizik 7, Kimya 7, Biyoloji 6</td><td class="n">20</td></tr>
+    <tr><td rowspan="4"><b>AYT</b><div class="note">20 Haziran 2027<br>160 soru · 180 dk</div></td><td>Türk Dili ve Edebiyatı-Sosyal Bilimler 1: Edebiyat 24, Tarih-1 10, Coğrafya-1 6</td><td class="n">40</td></tr>
+    <tr><td>Sosyal Bilimler 2: Tarih-2 11, Coğrafya-2 11, Felsefe Grubu 12, Din 6</td><td class="n">40</td></tr>
+    <tr><td>Matematik (geometri ≈10)</td><td class="n">40</td></tr>
+    <tr><td>Fen Bilimleri: Fizik 14, Kimya 13, Biyoloji 13</td><td class="n">40</td></tr>
+    <tr><td><b>YDT</b><div class="note">20 Haziran 2027</div></td><td>Yabancı Dil</td><td class="n">80</td></tr>
+   </tbody></table></div>
+   <div class="note">Sayısal: Matematik + Fen · Eşit Ağırlık: Matematik + TDE-Sosyal 1 · Sözel: TDE-Sosyal 1 + Sosyal 2. Puanda TYT %40, AYT %60 ağırlıktadır; diploma puanının 0,12 katı eklenir. 4 yanlış 1 doğruyu götürür. Geometri soru sayıları yayınevi analizlerine dayanan yaklaşık değerlerdir.</div>
+  </div>
+  <div class="sec"><h2>TYT dersleri</h2><div class="tiles">${MUF.filter(m=>m.sinav==="TYT").map(card).join("")}</div></div>
+  <div class="sec"><h2>AYT dersleri</h2><div class="tiles">${MUF.filter(m=>m.sinav==="AYT").map(card).join("")}</div></div>
+  ${soru()}`;
+}
+function dersDetay(m){
+  const p=mProg(m);
+  return`<div class="topbar"><div class="brand"><span class="eyebrow">${m.sinav} · ${m.soru}</span><h1>${m.ad}</h1></div><button class="btn sm" onclick="A.ders(null)">‹ Dersler</button></div>
+  <div class="ticks" style="margin-top:10px"></div>
+  <div class="sheet stack" style="margin-top:14px">
+   <div class="row" style="justify-content:space-between"><b>${p.done}/${p.tot} konu tamamlandı</b><span class="mono note">%${Math.round(p.done/p.tot*100)}</span></div>
+   <div class="bar"><i style="width:${p.done/p.tot*100}%"></i></div>
+   ${m.not?`<div class="note">${m.not}</div>`:""}
+   <div class="row"><button class="btn pri" onclick="A.video('${m.id}',-1)">▶ Ders oynatma listesi</button>${m.tekrar?`<button class="btn" onclick="A.video('${m.id}',-2)">▶ Tek videoda tekrar</button>`:""}${BANK.some(b=>b.d===m.d)||GEN.some(g=>g.d===m.d)?`<button class="btn" onclick="A.dersTest('${m.id}')">Karışık 20 soru</button>`:""}</div>
+  </div>
+  <div class="sec"><h2>Konular</h2><div class="sheet">${m.k.map((k,i)=>{const st=S.konu[kKey(m,k)]||{};const s=kStat(m,k);const q=hasQ(m,k);return`<div class="list-row" style="align-items:flex-start">
+    <button class="bub" style="flex:none;margin-top:2px;${st.d?"background:var(--lead);border-color:var(--lead);color:var(--lead-ink)":""}" aria-pressed="${!!st.d}" aria-label="${k[0]} tamamlandı olarak işaretle" onclick="A.konuDone('${m.id}',${i})">${st.d?"✓":i+1}</button>
+    <div style="flex:1;min-width:0"><b>${k[0]}</b><div class="note">${k[1]?"Konuya özel video":"Ders oynatma listesinde"}${st.w?" · izlendi":""}${s.t?` · ${s.t} soru, %${Math.round(s.c/s.t*100)} doğru`:""}</div>
+     <div class="row" style="gap:6px;margin-top:8px"><button class="btn sm" onclick="A.video('${m.id}',${i})">▶ Video</button>${q?`<button class="btn sm ink" onclick="A.konuQ('${m.id}',${i})">Soru çöz</button>`:""}</div></div></div>`}).join("")}</div>
+   <div class="note" style="margin-top:8px">Numaraya dokunarak bitirdiğin konuları işaretle. “Soru çöz” düğmesi, soru bankasında o konuya ait sorular olan konularda görünür.</div></div>`;
+}
+function videoModal(m,i){
+  let v,title,konu=null;
+  if(i===-1){v=m.pl;title=m.sinav+" "+m.ad+" · oynatma listesi"}
+  else if(i===-2){v=m.tekrar;title=m.sinav+" "+m.ad+" · tek videoda tekrar"}
+  else{konu=m.k[i];v=konu[1]||m.pl;title=konu[0]}
+  const q=`${m.sinav} ${m.ad.replace(/ \(.*\)/,"")} ${konu?konu[0]:""} konu anlatımı`;
+  const st=konu?(S.konu[kKey(m,konu)]||{}):{};
+  modal(`<div class="row" style="justify-content:space-between"><div style="min-width:0"><span class="eyebrow">${m.sinav} · ${m.ad}</span><h2>${title}</h2></div><button class="btn sm" onclick="A.close()">Kapat</button></div>
+   <div class="vframe"><iframe src="${ytSrc(v)}" title="${esc(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+   <a class="vlink" href="${ytLink(v)}" target="_blank" rel="noopener"><span class="vplay">▶</span><span><b>${konu&&!konu[1]?"Ders oynatma listesini YouTube’da aç":v.startsWith("PL")?"Oynatma listesini YouTube’da aç":"Videoyu YouTube’da aç"}</b><small>Video burada açılmazsa YouTube’da yeni sekmede aç</small></span></a>
+   ${konu&&!konu[1]?`<div class="note">Bu konunun videosu dersin oynatma listesinin içinde. Listeden konuyu seç ya da aşağıdan konuyu YouTube’da ara.</div>`:""}
+   <div class="row"><a class="btn sm" href="${ytSearch(q)}" target="_blank" rel="noopener">Başka anlatım ara</a>${konu&&konu[1]?`<button class="btn sm" onclick="A.video('${m.id}',-1)">Ders listesi</button>`:""}${konu?`<button class="btn sm ${st.w?"ink":""}" onclick="A.watched('${m.id}',${i})">${st.w?"✓ İzlendi":"İzledim"}</button>`:""}</div>`,true);
+}
+
+/* ============ Görünümler ============ */
+const VIEWS=[["panel","Panel","M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"],["dersler","Dersler","M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5zM7 8h2M16 8h2"],["deneme","Deneme","M8 3h8l3 3v15H5V3zM9 9h6M9 13h6M9 17h3"],["defter","Defter","M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"],["analiz","Analiz","M4 20V10M10 20V4M16 20v-7M22 20H2"],["araclar","Araçlar","M14 7a4 4 0 0 0-5 5l-6 6 3 3 6-6a4 4 0 0 0 5-5l-3 3-3-3z"]];
+let view=(location.hash||"").slice(1);if(!VIEWS.some(v=>v[0]===view))view="panel";
+let Z=null; /* aktif sınav */
+let daily=null; /* panel günün sorusu */
+let soruF={d:"mat",k:"",s:"",z:0,n:20,mode:"learn"};
+
+function go(v){if(v!==view||v==="dersler")dersSel=null;view=v;Z=null;try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}render();window.scrollTo(0,0)}
+window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if(VIEWS.some(x=>x[0]===v)&&v!==view&&!Z){view=v;render()}});
+
+function tabs(){
+  const due=dueList().length;
+  document.getElementById("tabs").hidden=!!Z;
+  document.getElementById("tabs").innerHTML=`<div class="in">${VIEWS.map(([id,ad,p])=>`<a href="#${id}" class="${view===id?"on":""}" onclick="event.preventDefault();A.go('${id}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${p}" stroke-linecap="round" stroke-linejoin="round"/></svg>${ad}${id==="defter"&&due?`<span class="badge">${due}</span>`:""}</a>`).join("")}</div>`;
+}
+function render(){
+  tabs();
+  const app=document.getElementById("app");
+  if(Z){app.innerHTML=Z.done?resultView():quizView();bindQuiz();return}
+  app.innerHTML=`<div class="wrap">${({panel,dersler,deneme,defter,analiz,araclar})[view]()}</div>`;
+  if(view==="araclar")pomoPaint();
+}
+
+function header(t,sub){return`<div class="topbar"><div class="brand"><span class="eyebrow">${sub}</span><h1>${t}</h1></div></div><div class="ticks" style="margin-top:10px"></div>`}
+
+/* ---- Panel ---- */
+function panel(){
+  const now=Date.now();const dT=Math.max(0,Math.ceil((TYT_DATE-now)/DAY));
+  const today=S.days[todayKey()]||0;const g=S.goal;const pct=Math.min(1,today/g);
+  let tot=0,cor=0;Object.values(S.stats).forEach(s=>{tot+=s.t;cor+=s.c});
+  const due=dueList().length;
+  const weak=weakTopics(3);
+  if(!daily)daily=genQ(pick(GEN.filter(x=>ALAN[S.alan==="TUM"?"TUM":S.alan].includes(x.d))));
+  const C=2*Math.PI*36;
+  return`
+  <div class="topbar"><div class="brand"><span class="eyebrow">YKS 2027 · mezun ve 12. sınıf</span><b>Net<i>pusula</i></b></div>
+  <select id="alanSel" aria-label="Puan türü" style="width:auto" onchange="A.setAlan(this.value)">${["SAY","EA","SOZ","TUM"].map(a=>`<option value="${a}" ${S.alan===a?"selected":""}>${{SAY:"Sayısal",EA:"Eşit Ağırlık",SOZ:"Sözel",TUM:"Tüm dersler"}[a]}</option>`).join("")}</select></div>
+  <div class="ticks" style="margin-top:10px"></div>
+  <div class="sheet hero" style="margin-top:14px">
+    <div class="count">${dT}<small>GÜN · TYT</small></div>
+    <div class="stack" style="gap:8px">
+      <div><b>19 Haziran 2027</b> TYT, <b>20 Haziran 2027</b> AYT ve YDT</div>
+      <div class="note">Başvurular 4 Şubat – 2 Mart 2027, sonuçlar 21 Temmuz 2027 (ÖSYM takvimi).</div>
+    </div>
+  </div>
+  <div class="sheet row" style="margin-top:12px;gap:16px;flex-wrap:nowrap">
+    <svg class="ring" viewBox="0 0 84 84" role="img" aria-label="Günlük hedef ilerlemesi"><circle cx="42" cy="42" r="36" stroke="var(--line)"/><circle cx="42" cy="42" r="36" stroke="var(--form)" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 42 42)" stroke-linecap="round"/><text x="42" y="47" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="16" fill="var(--ink)">${today}</text></svg>
+    <div style="flex:1;min-width:0" class="stack">
+      <div><b>Bugün ${today} / ${g} soru</b> <span class="muted">· günlük hedef</span></div>
+      <div class="kv"><div><b>${streak()}</b><span>gün seri</span></div><div><b>${tot}</b><span>toplam soru</span></div><div><b>${tot?Math.round(cor/tot*100):0}%</b><span>doğruluk</span></div></div>
+    </div>
+  </div>
+  <div class="tiles" style="margin-top:12px">
+    <button class="tile" onclick="A.smart()"><span class="tag">KİŞİSEL</span><h3>Akıllı Test</h3><span>Zayıf konulardan 20 soru</span></button>
+    <button class="tile" onclick="A.review()" ${due?"":""}><span class="tag">${due} SORU HAZIR</span><h3>Tekrar Zamanı</h3><span>Aralıklı tekrar kutuları</span></button>
+    <button class="tile" onclick="A.deneme('tyt')"><span class="tag">55 DK</span><h3>TYT Mini Deneme</h3><span>40 soru, net ve puan tahmini</span></button>
+    <button class="tile" onclick="A.deneme('hiz')"><span class="tag">20 DK</span><h3>Hız Testi</h3><span>Dakikada bir soru temposu</span></button>
+  </div>
+  <div class="sec"><div class="sec-h"><h2>Günün sorusu</h2><span class="pill f">${DERS[daily.d].ad} · ${daily.k}</span></div>
+   <div class="sheet" id="dailyBox">${dailyBody()}</div></div>
+  <div class="sec"><div class="sec-h"><h2>Odaklanman gereken konular</h2><a href="#analiz" onclick="event.preventDefault();A.go('analiz')" class="muted">Tümü</a></div>
+   ${weak.length?`<div class="sheet">${weak.map(w=>`<div class="list-row"><div><b>${w.k}</b><div class="note">${DERS[w.d].ad} · ${w.t} soru · %${Math.round(w.c/w.t*100)} doğru</div></div><button class="btn sm" onclick="A.konuTest('${w.d}','${w.k.replace(/'/g,"\\'")}')">10 soru çöz</button></div>`).join("")}</div>`
+   :`<div class="empty">Birkaç konu testi çözdükten sonra en düşük başarı oranına sahip konular burada sıralanır.</div>`}
+  </div>
+  <div class="sec"><h2>Son 12 hafta</h2><div class="sheet">${heatmap()}</div></div>`;
+}
+function dailyBody(){
+  const q=daily;const done=q.your!==undefined;
+  return`<div class="q-text">${q.q}</div><div class="opts">${q.o.map((o,i)=>{let cls="opt";if(done){if(i===q.a)cls+=" right";else if(i===q.your)cls+=" wrong"}return`<button class="${cls}" ${done?"disabled":""} onclick="A.dailyAns(${i})"><span class="bub">${LET[i]}</span><span class="otx">${o}</span></button>`}).join("")}</div>
+  ${done?`<div class="stack" style="margin-top:12px"><div class="verdict ${q.your===q.a?"ok":"bad"}">${q.your===q.a?"Doğru":"Yanlış · deftere eklendi"}</div><div class="sol">${q.c}</div><button class="btn" onclick="A.dailyNew()">Yeni soru üret</button></div>`:""}`;
+}
+function weakTopics(n){
+  return Object.entries(S.stats).filter(([k,s])=>s.t>=3).map(([k,s])=>{const [d,kk]=k.split("|");return{d,k:kk,t:s.t,c:s.c,sc:(s.c+1)/(s.t+2)}}).filter(x=>DERS[x.d]).sort((a,b)=>a.sc-b.sc).slice(0,n);
+}
+function heatmap(){
+  const end=new Date();const start=new Date(end);start.setDate(start.getDate()-83-((end.getDay()+6)%7));
+  let cells="";const d=new Date(start);
+  while(d<=end){const v=S.days[todayKey(d)]||0;const l=v===0?"":v<10?"l1":v<30?"l2":v<60?"l3":"l4";cells+=`<i class="${l}" title="${d.toLocaleDateString("tr-TR")}: ${v} soru"></i>`;d.setDate(d.getDate()+1)}
+  return`<div class="heat" aria-label="Günlük çözülen soru yoğunluğu">${cells}</div><div class="row note" style="margin-top:8px;gap:6px">Az <span class="heat" style="display:inline-flex;grid-auto-flow:column;grid-template-rows:1fr"><i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i></span> Çok</div>`;
+}
+
+/* ---- Soru bankası ---- */
+function soru(){
+  const dl=ALAN.TUM;const ks=konular([soruF.d],soruF.s);
+  const {st,gn}=sources({d:[soruF.d],s:soruF.s||null,k:soruF.k||null});
+  return `<div class="sec"><h2>Serbest test oluştur</h2></div>
+  <div class="stack" style="margin-top:4px">
+   <div class="sheet stack">
+    <div><div class="eyebrow" style="margin-bottom:8px">Ders</div><div class="chips">${dl.map(d=>`<button class="chip ${soruF.d===d?"on":""}" onclick="A.sf('d','${d}')">${DERS[d].ad}</button>`).join("")}</div></div>
+    <div class="grid2">
+     <label class="fld">Sınav<select id="sfS" onchange="A.sf('s',this.value)"><option value="">TYT + AYT</option><option value="TYT" ${soruF.s==="TYT"?"selected":""}>TYT</option><option value="AYT" ${soruF.s==="AYT"?"selected":""}>AYT</option></select></label>
+     <label class="fld">Konu<select id="sfK" onchange="A.sf('k',this.value)"><option value="">Tüm konular</option>${ks.map(k=>`<option ${soruF.k===k?"selected":""}>${k}</option>`).join("")}</select></label>
+    </div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Soru sayısı</div><div class="chips">${[10,20,40].map(n=>`<button class="chip ${soruF.n===n?"on":""}" onclick="A.sf('n',${n})">${n}</button>`).join("")}</div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Çözüm modu</div><div class="chips">
+      <button class="chip ${soruF.mode==="learn"?"on":""}" onclick="A.sf('mode','learn')">Öğrenme · anında çözüm</button>
+      <button class="chip ${soruF.mode==="test"?"on":""}" onclick="A.sf('mode','test')">Test · süreli, sonda çözüm</button></div></div>
+    <div class="note">${st.length} özgün soru${gn.length?` + ${gn.length} soru üreticisi (her seferinde yeni sayılarla sınırsız soru)`:""}</div>
+    <button class="btn pri" ${st.length+gn.length?"":"disabled"} onclick="A.startSoru()">Teste başla</button>
+   </div>
+   <div class="sec"><h2>Konu haritası</h2><div class="sheet">${ks.map(k=>{const s=S.stats[soruF.d+"|"+k];const p=s?Math.round(s.c/s.t*100):null;return`<div class="list-row"><div style="flex:1"><b>${k}</b><div class="bar ${p===null?"":p>=70?"ok":p<45?"bad":""}" style="margin-top:6px"><i style="width:${p||0}%"></i></div></div><span class="mono note" style="min-width:68px;text-align:right">${p===null?"çözülmedi":"%"+p+" · "+s.t}</span></div>`}).join("")||`<div class="empty">Bu filtreyle konu yok.</div>`}</div></div>
+  </div>`;
+}
+
+/* ---- Deneme ---- */
+function deneme(){
+  const hist=S.denemeler.slice(-6).reverse();
+  return header("Deneme Sınavları","ÖSYM süresine orantılı, optik formlu")+`
+  <div class="tiles" style="margin-top:14px">${Object.entries(DENEME).map(([id,d])=>`<button class="tile" onclick="A.deneme('${id}')"><span class="tag">${d.alt.toUpperCase()}</span><h3>${d.ad}</h3><span>${[...new Set(d.parts.map(p=>p.g))].join(" · ")}</span></button>`).join("")}</div>
+  <div class="sheet note" style="margin-top:12px">Gerçek sınavda TYT 120 soru / 165 dk, AYT 160 soru / 180 dk sürer. Mini denemeler aynı soru başı süreyle hazırlanır; 4 yanlış 1 doğruyu götürür. Sınav sırasında şık eleme, soru işaretleme ve optik form görünümü kullanılabilir.</div>
+  <div class="sec"><h2>Son denemeler</h2>${hist.length?`<div class="sheet tbl-wrap"><table><thead><tr><th>Tarih</th><th>Deneme</th><th class="n">Net</th><th class="n">Puan*</th></tr></thead><tbody>${hist.map(h=>`<tr><td>${new Date(h.t).toLocaleDateString("tr-TR",{day:"numeric",month:"short"})}</td><td>${DENEME[h.type]?DENEME[h.type].ad:h.type}</td><td class="n">${tr(+h.net.toFixed(2))} / ${h.n}</td><td class="n">${h.puan?tr(Math.round(h.puan)):"—"}</td></tr>`).join("")}</tbody></table><div class="note" style="margin-top:8px">* Yalnızca TYT mini denemesi için 120 soruya ölçeklenmiş tahmini ham puan.</div></div>`:`<div class="empty">İlk denemeni çözdüğünde netlerin ve tahmini puanın burada listelenir.</div>`}</div>`;
+}
+
+/* ---- Defter ---- */
+function defter(){
+  const all=Object.values(S.defter);const due=dueList();const mastered=all.filter(e=>e.box>5).length;
+  const boxes=[1,2,3,4,5].map(b=>all.filter(e=>e.box===b).length);
+  const byD={};all.filter(e=>e.box<=5).forEach(e=>{(byD[e.q.d]=byD[e.q.d]||[]).push(e)});
+  return header("Yanlış Defteri","Aralıklı tekrar · 5 kutu")+`
+  <div class="sheet stack" style="margin-top:14px">
+   <div class="row" style="justify-content:space-between"><div><b>${due.length}</b> soru bugün tekrar bekliyor</div><button class="btn pri" ${due.length?"":"disabled"} onclick="A.review()">Tekrara başla</button></div>
+   <div class="grid3" style="grid-template-columns:repeat(5,minmax(0,1fr));gap:6px">${boxes.map((n,i)=>`<div style="text-align:center;border:1.5px solid var(--form);border-radius:8px;padding:8px 2px"><div class="mono" style="font-weight:700;font-size:1.2rem">${n}</div><div class="note" style="font-size:.7rem">${i+1}. kutu<br>${BOX_DAYS[i+1]} gün</div></div>`).join("")}</div>
+   <div class="note">Yanlış ya da boş bıraktığın her soru 1. kutuya düşer. Tekrarda doğru bilince bir sonraki kutuya geçer ve daha seyrek karşına çıkar; yine yanlış yaparsan başa döner. 5. kutuyu geçen soru öğrenildi sayılır (şu ana kadar ${mastered}).</div>
+  </div>
+  <div class="sec"><h2>Defterdeki sorular</h2>${Object.keys(byD).length?Object.entries(byD).map(([d,list])=>`<div class="sheet"><h3>${DERS[d].ad} <span class="muted">(${list.length})</span></h3>${list.sort((a,b)=>a.due-b.due).map(e=>`<details class="rev"><summary><span class="box-badge">K${e.box}</span><span style="flex:1;min-width:0"><b>${e.q.k}</b><span class="note"> · ${e.due<=Date.now()?"bugün":new Date(e.due).toLocaleDateString("tr-TR",{day:"numeric",month:"short"})} · ${e.wrong}× yanlış</span></span></summary><div class="q-text">${e.q.q}</div><div class="sol"><b>Doğru cevap: ${e.q.o[e.q.a]}</b><br>${e.q.c}</div><button class="btn sm ghost" style="margin-top:8px" onclick="A.delDefter('${e.q.id}')">Defterden çıkar</button></details>`).join("")}</div>`).join(""):`<div class="empty">Henüz yanlışın yok. Soru çözdükçe yanlış ve boş bıraktıkların buraya, çözümleriyle birlikte otomatik eklenir.</div>`}</div>`;
+}
+
+/* ---- Analiz ---- */
+function analiz(){
+  const per={};Object.entries(S.stats).forEach(([k,s])=>{const d=k.split("|")[0];if(!DERS[d])return;const p=per[d]||(per[d]={t:0,c:0,ms:0});p.t+=s.t;p.c+=s.c;p.ms+=s.ms});
+  const topics=Object.entries(S.stats).filter(([k,s])=>DERS[k.split("|")[0]]).map(([k,s])=>{const [d,kk]=k.split("|");return{d,k:kk,...s}}).sort((a,b)=>(a.c/a.t)-(b.c/b.t));
+  return header("Analiz","Ders, konu ve deneme gelişimi")+`
+  <div class="sec"><h2>Deneme net grafiği</h2><div class="sheet">${netChart()}</div></div>
+  <div class="sec"><h2>Ders bazında başarı</h2>${Object.keys(per).length?`<div class="sheet tbl-wrap"><table><thead><tr><th>Ders</th><th class="n">Soru</th><th class="n">Doğru %</th><th class="n">Ort. süre</th></tr></thead><tbody>${Object.entries(per).sort((a,b)=>b[1].t-a[1].t).map(([d,p])=>`<tr><td>${DERS[d].ad}<div class="bar ${p.c/p.t>=.7?"ok":p.c/p.t<.45?"bad":""}" style="margin-top:4px;max-width:160px"><i style="width:${Math.round(p.c/p.t*100)}%"></i></div></td><td class="n">${p.t}</td><td class="n">${Math.round(p.c/p.t*100)}</td><td class="n">${Math.round(p.ms/p.t/1000)} sn</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">Soru çözdükçe her ders için doğruluk ve soru başına süre burada görünür.</div>`}</div>
+  <div class="sec"><h2>Konu karnesi</h2>${topics.length?`<div class="sheet tbl-wrap"><table><thead><tr><th>Konu</th><th class="n">D/T</th><th class="n">%</th><th></th></tr></thead><tbody>${topics.map(t=>{const p=Math.round(t.c/t.t*100);return`<tr><td><b>${t.k}</b><div class="note">${DERS[t.d].ad}</div></td><td class="n">${t.c}/${t.t}</td><td class="n" style="color:${p>=70?"var(--ok)":p<45?"var(--bad)":"var(--ink)"}">${p}</td><td style="text-align:right"><button class="btn sm" onclick="A.konuTest('${t.d}','${t.k.replace(/'/g,"\\'")}')">Çöz</button></td></tr>`}).join("")}</tbody></table></div>`:`<div class="empty">Konu karnesi ilk testinden sonra oluşur.</div>`}</div>`;
+}
+function netChart(){
+  const h=S.denemeler.filter(x=>x.type==="tyt").slice(-12);
+  if(h.length<1)return`<div class="empty">TYT mini denemesi çözdükçe toplam netin (40 üzerinden) burada çizilir.</div>`;
+  const W=600,H=200,pl=34,pr=12,pt=14,pb=26;const max=40;
+  const x=i=>pl+(h.length===1?(W-pl-pr)/2:i*(W-pl-pr)/(h.length-1));const y=v=>pt+(H-pt-pb)*(1-Math.max(0,v)/max);
+  const grid=[0,10,20,30,40].map(v=>`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-6}" y="${y(v)+3}" text-anchor="end">${v}</text>`).join("");
+  const pts=h.map((d,i)=>`${x(i)},${y(d.net)}`).join(" ");
+  const area=`${x(0)},${y(0)} ${pts} ${x(h.length-1)},${y(0)}`;
+  const last=h[h.length-1];
+  return`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="TYT mini deneme net gelişimi">${grid}<polygon points="${area}" fill="var(--form)" opacity=".12"/><polyline points="${pts}" fill="none" stroke="var(--form)" stroke-width="2.5" stroke-linejoin="round"/>${h.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.net)}" r="${i===h.length-1?5:3}" fill="${i===h.length-1?"var(--form)":"var(--sheet)"}" stroke="var(--form)" stroke-width="2"/>`).join("")}${h.map((d,i)=>`<text x="${x(i)}" y="${H-8}" text-anchor="middle">${i+1}</text>`).join("")}</svg><div class="note">Son deneme: <b class="mono">${tr(+last.net.toFixed(2))}</b> net · tahmini TYT ham puanı <b class="mono">${tr(Math.round(last.puan))}</b></div>`;
+}
+
+/* ---- Araçlar ---- */
+let pomo={len:25*60,left:25*60,run:false,end:0,phase:"Odak",cycles:0,iv:null};
+function araclar(){
+  const fm=S.focus[todayKey()]||0;
+  return header("Araçlar","Puan, odak ve yedekleme")+`
+  <div class="sec"><h2>TYT puan hesaplayıcı</h2><div class="sheet stack">
+   <div class="grid2">${[["tur","Türkçe",40],["sos","Sosyal Bilimler",20],["mat","Temel Matematik",40],["fen","Fen Bilimleri",20]].map(([id,ad,mx])=>`<label class="fld">${ad} neti <span class="note">(en çok ${mx})</span><input id="pc_${id}" type="number" inputmode="decimal" min="0" max="${mx}" step="0.25" value="${{tur:28,sos:12,mat:22,fen:8}[id]}" oninput="A.calc()"></label>`).join("")}
+   <label class="fld">Diploma notu <span class="note">(50–100)</span><input id="pc_dip" type="number" inputmode="decimal" min="50" max="100" step="0.01" value="80" oninput="A.calc()"></label></div>
+   <div id="calcOut"></div>
+   <div class="note">Örnek netlerle açılır; kendi netlerini yaz. Yaklaşık katsayılar kullanılır (1 net ≈ 3,28–3,38 puan, taban 100). ÖSYM puanı her yıl tüm adayların ortalaması ve standart sapmasıyla hesapladığı için gerçek puan birkaç puan sapabilir.</div>
+  </div></div>
+  <div class="sec"><h2>Pomodoro</h2><div class="sheet stack" style="align-items:center">
+   <div class="eyebrow" id="pPhase">${pomo.phase}</div><div class="pomo" id="pTime">25:00</div>
+   <div class="row" style="justify-content:center"><button class="btn pri" id="pBtn" onclick="A.pomo()">Başlat</button><button class="btn" onclick="A.pomoReset()">Sıfırla</button>
+   <select id="pLen" style="width:auto" onchange="A.pomoLen(this.value)">${[25,40,50].map(m=>`<option value="${m}" ${pomo.len===m*60?"selected":""}>${m} dk odak</option>`).join("")}</select></div>
+   <div class="note">Bugünkü odak süresi: <b class="mono" id="pFocus">${fm}</b> dk · tamamlanan tur: <b class="mono" id="pCyc">${pomo.cycles}</b></div>
+  </div></div>
+  <div class="sec"><h2>Günlük hedef</h2><div class="sheet chips">${[40,60,100,150,200].map(n=>`<button class="chip ${S.goal===n?"on":""}" onclick="A.goal(${n})">${n} soru</button>`).join("")}</div></div>
+  <div class="sec"><h2>Yedekle ve taşı</h2><div class="sheet stack">
+   <div class="note">İlerlemen yalnızca bu tarayıcıda saklanır. Başka cihaza geçerken yedek kodunu kopyalayıp oradaki kutuya yapıştır.</div>
+   <div class="row"><button class="btn" onclick="A.exportData()">Yedek kodunu kopyala</button></div>
+   <textarea id="impBox" placeholder="Yedek kodunu buraya yapıştır" aria-label="Yedek kodu"></textarea>
+   <div class="row"><button class="btn" onclick="A.importData()">Yedeği yükle</button><button class="btn ghost" onclick="A.resetAsk()">Tüm verileri sil</button></div>
+  </div></div>`;
+}
+function pomoPaint(){
+  const t=document.getElementById("pTime");if(!t)return;
+  const left=pomo.run?Math.max(0,Math.round((pomo.end-Date.now())/1000)):pomo.left;
+  t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
+  document.getElementById("pBtn").textContent=pomo.run?"Duraklat":"Başlat";
+  document.getElementById("pPhase").textContent=pomo.phase;
+  if(document.getElementById("calcOut"))A.calc();
+}
+function pomoTick(){
+  if(!pomo.run)return;const left=Math.round((pomo.end-Date.now())/1000);
+  if(left<=0){
+    if(pomo.phase==="Odak"){const k=todayKey();S.focus[k]=(S.focus[k]||0)+Math.round(pomo.len/60);pomo.cycles++;save();pomo.phase="Mola";pomo.left=(pomo.cycles%4===0?15:5)*60}
+    else{pomo.phase="Odak";pomo.left=pomo.len}
+    pomo.end=Date.now()+pomo.left*1000;toast(pomo.phase==="Mola"?"Odak turu bitti, mola zamanı":"Mola bitti, yeni tur başladı");
+    const f=document.getElementById("pFocus");if(f){f.textContent=S.focus[todayKey()]||0;document.getElementById("pCyc").textContent=pomo.cycles}
+  }
+  if(view==="araclar"&&!Z)pomoPaint();
+}
+
+/* ============ Sınav motoru ============ */
+function startQuiz(qs,opt){
+  if(!qs.length){toast("Bu seçimle soru bulunamadı");return}
+  Z=Object.assign({qs,ans:qs.map(()=>null),elim:qs.map(()=>[]),flag:qs.map(()=>false),times:qs.map(()=>0),i:0,start:Date.now(),qStart:Date.now(),mode:"learn",limit:0,done:false,elimMode:false,showOptik:false,revealed:qs.map(()=>false)},opt);
+  render();window.scrollTo(0,0);
+  clearInterval(Z.iv);Z.iv=setInterval(quizTick,1000);
+}
+function quizTick(){
+  if(!Z||Z.done)return;const el=document.getElementById("qTimer");if(!el)return;
+  const el2=Math.floor((Date.now()-Z.start)/1000);
+  if(Z.limit){const left=Z.limit-el2;if(left<=0){finish(true);return}el.textContent=fmt(left);el.classList.toggle("warn",left<300)}
+  else el.textContent=fmt(el2);
+}
+const fmt=s=>{s=Math.max(0,s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+":":"")+String(m).padStart(2,"0")+":"+String(x).padStart(2,"0")};
+function stamp(){if(!Z)return;Z.times[Z.i]+=Date.now()-Z.qStart;Z.qStart=Date.now()}
+
+function quizView(){
+  const q=Z.qs[Z.i],n=Z.qs.length,i=Z.i,learn=Z.mode!=="test",rev=Z.revealed[i];
+  const answered=Z.ans.filter(a=>a!==null).length;
+  const el=Math.floor((Date.now()-Z.start)/1000);
+  return`<div class="wrap" style="padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))">
+  <div class="qhead">
+   <div class="row"><button class="btn sm ghost" onclick="A.quit()">✕ Çık</button><span class="eyebrow" style="text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Z.title}</span><span class="timer" id="qTimer">${fmt(Z.limit?Z.limit-el:el)}</span></div>
+   <div class="bar"><i style="width:${(learn?(i+(rev?1:0)):answered)/n*100}%"></i></div>
+   <div class="row"><span class="mono" style="font-weight:700">${i+1}<span class="muted">/${n}</span></span>
+    <div class="row" style="gap:6px">${!learn||!rev?`<button class="tool ${Z.elimMode?"on":""}" onclick="A.elimMode()" aria-pressed="${Z.elimMode}">Şık ele</button>`:""}${Z.mode==="test"?`<button class="tool ${Z.flag[i]?"on":""}" onclick="A.flag()">İşaretle</button><button class="tool ${Z.showOptik?"on":""}" onclick="A.optik()">Optik</button>`:""}</div></div>
+  </div>
+  <div class="ticks" style="opacity:.25;height:5px"></div>
+  ${Z.showOptik?`<div class="sheet" style="margin-top:10px"><div class="optik">${Z.qs.map((x,j)=>`<button class="oc ${Z.ans[j]!==null?"ans":""} ${j===i?"cur":""} ${Z.flag[j]?"flag":""}" onclick="A.jump(${j})">${j+1}${Z.ans[j]!==null?LET[Z.ans[j]]:""}</button>`).join("")}</div><div class="note" style="margin-top:8px">${answered} işaretli · ${n-answered} boş · ${Z.flag.filter(Boolean).length} işaretlenmiş soru</div></div>`:""}
+  <div class="sheet" style="margin-top:12px">
+   <div class="q-meta"><span class="pill f">${DERS[q.d].ad}</span><span class="pill">${q.k}</span><span class="pill">${q.s}</span><span class="pill">${"●".repeat(q.z)}${"○".repeat(3-q.z)}</span>${q.gen?`<span class="pill">üretilen</span>`:""}</div>
+   <div class="q-text">${q.q}</div>
+   <div class="opts">${q.o.map((o,j)=>{let c="opt";if(Z.ans[i]===j)c+=" sel";if(Z.elim[i].includes(j))c+=" elim";if(learn&&rev){if(j===q.a)c+=" right";else if(Z.ans[i]===j)c+=" wrong"}return`<button class="${c}" ${learn&&rev?"disabled":""} onclick="A.pick(${j})"><span class="bub">${LET[j]}</span><span class="otx">${o}</span></button>`}).join("")}</div>
+   ${learn&&rev?`<div class="stack" style="margin-top:14px"><div class="verdict ${Z.ans[i]===q.a?"ok":"bad"}">${Z.ans[i]===q.a?"Doğru":Z.ans[i]===null?"Boş bırakıldı":"Yanlış · doğru cevap "+LET[q.a]}</div><div class="sol">${q.c}</div></div>`:""}
+  </div>
+  <div class="qnav">
+   ${learn?`${rev?`<button class="btn pri" style="flex:1" onclick="A.next()">${i<n-1?"Sonraki soru":"Sonuçları gör"}</button>`:`<button class="btn" onclick="A.skip()">Boş geç</button><button class="btn ink" style="flex:1" ${Z.ans[i]===null?"disabled":""} onclick="A.check()">Kontrol et</button>`}`
+   :`<button class="btn" ${i===0?"disabled":""} onclick="A.jump(${i-1})">‹ Önceki</button>${i<n-1?`<button class="btn ink" style="flex:1" onclick="A.jump(${i+1})">Sonraki ›</button>`:`<button class="btn pri" style="flex:1" onclick="A.finishAsk()">Sınavı bitir</button>`}`}
+  </div>
+  ${Z.mode==="test"&&i<n-1?`<div style="margin-top:10px;text-align:center"><button class="btn sm ghost" onclick="A.finishAsk()">Sınavı bitir</button></div>`:""}
+  </div>`;
+}
+function bindQuiz(){}
+
+function finish(auto){
+  stamp();Z.done=true;clearInterval(Z.iv);
+  const groups={};
+  Z.qs.forEach((q,j)=>{
+    const g=Z.groupOf?Z.groupOf[j]:DERS[q.d].ad;const G=groups[g]||(groups[g]={D:0,Y:0,B:0});
+    const a=Z.ans[j];if(a===null)G.B++;else if(a===q.a)G.D++;else G.Y++;
+    if(Z.mode==="test")record(q,a===q.a,Z.times[j]);
+    if(Z.review)leitner(q,a===q.a);
+  });
+  let net=0;Object.values(groups).forEach(G=>{G.net=G.D-G.Y/4;net+=G.net});
+  Z.res={groups,net,auto,dur:Math.round((Date.now()-Z.start)/1000)};
+  if(Z.kind&&DENEME[Z.kind]){
+    let puan=null;
+    if(Z.kind==="tyt"){puan=100;Object.entries(groups).forEach(([g,G])=>{puan+=Math.max(0,G.net)*(DENEME.tyt.olcek[g]||1)*(TYT_K[g]||3.3)});puan=Math.min(500,puan)}
+    Z.res.puan=puan;
+    S.denemeler.push({t:Date.now(),type:Z.kind,net,n:Z.qs.length,puan,groups:Object.fromEntries(Object.entries(groups).map(([g,G])=>[g,+G.net.toFixed(2)]))});
+  }
+  save();render();window.scrollTo(0,0);
+}
+function leitner(q,ok){
+  const e=S.defter[q.id];if(!e)return;
+  if(ok){e.box++;e.due=Date.now()+(BOX_DAYS[Math.min(e.box,5)]||30)*DAY}else{e.box=1;e.due=Date.now()+DAY}
+}
+function resultView(){
+  const r=Z.res,n=Z.qs.length;let D=0,Y=0,B=0;Object.values(r.groups).forEach(G=>{D+=G.D;Y+=G.Y;B+=G.B});
+  return`<div class="wrap">
+  <div class="topbar"><div class="brand"><span class="eyebrow">${r.auto?"Süre doldu · ":""}Sonuç</span><h1>${Z.title}</h1></div></div>
+  <div class="ticks" style="margin-top:10px"></div>
+  <div class="sheet row" style="margin-top:14px;justify-content:space-between;align-items:flex-end">
+   <div><div class="big-net mono" style="font-family:var(--f-display)">${tr(+r.net.toFixed(2))}</div><div class="note">net · ${n} soru · ${fmt(r.dur)}</div></div>
+   <div class="kv" style="min-width:200px"><div><b style="color:var(--ok)">${D}</b><span>doğru</span></div><div><b style="color:var(--bad)">${Y}</b><span>yanlış</span></div><div><b>${B}</b><span>boş</span></div></div>
+  </div>
+  ${r.puan?`<div class="sheet" style="margin-top:10px;border-color:var(--form)"><span class="eyebrow">Tahmini TYT ham puanı</span><div class="row" style="align-items:baseline"><span class="mono" style="font-size:2rem;font-weight:700">${tr(Math.round(r.puan))}</span><span class="note">netler 120 soruya ölçeklendi; yaklaşık değerdir</span></div></div>`:""}
+  <div class="sheet tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Test</th><th class="n">D</th><th class="n">Y</th><th class="n">B</th><th class="n">Net</th></tr></thead><tbody>${Object.entries(r.groups).map(([g,G])=>`<tr><td>${g}</td><td class="n">${G.D}</td><td class="n">${G.Y}</td><td class="n">${G.B}</td><td class="n"><b>${tr(+G.net.toFixed(2))}</b></td></tr>`).join("")}</tbody></table><div class="note" style="margin-top:6px">Net = Doğru − Yanlış ÷ 4. Ortalama ${Math.round(r.dur/n)} sn/soru${Z.kind&&DENEME[Z.kind]?` (hedef ${Math.round(DENEME[Z.kind].sure/n)} sn)`:""}.</div></div>
+  <div class="sheet" style="margin-top:10px"><div class="optik">${Z.qs.map((q,j)=>{const a=Z.ans[j];return`<a href="#r${j}" class="oc ${a===null?"r-blank":a===q.a?"r-ok":"r-bad"}" style="text-align:center;text-decoration:none" onclick="event.preventDefault();document.getElementById('r${j}').open=true;document.getElementById('r${j}').scrollIntoView({behavior:'smooth',block:'center'})">${j+1}</a>`}).join("")}</div></div>
+  <div class="row" style="margin-top:12px">${Y+B?`<button class="btn pri" onclick="A.retryWrong()">Yanlış ve boşları tekrar çöz (${Y+B})</button>`:""}<button class="btn" onclick="A.go('${Z.back||"panel"}')">Bitti</button></div>
+  <div class="sec"><h2>Soru soru çözümler</h2><div class="sheet">${Z.qs.map((q,j)=>{const a=Z.ans[j];const st=a===null?"blank":a===q.a?"ok":"bad";return`<details class="rev" id="r${j}" ${st!=="ok"&&j<3?"":""}><summary><span class="dot ${st}"></span><span class="mono" style="font-weight:700">${j+1}.</span><span style="flex:1;min-width:0"><b>${DERS[q.d].ad}</b><span class="note"> · ${q.k} · ${Math.round(Z.times[j]/1000)} sn</span></span><span class="mono note">${a===null?"–":LET[a]} / ${LET[q.a]}</span></summary><div class="q-text">${q.q}</div><div class="opts">${q.o.map((o,k)=>`<div class="opt ${k===q.a?"right":k===a?"wrong":""}"><span class="bub">${LET[k]}</span><span class="otx">${o}</span></div>`).join("")}</div><div class="sol" style="margin-top:10px">${q.c}</div></details>`}).join("")}</div></div>
+  </div>`;
+}
+
+/* ============ Modal ve bildirim ============ */
+function modal(html,wide){document.getElementById("layer").innerHTML=`<div class="scrim" onclick="if(event.target===this)A.close()"><div class="modal${wide?" wide":""}" role="dialog" aria-modal="true">${html}</div></div>`}
+function toast(m){const l=document.createElement("div");l.className="toast";l.textContent=m;document.body.appendChild(l);setTimeout(()=>l.remove(),2200)}
+
+/* ============ Eylemler ============ */
+const A={
+  go,
+  ders(id){dersSel=id;render();window.scrollTo(0,0)},
+  video(id,i){videoModal(MUF.find(x=>x.id===id),i)},
+  konuDone(id,i){const m=MUF.find(x=>x.id===id),k=kKey(m,m.k[i]);const st=S.konu[k]||(S.konu[k]={});st.d=!st.d;save();render()},
+  watched(id,i){const m=MUF.find(x=>x.id===id),k=kKey(m,m.k[i]);const st=S.konu[k]||(S.konu[k]={});st.w=!st.w;save();render();videoModal(m,i)},
+  konuQ(id,i){const m=MUF.find(x=>x.id===id),k=m.k[i];startQuiz(draw({d:[m.d],k:k[2]},10),{title:`${m.ad} · ${k[0]}`,mode:"learn",back:"dersler"})},
+  dersTest(id){const m=MUF.find(x=>x.id===id);startQuiz(draw({d:[m.d],s:BANK.concat(GEN).some(x=>x.d===m.d&&x.s===m.sinav)?m.sinav:null},20),{title:`${m.sinav} ${m.ad}`,mode:"learn",back:"dersler"})},
+  close(){document.getElementById("layer").innerHTML=""},
+  setAlan(v){S.alan=v;daily=null;save();render()},
+  dailyAns(i){daily.your=i;const ok=i===daily.a;record(daily,ok,0);save();render()},
+  dailyNew(){daily=null;render()},
+  sf(k,v){soruF[k]=v;if(k==="d"){soruF.k="";if(!konular([v],soruF.s).length)soruF.s=""}if(k==="s")soruF.k="";render()},
+  startSoru(){const f={d:[soruF.d],s:soruF.s||null,k:soruF.k||null};const qs=draw(f,soruF.n);
+    startQuiz(qs,{title:`${DERS[soruF.d].ad}${soruF.k?" · "+soruF.k:""}`,mode:soruF.mode,limit:soruF.mode==="test"?Math.round(qs.length*82):0,back:"dersler"})},
+  konuTest(d,k){startQuiz(draw({d:[d],k},10),{title:`${DERS[d].ad} · ${k}`,mode:"learn",back:view})},
+  smart(){
+    const ders=ALAN[S.alan]||ALAN.TUM;
+    const tops=[];BANK.concat(GEN).forEach(x=>{if(ders.includes(x.d)&&!tops.some(t=>t.d===x.d&&t.k===x.k))tops.push({d:x.d,k:x.k})});
+    const w=tops.map(t=>{const s=S.stats[t.d+"|"+t.k];return{...t,w:s?(1-(s.c+1)/(s.t+2))+0.05:0.55}});
+    const used=new Set();const qs=[];
+    for(let tries=0;qs.length<20&&tries<100;tries++){let tot=w.reduce((a,b)=>a+b.w,0),r=Math.random()*tot,ch=w[0];for(const t of w){r-=t.w;if(r<=0){ch=t;break}}
+      const got=draw({d:[ch.d],k:ch.k},1,used);if(got.length)qs.push(got[0]);ch.w*=0.6}
+    startQuiz(qs,{title:"Akıllı Test",mode:"learn",back:"panel"})},
+  review(){const d=shuf(dueList()).slice(0,30);if(!d.length){toast("Bugün tekrar bekleyen soru yok");return}
+    startQuiz(d.map(e=>{const q=prep(Object.assign({},e.q,{gen:false}));q.gen=e.q.gen;return q}),{title:"Aralıklı Tekrar",mode:"learn",review:true,back:"defter"})},
+  deneme(id){const D=DENEME[id];const used=new Set();const qs=[],groupOf=[];
+    D.parts.forEach(p=>{draw({d:p.d,s:p.s||null},p.n,used).forEach(q=>{qs.push(q);groupOf.push(p.g)})});
+    startQuiz(qs,{title:D.ad,mode:"test",limit:D.sure,kind:id,groupOf,back:"deneme"})},
+  pick(j){const i=Z.i;
+    if(Z.elimMode){const e=Z.elim[i];const k=e.indexOf(j);if(k>=0)e.splice(k,1);else{e.push(j);if(Z.ans[i]===j)Z.ans[i]=null}render();return}
+    if(Z.elim[i].includes(j))Z.elim[i]=Z.elim[i].filter(x=>x!==j);
+    Z.ans[i]=Z.ans[i]===j&&Z.mode==="test"?null:j;render()},
+  check(){const i=Z.i;stamp();Z.revealed[i]=true;const q=Z.qs[i];const ok=Z.ans[i]===q.a;
+    if(Z.review)leitner(q,ok);record(q,ok,Z.times[i]);save();render()},
+  skip(){const i=Z.i;stamp();Z.ans[i]=null;Z.revealed[i]=true;const q=Z.qs[i];if(Z.review)leitner(q,false);record(q,false,Z.times[i]);save();render()},
+  next(){if(Z.i<Z.qs.length-1){Z.i++;Z.qStart=Date.now();Z.elimMode=false;render();window.scrollTo(0,0)}else learnDone()},
+  jump(j){stamp();Z.i=j;Z.elimMode=false;render();window.scrollTo(0,0)},
+  flag(){Z.flag[Z.i]=!Z.flag[Z.i];render()},
+  optik(){Z.showOptik=!Z.showOptik;render()},
+  elimMode(){Z.elimMode=!Z.elimMode;render()},
+  finishAsk(){const b=Z.ans.filter(a=>a===null).length,f=Z.flag.filter(Boolean).length;
+    modal(`<h2>Sınavı bitir</h2><p>${b?`<b>${b}</b> soru boş.`:"Tüm sorular işaretli."}${f?` ${f} soruyu sonra bakmak için işaretledin.`:""} Bitirdikten sonra cevaplar değiştirilemez.</p><div class="row"><button class="btn pri" onclick="A.close();A.finishNow()">Bitir ve sonucu gör</button><button class="btn" onclick="A.close()">Devam et</button></div>`)},
+  finishNow(){finish(false)},
+  quit(){modal(`<h2>Çıkmak istiyor musun?</h2><p class="muted">${Z.mode==="test"?"Bu sınavın cevapları kaydedilmez.":"Kontrol ettiğin sorular kaydedildi; kalanlar kaydedilmez."}</p><div class="row"><button class="btn pri" onclick="A.close();A.quitNow()">Çık</button><button class="btn" onclick="A.close()">Devam et</button></div>`)},
+  quitNow(){clearInterval(Z.iv);const b=Z.back||"panel";Z=null;go(b)},
+  retryWrong(){const qs=Z.qs.filter((q,j)=>Z.ans[j]!==q.a).map(q=>prep(Object.assign({},q,{gen:false})));startQuiz(qs,{title:"Yanlışları Tekrar",mode:"learn",back:Z.back})},
+  delDefter(id){delete S.defter[id];save();render()},
+  goal(n){S.goal=n;save();render()},
+  calc(){const g=id=>{const v=parseFloat((document.getElementById("pc_"+id)||{}).value);return isFinite(v)?v:0};
+    const tur=Math.min(40,g("tur")),sos=Math.min(20,g("sos")),mat=Math.min(40,g("mat")),fen=Math.min(20,g("fen"));const dip=Math.min(100,Math.max(50,g("dip")||50));
+    const ham=Math.min(500,100+tur*TYT_K["Türkçe"]+sos*TYT_K["Sosyal"]+mat*TYT_K["Matematik"]+fen*TYT_K["Fen"]);const obp=dip*5;const yer=ham+obp*0.12;
+    const o=document.getElementById("calcOut");if(o)o.innerHTML=`<div class="grid3"><div class="sheet" style="padding:12px"><span class="eyebrow">Toplam net</span><div class="mono" style="font-size:1.5rem;font-weight:700">${tr(+(tur+sos+mat+fen).toFixed(2))}</div></div><div class="sheet" style="padding:12px"><span class="eyebrow">TYT ham</span><div class="mono" style="font-size:1.5rem;font-weight:700">${tr(+ham.toFixed(1))}</div></div><div class="sheet" style="padding:12px;border-color:var(--form)"><span class="eyebrow">Yerleştirme</span><div class="mono" style="font-size:1.5rem;font-weight:700">${tr(+yer.toFixed(1))}</div><div class="note">OBP ${tr(obp)} × 0,12 eklendi</div></div></div>`},
+  pomo(){if(pomo.run){pomo.left=Math.max(0,Math.round((pomo.end-Date.now())/1000));pomo.run=false}else{pomo.end=Date.now()+pomo.left*1000;pomo.run=true}pomoPaint()},
+  pomoReset(){pomo.run=false;pomo.phase="Odak";pomo.left=pomo.len;pomoPaint()},
+  pomoLen(m){pomo.len=m*60;if(!pomo.run&&pomo.phase==="Odak")pomo.left=pomo.len;pomoPaint()},
+  exportData(){const s=JSON.stringify(S);const done=()=>toast("Yedek kodu kopyalandı");
+    const fallback=()=>{const b=document.getElementById("impBox");b.value=s;b.select();toast("Kod kutuya yazıldı, seçip kopyala")};
+    try{navigator.clipboard.writeText(s).then(done,fallback)}catch(e){fallback()}},
+  importData(){try{const v=JSON.parse(document.getElementById("impBox").value);if(!v||typeof v!=="object"||!v.stats)throw 0;S=Object.assign(fresh(),v);save();toast("Yedek yüklendi");render()}catch(e){toast("Kod okunamadı. Yedek kodunun tamamını yapıştırdığından emin ol.")}},
+  resetAsk(){modal(`<h2>Tüm veriler silinsin mi?</h2><p class="muted">İstatistikler, yanlış defteri ve deneme geçmişi kalıcı olarak silinir. Önce yedek almanı öneririz.</p><div class="row"><button class="btn pri" onclick="A.close();A.resetNow()">Sil</button><button class="btn" onclick="A.close()">Vazgeç</button></div>`)},
+  resetNow(){S=fresh();save();toast("Veriler silindi");render()}
+};
+window.A=A;
+function learnDone(){stamp();Z.done=true;clearInterval(Z.iv);
+  const groups={};Z.qs.forEach((q,j)=>{const g=DERS[q.d].ad;const G=groups[g]||(groups[g]={D:0,Y:0,B:0});const a=Z.ans[j];if(a===null)G.B++;else if(a===q.a)G.D++;else G.Y++});
+  let net=0;Object.values(groups).forEach(G=>{G.net=G.D-G.Y/4;net+=G.net});
+  Z.res={groups,net,dur:Math.round((Date.now()-Z.start)/1000)};render();window.scrollTo(0,0)}
+
+setInterval(pomoTick,1000);
+render();
+</script>
+
+</body></html>
