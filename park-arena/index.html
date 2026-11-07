@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Park Arena"><meta name="theme-color" content="#0a0e13">
 <title>Park Arena</title>
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="ikon-192.png"><meta name="theme-color" content="#14161a"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Park Arena">
+
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Bungee&family=Black+Ops+One&family=Audiowide&family=Righteous&family=Teko:wght@600&family=Permanent+Marker&family=Pacifico&family=Lobster&family=Kaushan+Script&family=Monoton&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2163,7 +2163,7 @@ async function accProfile(f){try{toast((f.name||f.user)+' garajı yükleniyor…
 /* ================= v2.1: görev araçları (polis, taksi, ambulans) ================= */
 var EMER={cekk:{tow:1,bar:['#ffa000','#ffb51a'],siren:'none'},cekb:{tow:1,bar:['#ffa000','#ffb51a'],siren:'none'},mpol:{bar:['#1f5fff','#ff2030'],siren:'wail'},itfaiye:{bar:['#ff2030','#ff2030'],siren:'hilo',ladder:true},polis:{bar:['#1f5fff','#ff2030'],siren:'wail'},ambulans:{bar:['#ff2030','#ffffff'],siren:'hilo'},taksi:{sign:true}};
 var EMER_DESIGN={
-  cekk:{liv:2,c1:3,c2:3,layers:[{t:'text',loc:'L',txt:'KURTARMA',col:3,size:1.15,font:5,dy:.2},{t:'text',loc:'R',txt:'KURTARMA',col:3,size:1.15,font:5,dy:.2},{t:'text',loc:'hood',txt:'ÇEKİCİ 7/24',col:3,size:.9,font:5}]},
+  cekk:{liv:0,c1:3,c2:3,layers:[{t:'text',loc:'L',txt:'KURTARMA',col:3,size:1.15,font:5,dy:.2},{t:'text',loc:'R',txt:'KURTARMA',col:3,size:1.15,font:5,dy:.2},{t:'text',loc:'hood',txt:'ÇEKİCİ 7/24',col:3,size:.9,font:5}]},
   msim:{liv:0,layers:[{t:'text',loc:'L',txt:'93',col:2,size:.7,font:5,ol:3,olc:3},{t:'text',loc:'R',txt:'93',col:2,size:.7,font:5,ol:3,olc:3}]},
   sahin:{liv:0,layers:[{t:'text',loc:'hood',txt:'7',col:2,size:.8,font:1},{t:'text',loc:'L',txt:'PARK ARENA',col:2,size:.6,font:1},{t:'text',loc:'R',txt:'PARK ARENA',col:2,size:.6,font:1}]},
   kuzey:{liv:0,layers:[{t:'text',loc:'hood',txt:'11',col:0,size:.8,font:1},{t:'text',loc:'L',txt:'KUZEY',col:0,size:.6,font:1},{t:'text',loc:'R',txt:'KUZEY',col:0,size:.6,font:1}]},
@@ -2564,9 +2564,9 @@ function towExtras(spec,root,body,S,c){const hl=S.hl,yel=solidMat(0xf2b705,.25,.
   const B=beaconBar(body,Math.min(1.25,c.W*.6),top+.005,zz-.05);
   const by=S.yT(-.6*hl),bz0=-.08*hl;
   // vinç kolu (A çerçeve)
-  for(const sx of[-1,1])beam(body,V3(sx*.42,by,bz0),V3(sx*.08,by+1.0,-.98*hl),.09,.12,yel);
+  for(const sx of[-1,1])beam(body,V3(sx*.42,by,bz0),V3(sx*.08,by+1.25,-.98*hl),.09,.12,yel);
   beam(body,V3(-.42,by+.05,bz0),V3(.42,by+.05,bz0),.08,.08,yel);
-  const tip=V3(0,by+1.02,-1.02*hl);beam(body,V3(-.12,tip.y,tip.z+.05),V3(.12,tip.y,tip.z+.05),.1,.1,yel);
+  const tip=V3(0,by+1.27,-1.02*hl);beam(body,V3(-.12,tip.y,tip.z+.05),V3(.12,tip.y,tip.z+.05),.1,.1,yel);
   const dr=new T.Mesh(new T.CylinderGeometry(.13,.13,.5,18),blk);dr.rotation.z=PI/2;dr.position.set(0,by+.16,bz0-.25);body.add(dr);
   rod(body,tip,V3(0,.62,-hl-.62),.012,blk);rod(body,V3(0,by+.2,bz0-.25),tip,.01,blk);
   // teker kaldırıcı
@@ -2969,7 +2969,7 @@ function updateCam(dt,snap){
     const spd=clamp(Math.abs(P.vf)/38,0,1),gy=P.gy||0;
     if(snap||cam.hy==null)cam.hy=P.yaw;
     let dyw=P.yaw-cam.hy;dyw=Math.atan2(Math.sin(dyw),Math.cos(dyw));cam.hy+=dyw*Math.min(1,dt*(3.5+spd*5));
-    const ang=cam.hy+PI+cam.orbit, dist=(5.4+d.L*.35)*cam.zoom*(1+.1*spd)*FAR, h=((1.9+d.W*.25)*cam.zoom+(d.type==='suv'?.35:0))*(1-.1*spd)*(FAR>1?1.3:1)+gy;
+    const ang=cam.hy+PI+cam.orbit, dist=((d.moto?3.6:5.4)+d.L*.35)*cam.zoom*(1+.1*spd)*FAR, h=((1.9+d.W*.25)*cam.zoom+(d.type==='suv'?.35:0))*(1-.1*spd)*(FAR>1?1.3:1)+gy;
     tv.set(P.x+Math.sin(ang)*dist,h,P.z+Math.cos(ang)*dist);
     tl.set(P.x+s*2.2,.95+gy,P.z+c*2.2); tu.set(0,1,0);
     const kk=snap?1:1-Math.exp(-dt*20);cam.pos.lerp(tv,kk); cam.look.lerp(tl,kk);
@@ -2977,7 +2977,7 @@ function updateCam(dt,snap){
     tv.set(P.x-s*1.5,(17+d.L)*cam.zoom,P.z-c*1.5); tl.set(P.x+s*1.2,0,P.z+c*1.2); tu.set(s,0,c);
     cam.pos.lerp(tv,k); cam.look.lerp(tl,k);
   }else if(cam.mode===3){cam.orbit=clamp(cam.orbit,-1.35,1.35);
-    const ez=d.eyeZ!=null?d.eyeZ:-.15,ex=d.W*.21,ey=(d.eye||1.1)+(P.gy||0)-.02;
+    const ez=d.eyeZ!=null?d.eyeZ:-.15,ex=d.moto?0:d.W*.21,ey=(d.eye||1.1)+(P.gy||0)-.02;
     tv.set(P.x+s*ez+c*ex,ey,P.z+c*ez-s*ex);const la=P.yaw+cam.orbit*-1.2;tl.set(tv.x+Math.sin(la)*10,ey-.55,tv.z+Math.cos(la)*10);tu.set(0,1,0);
     cam.pos.copy(tv);cam.look.copy(tl);
   }else{
@@ -3164,7 +3164,7 @@ function updCarMesh(dt){
   const rf=d.roll||1,tp=clamp(-P.acc*.006,-.05,.05)*rf, tr=clamp(P.vf*(P.yawRate||0)*.012,-.06,.06)*rf;
   P.pitch+=(tp-P.pitch)*Math.min(1,dt*6); P.roll+=(tr-P.roll)*Math.min(1,dt*6);
   u.body.rotation.set(P.pitch,0,P.roll);
-  if(u.moto){const v=Math.abs(P.vf),tgt=v<.8&&IN.gas<.1?-.11:clamp(-Math.atan(P.vf*(P.yawRate||0)/9.81)*1.08,-.95,.95);P.lean=(P.lean||0)+(tgt-(P.lean||0))*Math.min(1,dt*(v<.8?2.5:6));
+  if(u.moto){const v=Math.abs(P.vf),tgt=v<.8&&IN.gas<.1?-.11:clamp(-Math.atan(P.vf*(P.yawRate||0)/9.81)*1.05,-.85,.85);P.lean=(P.lean||0)+(tgt-(P.lean||0))*Math.min(1,dt*(v<.8?2.5:6));
     u.lean.rotation.z=P.lean;u.body.rotation.set(clamp(-P.acc*.004,-.06,.05),0,0);if(u.rider){u.rider.rotation.z=P.lean*.22;u.rider.position.x=-P.lean*.09;}}
   const braking=(P.gear==='D'&&IN.brk>.05)||(P.gear==='R'&&IN.gas>.05)||IN.hand;
   u.tail.emissiveIntensity=braking?2.6:.55; u.rev.emissiveIntensity=P.gear==='R'?2:0;
@@ -3902,6 +3902,7 @@ for(const g of save.garage)if(g.design&&Array.isArray(g.design.layers))for(const
 (function(){let ch=0;for(const g of save.garage){if(g.key==='poyraz'&&!g.ebInit){g.ebInit=1;const D=presetEB();g.mods.color=D._color;g.mods.finish=1;delete D._color;if(!g.bought.color.includes(18))g.bought.color.push(18);if(g.design&&g.design.plate)D.plate=g.design.plate;g.design=D;ch=1;}}if(ch)persist();})();
 // v2.4: hazır plakalar (27 AHK 178 · 27 EJ 551 · 78 BY 201) tüm araçlara sırayla
 (function(){if(save.plV24)return;save.plV24=1;save.garage.forEach((g,i)=>{if(!g.design)g.design={liv:0,c1:1,c2:0,layers:[]};if(!g.design.plate||g.design.plate.txt==='34 PA 2026')g.design.plate={txt:PLATE_PRE[i%3],st:0};});persist();})();
+(function(){if(save.cekkFix)return;save.cekkFix=1;save.garage.forEach(g=>{if(g.key==='cekk'&&g.design&&g.design.liv===2)g.design.liv=0;});persist();})();
 // Tayfun GT3: Mehmet Emir sarı-kırmızı hazır gelsin (bir kez)
 (function(){let ch=0;for(const g of save.garage){if(g.key==='tayfun'&&!g.dsInit){g.dsInit=1;if(!g.design||!g.design.layers||!g.design.layers.length){g.design=presetME();g.mods.color=4;g.mods.finish=0;if(!g.bought.color.includes(4))g.bought.color.push(4);ch=1;}}}if(ch)persist();})();
 
@@ -4081,7 +4082,7 @@ requestAnimationFrame(loop);}
 $('#loading').textContent='ARAÇLAR YÜKLENİYOR';
 setTimeout(()=>loadModels(bootGame),30);setTimeout(bootGame,15000);
 // debug hooks for automated testing
-window.__PA={TRF,CLOUD,cloudPush,cloudPull,ACC,accProfile,RAIN,DMG,dent,GB,TOD,applyTOD,cam,cycleCam,get skid(){return SKID;},padRemap,pad,ACC,save,MP,makeCar,defMods,CARS,scene,camera:typeof camera!=='undefined'?camera:null,get showCar(){return showCar},P,startLevel,startFree,LEVELS,get state(){return state},get mission(){return mission},get target(){return target},IN,obs:()=>obs,inTarget};
+window.__PA={startTrack,MR,get TR(){return TR},TRF,CLOUD,cloudPush,cloudPull,ACC,accProfile,RAIN,DMG,dent,GB,TOD,applyTOD,cam,cycleCam,get skid(){return SKID;},padRemap,pad,ACC,save,MP,makeCar,defMods,CARS,scene,camera:typeof camera!=='undefined'?camera:null,get showCar(){return showCar},P,startLevel,startFree,LEVELS,get state(){return state},get mission(){return mission},get target(){return target},IN,obs:()=>obs,inTarget};
 })();
 </script>
 
