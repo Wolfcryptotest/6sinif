@@ -1134,19 +1134,26 @@ const goalX=t=>t.dir>0?FL:0, ownGoalX=t=>t.dir>0?0:FL;
 function inOwnBox(p,x=p.x,y=p.y){const gx=ownGoalX(p.team);return Math.abs(x-gx)<16.5&&Math.abs(y-FW/2)<20.16}
 function inBoxOf(t,x,y){const gx=ownGoalX(t);return Math.abs(x-gx)<16.5&&Math.abs(y-FW/2)<20.16}
 function nearestOpp(p){let b=null,bd=1e9;for(const o of oppT(p.team).players){const d=d2(p,o);if(d<bd){bd=d;b=o}}return[b,bd]}
+function calcRoles(f){const R=f.b.map(([bx,by],i)=>{if(i===0)return'GK';const L=f.l[i],w=Math.abs(by-.5);
+    if(L==='D')return w>.3?'FB':'CB';if(L==='A')return w>.3?'W':'ST';return w>.33?'WM':'CM';});
+  const mids=f.b.map((q,i)=>[q[0],i]).filter(([x,i])=>R[i]==='CM').sort((a,c)=>a[0]-c[0]);if(mids.length&&mids[0][0]<.42)R[mids[0][1]]='DM';if(mids.length>1&&mids[1][0]<.42&&Math.abs(mids[1][0]-mids[0][0])<.03)R[mids[1][1]]='DM';
+  return R;}
+function roleOf(p){const t=p.team;if(t._rk!==t.form){t._rk=t.form;t._roles=calcRoles(t.form);}return t._roles[p.i];}
 function formTarget(p,att){
-  const t=p.team,[bx,by]=t.form.b[p.i],b=G.ball,pr=prog(t,b.x),bn=nyOf(t,b.y);let nx,ny;
+  const t=p.team,[bx,by]=t.form.b[p.i],b=G.ball,pr=prog(t,b.x),bn=nyOf(t,b.y),role=roleOf(p);let nx,ny;
   if(att){nx=.10+bx*.62+pr*.30;ny=.5+(by-.5)*1.02+(bn-.5)*.22;
     const side=(by-.5)*(bn-.5)>0;
-    if(p.i===1||p.i===4){if(side&&pr>.45)nx+=.12;ny=.5+(by-.5)*1.08}          // bekler: top kendi kanadındaysa bindirme
-    else if(p.i===8||p.i===10){ny=by<.5?.07:.93;nx+=.03}                       // kanatlar: çizgiye yakın, geniş
-    else if(p.i===9){ny=.5+(bn-.5)*.25;nx=Math.max(nx,Math.min(.9,pr+.12))}    // forvet: merkezde, en önde
-    else if(p.i===5){nx=Math.min(nx,pr-.06);ny=.5+(bn-.5)*.3}                  // ön libero: topun gerisinde, merkezi korur
-    else if(p.i===2||p.i===3){nx=Math.min(nx,.5)}}                             // stoperler: orta sahayı geçmez
+    if(role==='FB'){if(side&&pr>.45)nx+=.12;ny=.5+(by-.5)*1.08}               // bekler: top kendi kanadındaysa bindirme
+    else if(role==='W'){ny=by<.5?.07:.93;nx+=.03}                               // kanatlar: çizgiye yakın, geniş
+    else if(role==='WM'){ny=by<.5?.09:.91}                                     // kanat orta saha / kanat bek: geniş kalır
+    else if(role==='ST'){ny=by+(bn-.5)*.25;nx=Math.max(nx,Math.min(.9,pr+.12))} // forvet: kendi koridorunda, en önde
+    else if(role==='DM'){nx=Math.min(nx,pr-.06);ny=by+(bn-.5)*.3}              // ön libero: topun gerisinde, merkezi korur
+    else if(role==='CB'){nx=Math.min(nx,.5)}}                                   // stoperler: orta sahayı geçmez
   else{nx=.04+bx*.55+pr*.32;ny=.5+(by-.5)*.72+(bn-.5)*.42;
-    if(p.i===8||p.i===10)nx=Math.min(nx,Math.max(.3,pr-.02));                 // kanatlar savunmaya yardım
-    else if(p.i===9)nx=Math.max(nx,.42);                                       // forvet önde bekler (kontra)
-    else if(p.i===5){nx=Math.min(nx,.3+pr*.25);ny=.5+(bn-.5)*.45}}
+    if(role==='W'||role==='WM')nx=Math.min(nx,Math.max(.3,pr-.02));            // kanatlar savunmaya yardım
+    else if(role==='ST')nx=Math.max(nx,.42);                                    // forvet önde bekler (kontra)
+    else if(role==='DM'){nx=Math.min(nx,.3+pr*.25);ny=by+(bn-.5)*.45}
+    else if(role==='CB'){ny=.5+(by-.5)*.85+(bn-.5)*.3}}
   nx=clamp(nx,.03,att?.93:.86);if(att&&SET.offside&&p.line!=='D')nx=Math.min(nx,Math.max(t.offLine-.006,pr));ny=clamp(ny,.04,.96);return[wx(t,nx),wy(t,ny)]}
 
 /* ================= SET PIECES ================= */
@@ -1172,7 +1179,7 @@ function startSet(type,team,x,y,silent,tk0){
   tk.x=x-ax/al*.7;tk.y=y-ay/al*.7;tk.face=Math.atan2(ay,ax);tk.vx=tk.vy=0;tk.st='n';
   if(type==='ti'){tk.x=x;tk.y=y<1?-0.4:FW+.4}
   b.owner=tk;b.last=tk;
-  if(team.humans.length&&type!=='gk'){const h=team.humans.reduce((a,c)=>c.p&&d2(c.p,tk)<(a.p?d2(a.p,tk):1e9)?c:a);setCtrl(h,tk)}
+  if(team.humans.length){const h=team.humans.reduce((a,c)=>c.p&&d2(c.p,tk)<(a.p?d2(a.p,tk):1e9)?c:a);setCtrl(h,tk)}
   for(const h of G.humans){h.charge=0;h.charging=false;h.buf=null;h.pk=null;h.pc=0;if(!h.p){const c=nearestTo(h.team,G.ball,h);if(c)setCtrl(h,c)}}
   if(!silent)sWhistle(1,.25);
 }
@@ -1193,7 +1200,11 @@ function layoutSet(type,team,x,y){
       if(att&&role>=0){tx=gx+sg*spots[role][0];ty=FW/2+spots[role][1]+rnd(-1,1)}
       else if(!att&&[2,3,5,1,4,6].indexOf(p.i)>=0){const k=[2,3,5,1,4,6].indexOf(p.i);tx=gx+sg*(spots[k][0]-1.2);ty=FW/2+spots[k][1]*.9}
       else{[tx,ty]=formTarget(p,att);if(att)tx=lerp(tx,FL/2,.3)}}
-    else{[tx,ty]=formTarget(p,att);if(p.i===0){tx=ownGoalX(t)+(t.dir>0?1:-1)*(type==='gk'&&att?2:1.5);ty=FW/2}}
+    else{[tx,ty]=formTarget(p,att);if(p.i===0){tx=ownGoalX(t)+(t.dir>0?1:-1)*(type==='gk'&&att?2:1.5);ty=FW/2}
+      if(type==='gk'&&p.i>0){const gx=ownGoalX(team),dirT=team.dir;
+        if(att){const r=roleOf(p);if(r==='CB'){tx=gx+dirT*rnd(9,12);ty=FW/2+(t.form.b[p.i][1]<.5?-1:1)*rnd(15,18)}
+          else{const d=hyp(tx-x,ty-y);if(d<16){const k=16/(d||1);tx=x+(tx-x)*k;ty=y+(ty-y)*k;if(Math.abs(tx-gx)<16.5)tx=gx+dirT*rnd(18,22)}}}
+        else if(Math.abs(tx-gx)<17.5&&Math.abs(ty-FW/2)<21)tx=gx+dirT*rnd(18,21);}}
     p.x=clamp(tx,-1,FL+1);p.y=clamp(ty,1,FW-1);p.vx=p.vy=0;p.st='n';p.stT=0;p.want=0;p.runT=0;p.kickCd=0;
     p.face=t.dir>0?0:Math.PI;
   }
@@ -1245,7 +1256,8 @@ function passToPoint(p,tx,ty,type,r,pw){if(type==='throw'){G.ball.y=clamp(G.ball
   else if(type==='throw'){const T=.45+d*.035;vz=G_*T/2-1.9/T;hs=d/T;z0=1.9}
   else if(type==='thru'){let lane=99;for(const o of oppT(p.team).players)lane=Math.min(lane,segDist(o.x,o.y,b.x,b.y,tx,ty));if(lane<1.3&&d>14){const T=.55+d*.022;vz=G_*T/2;hs=d/T*1.05}else hs=clamp(speedFor(d,3.5+(pw??.35)*6),9,31)}
   else hs=clamp(speedFor(d,7.5+(pw??.35)*7),9,30);
-  if(r){r.want=2.2;r.rx=tx;r.ry=ty}
+  if(!r&&type!=='throw'&&G.state!=='set'){let bd=1e9;for(const q of p.team.players){if(q===p||q.i===0)continue;const dd=hyp(q.x-tx,q.y-ty);if(dd<bd){bd=dd;r=q}}if(bd>30)r=null}
+  if(r){r.want=clamp(2.2+d/16,2.2,4.8);r.rx=tx;r.ry=ty}
   G.stats[p.ti].pa++;
   let vx=Math.cos(ang)*hs,vy=Math.sin(ang)*hs,curl=0;
   if(type==='cross'){const nx=-Math.sin(ang),ny=Math.cos(ang),gx=goalX(p.team);curl=(Math.sign(nx*(gx-b.x))||1)*3.4;const T=d/hs;vx-=nx*curl*T/2;vy-=ny*curl*T/2}
@@ -1421,7 +1433,7 @@ function carrierAI(p,dt){
   const t=p.team,b=G.ball,gx=goalX(t),gy=FW/2,dG=hyp(gx-p.x,gy-p.y),[no,press]=nearestOpp(p);
   p.aiT-=dt;
   if(G.state==='set'){
-    const s=G.set;if(s.taker!==p||s.t<(G.demo?.6:1.1))return;
+    const s=G.set;if(s.taker!==p||s.t<(G.demo?.6:(p.human&&p.i===0?6:1.1)))return;
     if(s.type==='pen'){shoot(p,rnd(.6,.9),FW/2+(Math.random()<.5?1:-1)*rnd(1.6,3.1));return}
     if(s.type==='ci'){const r=boxTarget(p);if(r)passTo(p,r,'lob');else passToPoint(p,gx-t.dir*9,gy+rnd(-5,5),'lob');return}
     if(s.type==='fk'&&dG<(hasT(p,'s')?31:27)&&Math.random()<(hasT(p,'s')?.9:.6)){shoot(p,rnd(.6,.85));return}
@@ -2421,7 +2433,8 @@ function viewData(){
     mood:G.state==='goal'&&G.goalTeam?(p.team===G.goalTeam?(p===G.scorer?0:1):-1):(G.state==='ft'&&!G.demo&&G.score[0]!==G.score[1])?(G.score[p.ti]>G.score[1-p.ti]?1:-1):0},[b.x,b.y,b.z])),replay:false}}
 function animExtra(e,ball){const p=e.p;e.gkReady=0;e.hold=0;
   if(p.i===0&&p.team){const dh=hyp(ball[0]-e.x,ball[1]-e.y);e.hold=(dh<.75&&ball[2]>.6&&ball[2]<1.6)?1:0;
-    const gx=ownGoalX(p.team);e.gkReady=(!e.hold&&e.st===0&&!(e.kT>0)&&hyp(ball[0]-gx,ball[1]-FW/2)<30)?1:0}
+    const gx=ownGoalX(p.team);const o=G.ball.owner,ownsT=o&&o.team===p.team,setOwn=G.state==='set'&&G.set&&G.set.team===p.team;
+    e.gkReady=(!e.hold&&e.st===0&&!(e.kT>0)&&!ownsT&&!setOwn&&hyp(ball[0]-gx,ball[1]-FW/2)<30)?clamp(1.25-hyp(ball[0]-gx,ball[1]-FW/2)/24,.35,1):0}
   return e}
 function camFollow(v,dt){
   let fx=v.ball[0],fy=v.ball[1];const st=G.state==='set'&&G.set?G.set.type:'';
@@ -2768,5 +2781,5 @@ startDemo();renderMain();requestAnimationFrame(frame);
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;upd();});addEventListener('appinstalled',()=>{dp=null;b.remove();});
   b.onclick=async()=>{if(dp){dp.prompt();try{await dp.userChoice;}catch(e){}dp=null;upd();}else if(ios)alert('Safari\'de Paylaş ⬆ düğmesine bas → "Ana Ekrana Ekle"');};
   document.body.appendChild(b);setInterval(upd,800);})();
-window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx};
+window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT};
 </script>
