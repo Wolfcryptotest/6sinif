@@ -392,7 +392,7 @@ body.touch .screen[data-back]{padding-left:calc(66px + env(safe-area-inset-left,
   <div class="logo"><div class="slotmark">P</div><div class="wordmark">PARK<br><em>ARENA</em></div></div>
   <p class="tag">Milimetrik park, geniş şehir, tam kontrolcü desteği. Direksiyon sende.</p>
   <div class="press"><i class="g x" data-k="ENTER"></i> <span id="press-t">Başlamak için bas</span></div>
-  <div class="ver">v2.6.1 · Wolfman Games<br><span style="opacity:.6">3D araçlar (CC BY 4.0): Comrade1280 · Daniel Zhabotinsky · Swiss_Fox</span></div>
+  <div class="ver">v2.7 · Wolfman Games<br><span style="opacity:.6">3D araçlar (CC BY 4.0): Comrade1280 · Daniel Zhabotinsky · Swiss_Fox</span></div>
   <button data-f id="b-start" style="position:absolute;inset:0;opacity:0" aria-label="Başla"></button>
 </section>
 
@@ -1454,7 +1454,7 @@ function randomSpec(r,tiers,maxL){const keys=CAR_KEYS.filter(k=>(!tiers||tiers.i
 const blobMat=new T.MeshBasicMaterial({transparent:true,depthWrite:false,map:canvasTex(64,64,(x,w,h)=>{const g=x.createRadialGradient(32,32,4,32,32,32);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,w,h);})});
 
 /* ================= WORLD ================= */
-const ground=new T.Mesh(new T.PlaneGeometry(1000,1000),M.asphalt); ground.rotation.x=-PI/2; ground.receiveShadow=true; scene.add(ground);
+const ground=new T.Mesh(new T.PlaneGeometry(2600,2600),M.asphalt); ground.rotation.x=-PI/2; ground.receiveShadow=true; scene.add(ground);
 const lotGroup=new T.Group(), cityGroup=new T.Group(), levelGroup=new T.Group(), fxGroup=new T.Group();
 scene.add(lotGroup,cityGroup,levelGroup,fxGroup);
 
@@ -1532,17 +1532,17 @@ const cityObs=[], citySlots=[];
 let cityBuilt=false;
 function buildCity(){
   if(cityBuilt)return; cityBuilt=true;
-  const g=cityGroup, r=rng(2026), SP=50, N=3, B=36, RW=14, EDGE=N*SP+RW/2;
+  const g=cityGroup, r=rng(2026), SP=50, N=CITY_N, B=36, RW=14, EDGE=N*SP+RW/2, LIM=(N-.5)*SP;
   // lane dashes
   const dashGeo=new T.PlaneGeometry(.18,3); dashGeo.rotateX(-PI/2);
   const dashes=[];
-  for(let k=-N;k<=N;k++)for(let t=-EDGE;t<=EDGE;t+=6){
+  for(let k=-N;k<=N&&false;k++)for(let t=-EDGE;t<=EDGE;t+=6){
     const near=Math.abs(((t%SP)+SP+SP/2)%SP-SP/2); if(near<RW/2+2)continue;
     dashes.push([k*SP,t,0],[t,k*SP,PI/2]);
   }
   const im=new T.InstancedMesh(dashGeo,M.line,dashes.length), mx=new T.Matrix4(), q=new T.Quaternion(), up=new T.Vector3(0,1,0), one=new T.Vector3(1,1,1);
   dashes.forEach((d,i)=>{q.setFromAxisAngle(up,d[2]);mx.compose(new T.Vector3(d[0],.016,d[1]),q,one);im.setMatrixAt(i,mx);});
-  g.add(im);
+  im.count=0;g.add(im);cityLanes(g,N,SP,RW,EDGE);
   // crosswalks (instanced: one draw call)
   const zebra=[];
   for(let i=-N;i<=N;i++)for(let j=-N;j<=N;j++)for(const [dx,dz,rot] of [[0,RW/2+2,0],[0,-RW/2-2,0],[RW/2+2,0,PI/2],[-RW/2-2,0,PI/2]]){
@@ -1554,11 +1554,13 @@ function buildCity(){
   g.add(zm);
   const lots=new Set(['25,-25','-75,25','75,75','-125,-75','125,-25','-25,125','75,-125']);
   const parks=new Set(['-75,-125','125,75','-125,125','25,75']);
-  const gasK='-25,-25';
-  for(let bx=-125;bx<=125;bx+=SP)for(let bz=-125;bz<=125;bz+=SP){
-    const k=bx+','+bz;
+  const gasK='-25,-25',gasX=new Set();
+  {const rx=rng(91);let nl=0;for(let bx=-LIM;bx<=LIM;bx+=SP)for(let bz=-LIM;bz<=LIM;bz+=SP){if(Math.abs(bx)<=125&&Math.abs(bz)<=125)continue;const k=bx+','+bz,v=rx();
+    if(v<.03&&nl<10){lots.add(k);nl++;}else if(v<.12)parks.add(k);else if(v<.14)gasX.add(k);}}
+  for(let bx=-LIM;bx<=LIM;bx+=SP)for(let bz=-LIM;bz<=LIM;bz+=SP){
+    const k=bx+','+bz,dc=Math.hypot(bx,bz),hf=dc<180?1.35:dc<330?1:dc<430?.6:.38;
     if(lots.has(k)) cityLot(g,bx,bz,r);
-    else if(k===gasK) gasStation(g,bx,bz);
+    else if(k===gasK||gasX.has(k)) gasStation(g,bx,bz);
     else if(parks.has(k)){
       const s=new T.Mesh(box(B,.16,B),M.curb);s.position.set(bx,.08,bz);s.receiveShadow=true;g.add(s);
       const gr=new T.Mesh(box(B-3,.18,B-3),M.grass);gr.position.set(bx,.09,bz);gr.receiveShadow=true;g.add(gr);
@@ -1568,8 +1570,8 @@ function buildCity(){
       const s=new T.Mesh(box(B,.16,B),M.concrete);s.position.set(bx,.08,bz);s.receiveShadow=true;g.add(s);
       cityPads.push({x:bx,z:bz,hw:B/2,hl:B/2,h:.16});
       const split=r()<.5;
-      if(split){for(const sx of[-1,1]){building(g,bx+sx*8,bz,14,10+r()*40,30,0);cityObs.push(obb(bx+sx*8,bz,14,30,0,'block'));}}
-      else{for(const sx of[-1,1])for(const sz of[-1,1]){building(g,bx+sx*8,bz+sz*8,13,8+r()*30,13,0);cityObs.push(obb(bx+sx*8,bz+sz*8,13,13,0,'block'));}}
+      if(split){for(const sx of[-1,1]){building(g,bx+sx*8,bz,14,(10+r()*40)*hf,30,0);cityObs.push(obb(bx+sx*8,bz,14,30,0,'block'));}}
+      else{for(const sx of[-1,1])for(const sz of[-1,1]){building(g,bx+sx*8,bz+sz*8,13,(8+r()*30)*hf,13,0);cityObs.push(obb(bx+sx*8,bz+sz*8,13,13,0,'block'));}}
       for(const sx of[-1,1])for(const sz of[-1,1]){makeLamp(g,bx+sx*16.6,bz+sz*16.6,sx>0?PI/2:-PI/2);cityObs.push(obb(bx+sx*16.6,bz+sz*16.6,.35,.35,0,'pole'));}
       makeTree(g,bx+16.4,bz,.6);makeTree(g,bx-16.4,bz,.6);cityObs.push(obb(bx+16.4,bz,.6,.6,0,'tree'),obb(bx-16.4,bz,.6,.6,0,'tree'));
     }
@@ -1579,8 +1581,9 @@ function buildCity(){
     addBox(g,0,0,s*(EDGE+1),2*EDGE+4,1.4,1,0,M.wall,false); cityObs.push(obb(0,s*(EDGE+1),2*EDGE+4,1));
     addBox(g,s*(EDGE+1),0,0,1,1.4,2*EDGE+4,0,M.wall,false); cityObs.push(obb(s*(EDGE+1),0,1,2*EDGE+4));
   }
-  for(let i=0;i<40;i++){const a=i/40*TAU,d=230+r()*60;building(g,Math.cos(a)*d,Math.sin(a)*d,20+r()*20,20+r()*70,20+r()*20,-a,false);}
+  for(let i=0;i<70;i++){const a=i/70*TAU,d=EDGE+70+r()*90;building(g,Math.cos(a)*d,Math.sin(a)*d,20+r()*20,20+r()*70,20+r()*20,-a,false);}
   addLampPools(g,LAMPS.filter(l=>l.par===g));
+  try{mergeStatic(g,200);}catch(e){console.warn('merge',e);}
 }
 function cityLot(g,bx,bz,r){
   const pad=new T.Mesh(box(36,.02,36),new T.MeshStandardMaterial({map:asphaltTex,color:0x8a8f96,roughness:.95}));pad.position.set(bx,.01,bz);pad.receiveShadow=true;g.add(pad);
@@ -1589,7 +1592,7 @@ function cityLot(g,bx,bz,r){
   for(const row of[{z:bz+9.6,rot:0},{z:bz-9.6,rot:PI}]){
     for(let i=-5;i<=5;i++){
       const x=bx+i*2.9; slotLines(g,x,row.z,row.rot,2.9,5.6);
-      if(r()<.55){const sp=randomSpec(r,['Günlük','Klasik','Arazi','Spor'],5.2),k=sp.key;const c=makeCar(sp,true);const rr=row.rot+(r()<.25?PI:0);c.position.set(x+(r()-.5)*.3,0,row.z+(r()-.5)*.3);c.rotation.y=rr;g.add(c);cityObs.push(obb(c.position.x,c.position.z,CARS[k].W,CARS[k].L,rr,'car'));}
+      if(r()<.55){const sp=randomSpec(r,['Günlük','Klasik','Arazi','Spor'],5.2),k=sp.key;const c=makeCar(sp,true);c.userData.mergeOK=1;const rr=row.rot+(r()<.25?PI:0);c.position.set(x+(r()-.5)*.3,0,row.z+(r()-.5)*.3);c.rotation.y=rr;g.add(c);cityObs.push(obb(c.position.x,c.position.z,CARS[k].W,CARS[k].L,rr,'car'));}
       else citySlots.push({x,z:row.z,rot:row.rot,w:2.9,l:5.6,dir:'any'});
     }
   }
@@ -1743,7 +1746,7 @@ function startFree(){
   lotGroup.visible=false; cityGroup.visible=true; if(showCar)showCar.visible=false;
   clearLevel(); removeTargetFx();
   obs=cityObs.slice(); pads=cityPads; mission={t:0,hits:0,dmg:0,park:0,done:false,maxDmg:1e9,lastHit:-1,earned:0,count:0};
-  if(MP.on)spawnPlayer((Math.random()<.5?-1:1)*3.4,-20-((Math.random()*4)|0)*9,0);else spawnPlayer(0,-20,0); pickFreeTarget();
+  if(MP.on)spawnPlayer((Math.random()<.5?-1:1)*3.4,-20-((Math.random()*4)|0)*9,0);else spawnPlayer(-5.25,-20,0); pickFreeTarget();
   $('#h-title').innerHTML='<small>SERBEST</small>Şehir Turu'; $('#h-desc').textContent='Sarı ışığı takip et, boş yere park et ve 25 jeton kazan.';
   $('#h-row').hidden=true; $('#compass').hidden=false;
   $('#p-sub').textContent='Serbest Sürüş'; $('#p-restart').hidden=true;
@@ -1752,7 +1755,7 @@ function startFree(){
 }
 function pickFreeTarget(){
   removeTargetFx();
-  const cand=citySlots.filter(s=>Math.hypot(s.x-P.x,s.z-P.z)>35);
+  let cand=citySlots.filter(s=>{const q=Math.hypot(s.x-P.x,s.z-P.z);return q>35&&q<280;});if(!cand.length)cand=citySlots.filter(s=>Math.hypot(s.x-P.x,s.z-P.z)>35);
   target=Object.assign({},cand[(Math.random()*cand.length)|0]); targetFx=makeTargetFx(target); mission.park=0;
 }
 
@@ -2873,7 +2876,7 @@ function mrInit(K){mrClear();MR.on=true;MR.g=new T.Group();trackGroup.add(MR.g);
 function mrPlace(a,K,dt,snap){const N=K.N,i=Math.floor(a.u)%N,f=a.u-Math.floor(a.u),p0=K.pts[i],p1=K.pts[(i+1)%N],n=K.nrm[i];
   const x=lerp(p0.x,p1.x,f)+n.x*a.lat,z=lerp(p0.z,p1.z,f)+n.z*a.lat,t=K.tan[i],yaw=Math.atan2(t.x,t.z);
   if(snap)a.yaw=yaw;let dy=yaw-a.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));const yr=dt?dy*Math.min(1,dt*10)/dt:0;a.yaw+=dy*Math.min(1,dt*10||1);
-  a.mesh.position.set(x,0,z);a.mesh.rotation.y=a.yaw;a.ob.x=x;a.ob.z=z;a.ob.rot=a.yaw;
+  a.mesh.position.set(x,K.BK?trkH(K.BK,i,a.lat,K.hw):0,z);a.mesh.rotation.y=a.yaw;a.ob.x=x;a.ob.z=z;a.ob.rot=a.yaw;
   const u=a.mesh.userData;const tl=clamp(-Math.atan(a.v*yr/9.81),-.85,.85);a.lean+=(tl-a.lean)*Math.min(1,(dt||1)*5);if(u.lean)u.lean.rotation.z=a.lean;riderLean(u,a.lean);
   a.spin+=a.v*(dt||0)/.3;for(const w of u.wheels)w.spin.rotation.x=a.spin;if(u.tail)u.tail.emissiveIntensity=a.brk?2.4:.55;}
 function mrTot(prog,lap,N){return lap*N+prog;}
@@ -2898,7 +2901,7 @@ function riderLean(u,L){const r=u.rider;if(!r)return;const k=u.pro?1:.6;r.rotati
   const lg=r.userData.legs;if(lg)for(const q of lg){const inner=q.sx*L<0;q.g.rotation.z=inner?-L*.85*k:L*.1;}}
 
 /* ================= trafik ışıkları + şehir trafiği ================= */
-const TRF={on:false,ag:[],built:false,lights:null,t:0,SP:50,N:3,off:2.1};
+const TRF={on:false,ag:[],built:false,lights:null,t:0,SP:50,N:10,off:5.25};
 const TDIR=[[0,1],[1,0],[0,-1],[-1,0]];
 function tlPhase(i,j,t){const c=(t+((i*7+j*13)&7)*2.2)%22;return c<9?['g','r']:c<11?['y','r']:c<12?['r','r']:c<20?['r','g']:['r','y'];}// [NS, EW]
 function trfBuildLights(){if(TRF.lights)return;const SP=TRF.SP,N=TRF.N,RW=14,heads=[];
@@ -2914,16 +2917,19 @@ const _cR=new T.Color(),LCOL=[[0xff2a1a,0x3a0d0a],[0xffb000,0x3a2a08],[0x22e05a,
 function trfLightsUpd(t){const H=TRF.lights;if(!H)return;H.heads.forEach((h,k)=>{const ph=tlPhase(h.i,h.j,t)[h.d%2===0?0:1],on=[ph==='r',ph==='y',ph==='g'];
   for(let l=0;l<3;l++){_cR.setHex(LCOL[l][on[l]?0:1]);H.L[l].setColorAt(k,_cR);}});for(const m of H.L)m.instanceColor.needsUpdate=true;}
 let TRF_ID=1;
-function trfNewAgent(r,near,spec){const N=TRF.N;let i,j,d,ni,nj;do{const R=near?1:N;i=((r()*(2*R+1))|0)-R;j=((r()*(2*R+1))|0)-R;d=(r()*4)|0;ni=i+TDIR[d][0];nj=j+TDIR[d][1];}while(Math.abs(ni)>N||Math.abs(nj)>N);
+function trfCell(){const N=TRF.N,SP=TRF.SP;return[clamp(Math.round((P.x||0)/SP),-N,N),clamp(Math.round((P.z||0)/SP),-N,N)];}
+function trfNewAgent(r,near,spec){const N=TRF.N,[ci,cj]=trfCell();let i,j,d,ni,nj;do{const R=near?2:4;i=clamp(ci+((r()*(2*R+1))|0)-R,-N,N);j=clamp(cj+((r()*(2*R+1))|0)-R,-N,N);d=(r()*4)|0;ni=i+TDIR[d][0];nj=j+TDIR[d][1];}while(Math.abs(ni)>N||Math.abs(nj)>N);
   const sp=spec||randomSpec(r,['Günlük','Klasik','Arazi'],5.4),mesh=makeCar(sp,true);cityGroup.add(mesh);const dd=mesh.userData.def;
-  const a={id:TRF_ID++,i,j,d,s:9+r()*30,v:0,vmax:9+r()*4,mesh,turn:null,ob:obb(0,0,dd.W,dd.L,0,'car'),L:dd.L,W:dd.W,lat:0,latT:0,stuck:0};a.ob.agent=a;return a;}
-function trfPos(a){const SP=TRF.SP,[fx,fz]=TDIR[a.d],o=TRF.off+(a.lat||0);return{x:a.i*SP+fx*a.s-fz*o,z:a.j*SP+fz*a.s+fx*o,yaw:Math.atan2(fx,fz)};}
+  const a={id:TRF_ID++,i,j,d,s:9+r()*30,v:0,vmax:9+r()*4,mesh,turn:null,ob:obb(0,0,dd.W,dd.L,0,'car'),L:dd.L,W:dd.W,lat:0,latT:0,stuck:0,lo:r()<.5?1.75:5.25};a.loT=a.lo;trfPlan(a);a.ob.agent=a;return a;}
+// sonraki kavşakta ne yapacağını önceden seç → doğru şeride geç (sağa dönüş: sağ şerit, sola dönüş: sol şerit)
+function trfPlan(a){const r=TRF.r||Math.random;a.next=trfChooseTurn(a,r);a.loT=a.next===(a.d+3)%4?5.25:a.next===(a.d+1)%4?1.75:(Math.random()<.15?(a.lo>3.5?1.75:5.25):a.lo);}
+function trfPos(a){const SP=TRF.SP,[fx,fz]=TDIR[a.d],o=(a.lo!=null?a.lo:TRF.off)+(a.lat||0);return{x:a.i*SP+fx*a.s-fz*o,z:a.j*SP+fz*a.s+fx*o,yaw:Math.atan2(fx,fz)};}
 function trfChooseTurn(a,r){const N=TRF.N,ni=a.i+TDIR[a.d][0],nj=a.j+TDIR[a.d][1],opts=[];
   for(const [dd,w] of [[a.d,3],[(a.d+1)%4,1.2],[(a.d+3)%4,1.2]]){const ti=ni+TDIR[dd][0],tj=nj+TDIR[dd][1];if(Math.abs(ti)<=N&&Math.abs(tj)<=N)opts.push([dd,w]);}
   if(!opts.length)opts.push([(a.d+2)%4,1]);
   if(a.tow&&a.tow.ph==='go'){const tg=a.tow.target.mesh.position;let best=opts[0][0],bd=1e9;for(const [dd] of opts){const mx=(ni+TDIR[dd][0]*.5)*TRF.SP,mz=(nj+TDIR[dd][1]*.5)*TRF.SP,dq=(mx-tg.x)**2+(mz-tg.z)**2;if(dq<bd){bd=dq;best=dd;}}return best;}
   let tot=opts.reduce((s,o)=>s+o[1],0),x=r()*tot;for(const o of opts){x-=o[1];if(x<=0)return o[0];}return opts[0][0];}
-function trfInit(){if(TRF.built)return;TRF.built=true;trfBuildLights();const r=rng(777);for(let k=0;k<28;k++)TRF.ag.push(trfNewAgent(r,k<12));TRF.r=r;}
+function trfInit(){if(TRF.built)return;TRF.built=true;trfBuildLights();const r=rng(777);TRF.r=r;for(let k=0;k<40;k++)TRF.ag.push(trfNewAgent(r,k<16));}
 const _b0=new T.Vector3(),_b1=new T.Vector3(),_b2=new T.Vector3();
 /* ---- kaza + çekici ---- */
 let trfTri=null;
@@ -2954,8 +2960,8 @@ function trfAheadState(w,tw){const N=TRF.N,SP=TRF.SP,need=(w.L+tw.L)/2+(tw.mesh.
 function trfRemove(a){cityGroup.remove(a.mesh);const k=obs.indexOf(a.ob);if(k>=0)obs.splice(k,1);const q=TRF.ag.indexOf(a);if(q>=0)TRF.ag.splice(q,1);}
 function trfRespawn(a){const N=TRF.N,r=TRF.r;a.wreck=false;a.carried=false;a.parked=false;a.towBy=null;a.turn=null;a.lat=a.latT=0;a.stuck=0;a.ghost=0;a.mesh.rotation.set(0,0,0);a.mesh.rotation.order='XYZ';
   if(a.tri){cityGroup.remove(a.tri);a.tri=null;}
-  for(let t=0;t<30;t++){let i,j,d;do{i=((r()*(2*N+1))|0)-N;j=((r()*(2*N+1))|0)-N;d=(r()*4)|0;}while(Math.abs(i+TDIR[d][0])>N||Math.abs(j+TDIR[d][1])>N);
-    a.i=i;a.j=j;a.d=d;a.s=9+r()*30;const p=trfPos(a);if(Math.hypot(p.x-P.x,p.z-P.z)>70||t===29){a.mesh.position.set(p.x,0,p.z);a.mesh.rotation.y=p.yaw;break;}}
+  const[ci,cj]=trfCell();for(let t=0;t<30;t++){let i,j,d;do{i=clamp(ci+((r()*9)|0)-4,-N,N);j=clamp(cj+((r()*9)|0)-4,-N,N);d=(r()*4)|0;}while(Math.abs(i+TDIR[d][0])>N||Math.abs(j+TDIR[d][1])>N);
+    a.i=i;a.j=j;a.d=d;a.s=9+r()*30;a.lo=r()<.5?1.75:5.25;a.loT=a.lo;trfPlan(a);const p=trfPos(a);if(Math.hypot(p.x-P.x,p.z-P.z)>70||t===29){a.mesh.position.set(p.x,0,p.z);a.mesh.rotation.y=p.yaw;break;}}
   a.v=0;const ub=a.mesh.userData;if(ub.tail)ub.tail.emissiveIntensity=.5;}
 function trafficTick(dt){const want=mode==='free'&&cityGroup.visible&&state==='play';if(!want&&PT.btn)PT.btn.style.display='none';if(!want){if(TRF.on){for(const a of TRF.ag){a.mesh.visible=false;if(a.tri)a.tri.visible=false;}TRF.on=false;}return;}
   if(!TRF.built)trfInit();if(!TRF.on){for(const a of TRF.ag){a.mesh.visible=true;if(a.tri)a.tri.visible=true;if(!obs.includes(a.ob))obs.push(a.ob);}TRF.on=true;}
@@ -2965,6 +2971,7 @@ function trafficTick(dt){const want=mode==='free'&&cityGroup.visible&&state==='p
   const SP=TRF.SP,blinkOn=(TRF.t%.8)<.4,dead=[];
   for(const a of TRF.ag){let x,z,yaw;const ub=a.mesh.userData;
     if(a.carried)continue;
+    if(!a.tow&&!a.cargo&&!a.towBy&&Math.hypot(a.mesh.position.x-P.x,a.mesh.position.z-P.z)>300){trfRespawn(a);continue;}
     if(a.parked){a.v=0;if(Math.hypot(a.mesh.position.x-P.x,a.mesh.position.z-P.z)>130)trfRespawn(a);continue;}
     if(a.wreck){a.v=0;a.wt+=dt;if(ub.tail)ub.tail.emissiveIntensity=blinkOn?2.8:.15;continue;}
     if(ub.emer&&ub.emer.mats){const ph=Math.floor(TRF.t*6+a.id)%4;ub.emer.mats.forEach((m,k)=>m.emissiveIntensity=(ph===k%2*2)?3:.2);}
@@ -2997,11 +3004,17 @@ function trafficTick(dt){const want=mode==='free'&&cityGroup.visible&&state==='p
       if(a.passing&&b===a.passing)continue;
       const dx=b.mesh.position.x-cx,dz=b.mesh.position.z-cz,f=dx*hx+dz*hz,l=Math.abs(dx*hz-dz*hx);
       if(f>0&&l<(b.wreck?2.6:2.2)){const fr=f-(a.L+b.L)/2-1.5;if(fr<freeA){freeA=fr;lim=b;}}}
-    if(!a.turn){const ph=tlPhase(a.i+fx,a.j+fz,TRF.t)[a.d%2===0?0:1],stop=SP-9-a.L/2;if(ph!=='g'&&a.s<stop+.5)freeL=stop-a.s;}
+    if(!a.turn){const ph=tlPhase(a.i+fx,a.j+fz,TRF.t)[a.d%2===0?0:1],stop=SP-9-a.L/2;if(ph!=='g'&&a.s<stop+.5)freeL=stop-a.s;
+      else if(a.next===(a.d+1)%4&&a.s>stop-6&&a.s<stop+.5){for(const b of TRF.ag){if(b===a||b.wreck||b.carried)continue;const dh=Math.cos(b.mesh.rotation.y-a.mesh.rotation.y);if(dh>-.7)continue;
+          const dx=b.mesh.position.x-cx,dz=b.mesh.position.z-cz,f=dx*hx+dz*hz,l=Math.abs(dx*hz-dz*hx);if(f>2&&f<48&&l<9&&(b.v>.8||f<22)){freeL=Math.min(freeL,stop-a.s);break;}}}}
+    // şerit değiştirme (yan şerit boşsa)
+    if(!a.turn&&!a.passing&&Math.abs(a.loT-a.lo)>.01){let ok=a.s<SP-16;if(ok)for(const b of TRF.ag){if(b===a||b.carried)continue;const dh=Math.cos(b.mesh.rotation.y-a.mesh.rotation.y);if(dh<.7)continue;
+        const dx=b.mesh.position.x-cx,dz=b.mesh.position.z-cz,f=dx*hx+dz*hz,rl=-(dx*hz-dz*hx)+a.lo;if(f>-a.L-5&&f<a.L+8&&Math.abs(rl-a.loT)<2.4){ok=false;break;}}
+      if(ok){const st=Math.sign(a.loT-a.lo)*Math.min(Math.abs(a.loT-a.lo),1.3*dt);a.lo+=st;a.lcV=st/dt;}else a.lcV=0;}else a.lcV=0;
     // kazazedenin yanından sollama (karşı şerit boşsa)
-    if(!a.tow&&!a.turn&&!a.passing&&lim&&lim.wreck&&!lim.turn&&freeA<8&&a.s<SP-26){let clear=true;for(const b of TRF.ag){if(b===a||b.wreck)continue;const dh=Math.cos(b.mesh.rotation.y-a.mesh.rotation.y);if(dh>-.7)continue;
-        const dx=b.mesh.position.x-cx,dz=b.mesh.position.z-cz,f=dx*hx+dz*hz;if(f>-4&&f<40){clear=false;break;}}
-      if(clear){a.passing=lim;a.latT=-2*TRF.off;}}
+    if(!a.tow&&!a.turn&&!a.passing&&lim&&lim.wreck&&!lim.turn&&freeA<8&&a.s<SP-26){let clear=true;const tl=a.lo>3.5?-3.5:3.5;for(const b of TRF.ag){if(b===a||b.wreck)continue;const dh=Math.cos(b.mesh.rotation.y-a.mesh.rotation.y);if(dh<.7)continue;
+        const dx=b.mesh.position.x-cx,dz=b.mesh.position.z-cz,f=dx*hx+dz*hz,rl=-(dx*hz-dz*hx);if(f>-12&&f<35&&Math.abs(rl-tl)<2.6){clear=false;break;}}
+      if(clear){a.passing=lim;a.latT=tl;}}
     if(a.passing){const w=a.passing,dx=w.mesh.position.x-cx,dz=w.mesh.position.z-cz,f=dx*hx+dz*hz;if(f<-(a.L+w.L)/2-3||a.s>SP-15||!w.wreck){a.latT=0;if(Math.abs(a.lat)<.3||a.s>SP-12)a.passing=null;}}
     if(!a.passing&&a.latT===0&&Math.abs(a.lat)>.01&&a.s>SP-12)a.lat=0;
     const free=Math.min(freeP,freeA,freeL);
@@ -3025,13 +3038,14 @@ function trafficTick(dt){const want=mode==='free'&&cityGroup.visible&&state==='p
         a.tow.st=S;a.tow.ph='glide';continue;}}
     if(a.tow&&a.tow.ph==='carry'){a.tow.t+=dt;const dP=Math.hypot(cx-P.x,cz-P.z);if(a.tow.t>32||(a.tow.t>10&&dP>150)){dead.push(a);}}
     a.lat+=(a.latT-a.lat)*Math.min(1,dt*1.6);const latV=(a.latT-a.lat)*1.6;
-    if(!a.turn){a.s+=a.v*dt;if(a.s>=SP-9){const nd=trfChooseTurn(a,TRF.r),ni=a.i+fx,nj=a.j+fz,Bn={x:ni*SP,z:nj*SP},rx=-fz,rz=fx,[gx,gz]=TDIR[nd],r2x=-gz,r2z=gx,o=TRF.off;
-        const P0={x:Bn.x-fx*9+rx*o,z:Bn.z-fz*9+rz*o},P2={x:Bn.x+gx*9+r2x*o,z:Bn.z+gz*9+r2z*o},C=nd===a.d?{x:Bn.x+rx*o,z:Bn.z+rz*o}:nd===(a.d+2)%4?{x:Bn.x+fx*6,z:Bn.z+fz*6}:{x:Bn.x+rx*o+r2x*o,z:Bn.z+rz*o+r2z*o};
-        a.turn={P0,C,P2,u:0,len:Math.hypot(C.x-P0.x,C.z-P0.z)+Math.hypot(P2.x-C.x,P2.z-C.z),nd,ni,nj};a.lat=a.latT=0;}}
+    if(!a.turn){a.s+=a.v*dt;if(a.s>=SP-9){let nd=(a.tow||a.next==null)?trfChooseTurn(a,TRF.r):a.next;{const ti=a.i+fx+TDIR[nd][0],tj=a.j+fz+TDIR[nd][1];if(Math.abs(ti)>TRF.N||Math.abs(tj)>TRF.N)nd=trfChooseTurn(a,TRF.r);}
+        const ni=a.i+fx,nj=a.j+fz,Bn={x:ni*SP,z:nj*SP},rx=-fz,rz=fx,[gx,gz]=TDIR[nd],r2x=-gz,r2z=gx,o=a.lo+a.lat,o2=nd===(a.d+3)%4?5.25:nd===(a.d+1)%4?1.75:a.lo;
+        const P0={x:Bn.x-fx*9+rx*o,z:Bn.z-fz*9+rz*o},P2={x:Bn.x+gx*9+r2x*o2,z:Bn.z+gz*9+r2z*o2},C=nd===a.d?{x:Bn.x+rx*(o+o2)/2,z:Bn.z+rz*(o+o2)/2}:nd===(a.d+2)%4?{x:Bn.x+fx*6,z:Bn.z+fz*6}:{x:Bn.x+rx*o+r2x*o2,z:Bn.z+rz*o+r2z*o2};
+        a.turn={P0,C,P2,u:0,len:Math.hypot(C.x-P0.x,C.z-P0.z)+Math.hypot(P2.x-C.x,P2.z-C.z),nd,ni,nj,o2};a.lat=a.latT=0;a.passing=null;}}
     if(a.turn){const T0=a.turn;T0.u=Math.min(1,T0.u+a.v*dt/T0.len);const u=T0.u,iu=1-u;x=iu*iu*T0.P0.x+2*iu*u*T0.C.x+u*u*T0.P2.x;z=iu*iu*T0.P0.z+2*iu*u*T0.C.z+u*u*T0.P2.z;
       const tx=2*iu*(T0.C.x-T0.P0.x)+2*u*(T0.P2.x-T0.C.x),tz=2*iu*(T0.C.z-T0.P0.z)+2*u*(T0.P2.z-T0.C.z);yaw=Math.atan2(tx,tz);
-      if(u>=1){a.i=T0.ni;a.j=T0.nj;a.d=T0.nd;a.s=9;a.turn=null;}}
-    else{const p=trfPos(a);x=p.x;z=p.z;yaw=p.yaw-Math.atan2(latV,Math.max(a.v,2));}
+      if(u>=1){a.i=T0.ni;a.j=T0.nj;a.d=T0.nd;a.s=9;a.turn=null;a.lo=a.loT=T0.o2;if(!a.tow)trfPlan(a);}}
+    else{const p=trfPos(a);x=p.x;z=p.z;yaw=p.yaw-Math.atan2(latV+(a.lcV||0),Math.max(a.v,2));}
     let dy=yaw-a.mesh.rotation.y;dy=Math.atan2(Math.sin(dy),Math.cos(dy));a.mesh.position.set(x,0,z);a.mesh.rotation.y+=dy*Math.min(1,dt*10);
     const W=ub.wheels;if(W){a.spin=(a.spin||0)+a.v*dt/.33;for(const w of W)w.spin.rotation.x=a.spin;}
     if(ub.tail)ub.tail.emissiveIntensity=a.v<vt-.3||vt<.5?2.4:.5;
@@ -3133,14 +3147,15 @@ function stepCar(dt){
   if(Math.abs(nvf)<roll*dt)nvf=0;else nvf-=Math.sign(nvf)*roll*dt;
   P.acc=(nvf-vf)/dt; vf=nvf;
   // lateral grip
-  const grip=IN.hand?2.2:13*d.grip*SURF*rainGrip();
+  const BA=(TR.on&&TR.K&&TR.K.BK)?TR.K.BK.B[TR.idx]/TR.K.BK.MX:0;const grip=(IN.hand?2.2:13*d.grip*SURF*rainGrip())*(1+2.5*BA);
   P.slip=Math.abs(vl);vl*=Math.exp(-grip*dt);
   // steering
-  const maxS=.62/(1+Math.abs(vf)*.05)*(d.moto?.72:1);
+  const maxS=.62/(1+Math.abs(vf)*.05)*(d.moto?.72:1)*(1+.8*BA);
   const tgt=IN.steer*maxS;
   P.steer+=(tgt-P.steer)*Math.min(1,dt*9);
   const wb=d.fz-d.rz;
   let yawRate=-vf/wb*Math.tan(P.steer)*(IN.hand&&Math.abs(vf)>5?1.35:1);
+  if(TR.on&&TR.K&&TR.K.BK&&vf>3){const K=TR.K,q=K.pts[(TR.idx+Math.round(clamp(vf*.9,8,30)/2.5))%K.N];let e=Math.atan2(q.x-P.x,q.z-P.z)-P.yaw;e=Math.atan2(Math.sin(e),Math.cos(e));if(Math.abs(e)<1.3)yawRate+=clamp(e,-.6,.6)*3.2*Math.max(.22,Math.min(1,BA*1.6))*Math.min(1,vf/12);}
   P.vx=s*vf+c*vl; P.vz=c*vf-s*vl;
   P.yaw+=yawRate*dt;
   P.x+=P.vx*dt; P.z+=P.vz*dt; P.vf=vf;
@@ -3733,7 +3748,7 @@ function loop(now){
   }
   setStudio(mode==='menu');if(studioOn)lotGroup.visible=false;
   sky.position.copy(camera.position);
-  renderer.render(scene,camera);
+  sky.position.copy(camera.position);renderer.render(scene,camera);
   autoFix(dt);
   kbHit.clear();
 }
@@ -4146,7 +4161,7 @@ for(const g of save.garage)if(g.design&&Array.isArray(g.design.layers))for(const
 
 /* ================= ZEMİN YÜKSEKLİĞİ (kaldırıma çıkıp inme) ================= */
 let pads=[];const cityPads=[];
-function groundH(x,z){let h=0;for(const p of pads){const dx=Math.abs(x-p.x),dz=Math.abs(z-p.z);if(dx>p.hw||dz>p.hl)continue;
+function groundH(x,z){if(TR.on&&TR.K&&TR.K.BK)return trkGroundH(x,z);let h=0;for(const p of pads){const dx=Math.abs(x-p.x),dz=Math.abs(z-p.z);if(dx>p.hw||dz>p.hl)continue;
   const d=Math.min(p.hw-dx,p.hl-dz),u=Math.min(1,d/.5);h=Math.max(h,p.h*u*u*(3-2*u));}return h;}
 function carGround(dt){const d=player,s=Math.sin(P.yaw),c=Math.cos(P.yaw),tw=d.W*.42;
   const at=(f,l)=>groundH(P.x+s*f+c*l,P.z+c*f-s*l);
@@ -4171,36 +4186,112 @@ const TRACK_DEF={
   ralli:{name:'Orman Rallisi',kind:'Toprak ralli parkuru',w:9,grip:.78,laps:2,reward:350,
     pts:[[0,-150],[60,-160],[110,-120],[95,-60],[140,-20],[150,50],[100,80],[60,40],[20,70],[40,130],[-10,170],[-80,150],[-110,90],[-70,50],[-120,0],[-150,-70],[-100,-120],[-50,-110]]}};
 TRACK_DEF.motogp={name:'Motor Yarışı',kind:'Motosiklet yarışı · 5 rakip',base:'pist',w:14,grip:1,laps:3,reward:600,race:1,pts:TRACK_DEF.pist.pts};
+/* ================= v2.7: BÜYÜK ŞEHİR · ÇOCUK PİSTLERİ · EĞİMLİ VİRAJLAR ================= */
+const CITY_N=10;
+/* ---- statik geometriyi malzeme + bölge bazında birleştir (binlerce mesh → birkaç yüz çizim) ---- */
+function mergeStatic(root,cell){cell=cell||200;root.updateMatrixWorld(true);const inv=new T.Matrix4().copy(root.matrixWorld).invert();
+  const B=new Map(),rm=[],v=new T.Vector3(),nm=new T.Matrix3();
+  root.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||Array.isArray(o.material)||!o.visible)return;
+    for(let p=o.parent;p&&p!==root;p=p.parent)if(p.userData&&((p.userData.def&&!p.userData.mergeOK)||p.userData.noMerge))return;
+    const g=o.geometry;if(!g||!g.attributes.position||!g.attributes.normal)return;
+    v.setFromMatrixPosition(o.matrixWorld);const key=o.material.uuid+'|'+Math.floor(v.x/cell)+'|'+Math.floor(v.z/cell)+'|'+(o.castShadow?1:0);
+    let b=B.get(key);if(!b)B.set(key,b={mat:o.material,cs:o.castShadow,list:[],nv:0,ni:0});
+    const n=g.attributes.position.count;b.list.push(o);b.nv+=n;b.ni+=g.index?g.index.count:n;rm.push(o);});
+  const M4=new T.Matrix4();
+  for(const b of B.values()){if(b.list.length<2)continue;
+    const pos=new Float32Array(b.nv*3),nor=new Float32Array(b.nv*3),uv=new Float32Array(b.nv*2),idx=new Uint32Array(b.ni);let vo=0,io=0;
+    for(const o of b.list){const g=o.geometry,P=g.attributes.position,N=g.attributes.normal,U=g.attributes.uv,n=P.count;M4.multiplyMatrices(inv,o.matrixWorld);nm.getNormalMatrix(M4);
+      for(let i=0;i<n;i++){v.fromBufferAttribute(P,i).applyMatrix4(M4);pos[(vo+i)*3]=v.x;pos[(vo+i)*3+1]=v.y;pos[(vo+i)*3+2]=v.z;
+        v.fromBufferAttribute(N,i).applyMatrix3(nm).normalize();nor[(vo+i)*3]=v.x;nor[(vo+i)*3+1]=v.y;nor[(vo+i)*3+2]=v.z;
+        if(U){uv[(vo+i)*2]=U.getX(i);uv[(vo+i)*2+1]=U.getY(i);}}
+      if(g.index){const I=g.index.array;for(let k=0;k<I.length;k++)idx[io+k]=I[k]+vo;io+=I.length;}else{for(let k=0;k<n;k++)idx[io+k]=vo+k;io+=n;}
+      vo+=n;}
+    const G2=new T.BufferGeometry();G2.setAttribute('position',new T.BufferAttribute(pos,3));G2.setAttribute('normal',new T.BufferAttribute(nor,3));G2.setAttribute('uv',new T.BufferAttribute(uv,2));G2.setIndex(new T.BufferAttribute(idx,1));G2.computeBoundingSphere();G2.computeBoundingBox();
+    const me=new T.Mesh(G2,b.mat);me.castShadow=b.cs;me.receiveShadow=true;me.userData.merged=1;root.add(me);
+    for(const o of b.list)o.parent.remove(o);}
+  // boş kalan grupları temizle
+  for(let pass=0;pass<4;pass++){const empty=[];root.traverse(o=>{if(o!==root&&(o.isGroup||o.type==='Object3D')&&!o.children.length)empty.push(o);});for(const o of empty)o.parent&&o.parent.remove(o);}}
+/* ---- 2+2 şerit çizgileri: ortada çift sarı, şerit arası kesik beyaz ---- */
+function cityLanes(g,N,SP,RW,EDGE){const mx=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0),one=new T.Vector3(1,1,1);
+  const dash=[],ylw=[];const segL=SP-RW-9;
+  for(let k=-N;k<=N;k++)for(let a=-N;a<N;a++){const mid=(a+.5)*SP;
+    for(const ax of[0,1]){const X=ax?mid:k*SP,Z=ax?k*SP:mid,rot=ax?PI/2:0;
+      for(const s of[-.16,.16])ylw.push([X+(ax?0:s),Z+(ax?s:0),rot]);
+      for(let t=-segL/2+1.5;t<=segL/2-1.5;t+=6)for(const s of[-3.5,3.5])dash.push([X+(ax?t:s),Z+(ax?s:t),rot]);}}
+  const dg=new T.PlaneGeometry(.16,3);dg.rotateX(-PI/2);const di=new T.InstancedMesh(dg,M.line,dash.length);
+  dash.forEach((d,i)=>{q.setFromAxisAngle(up,d[2]);mx.compose(new T.Vector3(d[0],.016,d[1]),q,one);di.setMatrixAt(i,mx);});g.add(di);
+  const yg=new T.PlaneGeometry(.13,segL);yg.rotateX(-PI/2);const yi=new T.InstancedMesh(yg,M.yline,ylw.length);
+  ylw.forEach((d,i)=>{q.setFromAxisAngle(up,d[2]);mx.compose(new T.Vector3(d[0],.017,d[1]),q,one);yi.setMatrixAt(i,mx);});g.add(yi);
+  // durma çizgileri (ışıktan önce, sağdaki iki şeridin önünde)
+  const st=[];for(let i=-N;i<=N;i++)for(let j=-N;j<=N;j++)for(let d=0;d<4;d++){const[fx,fz]=TDIR[d];const pi=i-fx,pj=j-fz;if(Math.abs(pi)>N||Math.abs(pj)>N)continue;
+    const rx=-fz,rz=fx;st.push([i*SP-fx*(RW/2+4.6)+rx*3.5,j*SP-fz*(RW/2+4.6)+rz*3.5,Math.atan2(fx,fz)]);}
+  const sg=new T.PlaneGeometry(6.6,.45);sg.rotateX(-PI/2);const si=new T.InstancedMesh(sg,M.line,st.length);
+  st.forEach((d,i)=>{q.setFromAxisAngle(up,d[2]);mx.compose(new T.Vector3(d[0],.018,d[1]),q,one);si.setMatrixAt(i,mx);});g.add(si);}
+/* ---- pist şekli: düz + yay parçalarından (çocuklar için uzun düzlükler) ---- */
+function trkShape(segs,step){step=step||12;const run=(first)=>{let x=0,z=0,h=0;const P=[[0,0]];
+    for(const s0 of segs){const s=s0[1]==='auto'?['S',first]:s0;
+      if(s[0]==='S'){const n=Math.max(1,Math.round(s[1]/step));for(let i=0;i<n;i++){x+=Math.cos(h)*s[1]/n;z+=Math.sin(h)*s[1]/n;P.push([x,z]);}}
+      else{const R=s[1],A=s[2]*PI/180,dir=s[0]==='L'?1:-1,n=Math.max(3,Math.round(R*A/step)),dA=A/n,ch=2*R*Math.sin(dA/2);
+        for(let i=0;i<n;i++){const hm=h+dir*dA/2;x+=Math.cos(hm)*ch;z+=Math.sin(hm)*ch;h+=dir*dA;P.push([x,z]);}}}
+    return P;};
+  let P=run(0);if(segs.some(s=>s[1]==='auto')){const e=P[P.length-1];P=run(-e[0]);}
+  const e=P[P.length-1];if(Math.hypot(e[0]-P[0][0],e[1]-P[0][1])<step*.8)P.pop();
+  let cx=0,cz=0;for(const p of P){cx+=p[0];cz+=p[1];}cx/=P.length;cz/=P.length;
+  return P.map(p=>[Math.round((p[0]-cx)*10)/10,Math.round(-(p[1]-cz)*10)/10]);}
+/* ---- viraj eğimi (banking) ---- */
+function trkBank(pts,tan,nrm,N,dirt){const raw=new Float32Array(N),B=new Float32Array(N),so=new Int8Array(N),MX=dirt?.1:.16;
+  for(let i=0;i<N;i++){const a=tan[(i+N-4)%N],b=tan[(i+4)%N],ang=a.angleTo(b),dx=b.x-a.x,dz=b.z-a.z,n=nrm[i],inside=dx*n.x+dz*n.z;raw[i]=Math.min(MX,ang*.6)*(inside>0?-1:1);}
+  for(let i=0;i<N;i++){let s=0;for(let o=-10;o<=10;o++)s+=raw[(i+o+N)%N];s/=21;B[i]=Math.abs(s);so[i]=s>=0?1:-1;}
+  return{B,so,E:dirt?3:7,MX};}
+function trkH(BK,k,l,hw){const b=BK.B[k];if(b<.004)return 0;const u=BK.so[k]*l;if(u<=hw)return Math.max(0,b*(u+hw));return Math.max(0,b*2*hw*(1-(u-hw)/BK.E));}
+function trkNearest(K,x,z,i0){let best=i0,bd=1e18;for(let o=-40;o<=40;o++){const k=(i0+o+K.N)%K.N,p=K.pts[k],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;best=k;}}return best;}
+function trkGroundH(x,z){const K=TR.K;const k=trkNearest(K,x,z,TR.idx),p=K.pts[k],n=K.nrm[k];return trkH(K.BK,k,(x-p.x)*n.x+(z-p.z)*n.z,K.hw);}
+function trkExt(pts){let m=0;for(const p of pts)m=Math.max(m,Math.abs(p.x),Math.abs(p.z));return Math.max(900,2*m+320);}
+/* ---- pist listesi (sıra = menü sırası) ---- */
+(function(){const old=Object.assign({},TRACK_DEF);for(const k in TRACK_DEF)delete TRACK_DEF[k];
+  const D=(id,o)=>{TRACK_DEF[id]=o;};
+  D('oval',{name:'Oval Pist',kind:'Kolay · uzun düzlükler, eğimli virajlar',w:18,grip:1,laps:3,reward:250,pts:trkShape([['S',210],['L',85,180],['S',420],['L',85,180],['S',210]])});
+  D('uzun',{name:'Uzun Düz Yol',kind:'Kolay · çok uzun düzlük, iki dönüş',w:18,grip:1,laps:2,reward:300,pts:trkShape([['S',410],['L',62,180],['S',820],['L',62,180],['S',410]])});
+  D('daire',{name:'Daire Pisti',kind:'Kolay · hep aynı eğimli viraj',w:16,grip:1,laps:4,reward:280,pts:trkShape([['L',150,90],['L',150,90],['L',150,90],['L',150,90]])});
+  const sb=[['L',95,35],['R',95,35],['S',90],['R',95,35],['L',95,35]];
+  D('sviraj',{name:'S Virajlı Yol',kind:'Orta · düzlükler arasında S virajlar',w:16,grip:1,laps:3,reward:320,pts:trkShape([['S','auto'],...sb,['S',160],['L',75,180],['S',160],...sb,['S',160],['L',75,180],['S',160]])});
+  const ch=[['L',70,30],['R',70,30],['R',70,30],['L',70,30]];
+  D('pist',{name:'Arena Pisti',kind:'Asfalt pist · düzlük, S ve geniş virajlar',w:16,grip:1,laps:3,reward:300,pts:trkShape([['S','auto'],...ch,['S',140],['L',58,90],['S',190],['L',58,90],['S',140],...ch,['S',140],['L',58,90],['S',190],['L',58,90],['S',140]])});
+  D('ralli',{name:'Orman Rallisi',kind:'Toprak ralli · geniş ve kolay',w:12,grip:.82,laps:2,reward:350,dirt:1,pts:trkShape([['S','auto'],['L',55,180],['S',110],['R',60,30],['L',60,60],['R',60,30],['S',110],['L',55,180],['S',260]])});
+  D('motogp',Object.assign({},old.motogp,{pts:TRACK_DEF.pist.pts}));})();
+
 const TRK={};let TR={on:false},SURF=1;
 const stripeTex=canvasTex(64,16,(x,w,h)=>{x.fillStyle='#d8262b';x.fillRect(0,0,32,16);x.fillStyle='#f2f2f2';x.fillRect(32,0,32,16);},true);
 const dirtTex=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#8a6a48';x.fillRect(0,0,w,h);const r=rng(5);for(let i=0;i<2600;i++){const v=r();x.fillStyle=v<.5?`rgba(60,40,22,${.2+r()*.3})`:`rgba(190,160,120,${.15+r()*.25})`;x.fillRect(r()*w,r()*h,1+r()*3,1+r()*3);}},true);
 const trkGrassTex=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#4f7a3a';x.fillRect(0,0,w,h);const r=rng(9);for(let i=0;i<3500;i++){x.fillStyle=r()<.5?`rgba(30,60,20,${.25+r()*.3})`:`rgba(120,160,80,${.2+r()*.3})`;x.fillRect(r()*w,r()*h,1,2+r()*3);}},true);
-function buildTrack(id){if(TRK[id])return TRK[id];if(TRACK_DEF[id].base){const K0=buildTrack(TRACK_DEF[id].base);return TRK[id]=Object.assign({},K0,{D:TRACK_DEF[id]});}const D=TRACK_DEF[id],g=new T.Group(),obsT=[];const rally=id==='ralli';
+function buildTrack(id){if(TRK[id])return TRK[id];if(TRACK_DEF[id].base){const K0=buildTrack(TRACK_DEF[id].base);return TRK[id]=Object.assign({},K0,{D:TRACK_DEF[id]});}const D=TRACK_DEF[id],g=new T.Group(),obsT=[];const rally=id==='ralli'||!!D.dirt;
   const curve=new T.CatmullRomCurve3(D.pts.map(p=>new T.Vector3(p[0],0,p[1])),true,'centripetal');
   const len=curve.getLength(),N=Math.ceil(len/2.5),pts=curve.getSpacedPoints(N).slice(0,N),tan=[],nrm=[];
   for(let i=0;i<N;i++){const a=pts[(i+N-1)%N],b=pts[(i+1)%N];const t=new T.Vector3().subVectors(b,a).normalize();tan.push(t);nrm.push(new T.Vector3(t.z,0,-t.x));}
+  const BK=trkBank(pts,tan,nrm,N,rally),HY=(k,l)=>trkH(BK,k,l,hw);
   const ribbon=(off0,off1,y,mat,vScale)=>{const pos=[],uv=[],idx=[];let dist=0;
     for(let i=0;i<=N;i++){const k=i%N,p=pts[k],n=nrm[k];if(i>0)dist+=pts[k].distanceTo(pts[(i-1)%N]);
-      pos.push(p.x+n.x*off0,y,p.z+n.z*off0,p.x+n.x*off1,y,p.z+n.z*off1);uv.push(0,dist/vScale,1,dist/vScale);
+      pos.push(p.x+n.x*off0,y+HY(k,off0),p.z+n.z*off0,p.x+n.x*off1,y+HY(k,off1),p.z+n.z*off1);uv.push(0,dist/vScale,1,dist/vScale);
       if(i<N){const a=i*2;idx.push(a,a+2,a+1,a+1,a+2,a+3);}}
     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(idx);geo.computeVertexNormals();
     mat.side=T.DoubleSide;const m=new T.Mesh(geo,mat);m.receiveShadow=true;g.add(m);return m;};
   const hw=D.w/2;
   // zemin
   const gt=(rally?dirtTex:trkGrassTex).clone();gt.needsUpdate=true;gt.repeat.set(90,90);
-  const gnd=new T.Mesh(new T.PlaneGeometry(900,900),new T.MeshStandardMaterial({map:rally?trkGrassTex:gt,color:rally?0x6f8f55:0xffffff,roughness:1}));
+  const gnd=new T.Mesh(new T.PlaneGeometry(trkExt(pts),trkExt(pts)),new T.MeshStandardMaterial({map:rally?trkGrassTex:gt,color:rally?0x6f8f55:0xffffff,roughness:1}));
   if(rally){const t2=trkGrassTex.clone();t2.needsUpdate=true;t2.repeat.set(90,90);gnd.material.map=t2;}
-  gnd.rotation.x=-PI/2;gnd.receiveShadow=true;g.add(gnd);
+  gnd.rotation.x=-PI/2;gnd.position.y=.006;gnd.receiveShadow=true;g.add(gnd);
   // yol
   const roadMat=rally?new T.MeshStandardMaterial({map:dirtTex,roughness:1,color:0xffffff}):new T.MeshStandardMaterial({map:asphaltTex,color:0x9aa0a8,roughness:.9});
   ribbon(-hw,hw,.02,roadMat,10);
+  {const em=rally?new T.MeshStandardMaterial({map:dirtTex,roughness:1,color:0xb8a68c}):new T.MeshStandardMaterial({map:trkGrassTex,roughness:1,color:0xd8e8c8});ribbon(hw,hw+BK.E,.012,em,6);ribbon(-hw-BK.E,-hw,.012,em,6);}
   if(!rally){ribbon(-hw+.35,-hw+.55,.025,M.line,4);ribbon(hw-.55,hw-.35,.025,M.line,4);}
   // virajlarda kerb
   if(!rally){const cm=new T.MeshStandardMaterial({map:stripeTex,roughness:.7,side:T.DoubleSide});
     const curv=i=>tan[(i+3)%N].angleTo(tan[(i+N-3)%N]);
     let s0=-1;for(let i=0;i<=N;i++){const on=i<N&&curv(i)>.16;if(on&&s0<0)s0=i;if(!on&&s0>=0){for(const side of[-1,1]){const pos=[],uv=[],idx=[];let dist=0;
         for(let j=s0;j<=i;j++){const k=j%N,p=pts[k],n=nrm[k];if(j>s0)dist+=p.distanceTo(pts[(j-1)%N]);const o0=side*hw,o1=side*(hw+1.3);
-          pos.push(p.x+n.x*o0,.035,p.z+n.z*o0,p.x+n.x*o1,.06,p.z+n.z*o1);uv.push(0,dist/2,1,dist/2);if(j<i){const a=(j-s0)*2;idx.push(a,a+2,a+1,a+1,a+2,a+3);}}
+          pos.push(p.x+n.x*o0,.035+HY(k,o0),p.z+n.z*o0,p.x+n.x*o1,.06+HY(k,o1),p.z+n.z*o1);uv.push(0,dist/2,1,dist/2);if(j<i){const a=(j-s0)*2;idx.push(a,a+2,a+1,a+1,a+2,a+3);}}
         const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));
         geo.setIndex(side>0?idx:idx.map((v,q)=>idx[q-q%3+(2-q%3)]));geo.computeVertexNormals();const m=new T.Mesh(geo,cm);m.receiveShadow=true;g.add(m);}s0=-1;}}}
   // bariyerler (yumuşak çarpışma)
@@ -4227,7 +4318,7 @@ function buildTrack(id){if(TRK[id])return TRK[id];if(TRACK_DEF[id].base){const K
     beam.position.set(p.x,6.6,p.z);beam.rotation.y=yaw;g.add(beam);
     if(!rally)for(const s of[-1,1]){const px=p.x+n.x*(off+9)*s,pz=p.z+n.z*(off+9)*s;for(let k=0;k<4;k++)addBox(g,px+t.x*0+n.x*k*1.6*s,k*1.1,pz+n.z*k*1.6*s,3,1.1,40,yaw,new T.MeshStandardMaterial({color:k%2?0x3a4250:0x56606e,roughness:.8}));}}
   g.visible=false;trackGroup.add(g);
-  return TRK[id]={g,pts,tan,nrm,N,hw,obs:obsT,D,len};}
+  return TRK[id]={g,pts,tan,nrm,N,hw,obs:obsT,D,len,BK};}
 function startTrack(id){const K=buildTrack(id);mode='track';try{mrClear();}catch(e){}
   if(K.D.race&&!CARS[curInst().key].moto){const g=save.garage.find(x=>x.key==='mruz')||save.garage.find(x=>CARS[x.key].moto);if(g){save.curId=g.id;persist();toast(CARS[g.key].name+' ile yarışıyorsun · garajdan motor değiştirebilirsin');}}
   clearLevel();removeTargetFx();obs=K.obs.slice();pads=[];
