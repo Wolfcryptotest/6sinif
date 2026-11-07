@@ -392,7 +392,7 @@ body.touch .screen[data-back]{padding-left:calc(66px + env(safe-area-inset-left,
   <div class="logo"><div class="slotmark">P</div><div class="wordmark">PARK<br><em>ARENA</em></div></div>
   <p class="tag">Milimetrik park, geniş şehir, tam kontrolcü desteği. Direksiyon sende.</p>
   <div class="press"><i class="g x" data-k="ENTER"></i> <span id="press-t">Başlamak için bas</span></div>
-  <div class="ver">v2.6 · Wolfman Games<br><span style="opacity:.6">3D araçlar (CC BY 4.0): Comrade1280 · Daniel Zhabotinsky · Swiss_Fox</span></div>
+  <div class="ver">v2.6.1 · Wolfman Games<br><span style="opacity:.6">3D araçlar (CC BY 4.0): Comrade1280 · Daniel Zhabotinsky · Swiss_Fox</span></div>
   <button data-f id="b-start" style="position:absolute;inset:0;opacity:0" aria-label="Başla"></button>
 </section>
 
@@ -2300,11 +2300,23 @@ function mkRiderHuman(rider,o){const m=T.SkeletonUtils.clone(PA_HUMAN.scene);rid
   const bones={};m.traverse(x=>{if(x.isBone)bones[x.name.replace(/^mixamorig:?/,'')]=x});const bk={};for(const k in RB_NM)bk[k]=bones[RB_NM[k]];
   if(!bk.h||!bk.la||!bk.lu||!bk.hd)throw new Error('iskelet eksik');
   const sk=(c,me,ro)=>new T.MeshStandardMaterial({color:c,metalness:me,roughness:ro,skinning:true});
-  const mTop=sk(o.col!=null?o.col:0x1d1f24,.06,.42);mTop.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vB;').replace('#include <begin_vertex>','#include <begin_vertex>\nvB=position;');sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vB;').replace('void main() {','void main() {\nif(vB.y<0.93)discard;')};
-  const mBot=o.pro?sk(0xe9e9e6,.05,.4):sk(0x17181c,.08,.55),mDark=sk(0x0d0e10,.05,.72),mBoot=sk(0x111214,.2,.45);
+  // deri yarış tulumu: bağlama-uzayı (vB) koordinatlarıyla panel, şerit, fermuar, diz paneli + deri dokusu
+  const baseC=new T.Color(o.col!=null?o.col:0x1d1f24),lum=baseC.r*.3+baseC.g*.59+baseC.b*.11,accC=new T.Color(lum>.55?0x16181c:0xf2f2f0).convertSRGBToLinear();
+  const suitMat=(col,part)=>{const mt=sk(col,.04,.46);mt.customProgramCacheKey=()=>'suit-'+part;mt.onBeforeCompile=sh=>{sh.uniforms.uA={value:accC};
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vB;').replace('#include <begin_vertex>','#include <begin_vertex>\nvB=position;');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vB;uniform vec3 uA;float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}')
+      .replace('void main() {','void main() {\n'+(part==='top'?'if(vB.y<0.93)discard;':''))
+      .replace('#include <color_fragment>','#include <color_fragment>\n float ax=abs(vB.x);vec3 c=diffuseColor.rgb;\n'+(part==='top'?
+        ' if(ax>0.105&&ax<0.155&&vB.y<1.43)c=uA;\n if(vB.y>1.37&&ax>0.175)c=uA;\n if(ax>0.3&&vB.y<1.37&&vB.y>1.33)c=mix(c,uA,0.85);\n if(ax<0.006&&vB.z>0.0)c*=0.25;\n if(vB.y<0.99)c*=0.55;\n':
+        ' if(vB.y>0.4&&vB.y<0.6&&vB.z>0.02)c=uA;\n if(ax>0.155&&vB.y<0.9)c=uA;\n if(vB.y>0.84)c*=0.6;\n')+
+        ' float n=hs(floor(vB.xy*420.0))*0.06+hs(floor(vB.zy*90.0))*0.05;c*=0.94+n;diffuseColor.rgb=c;')
+      .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=clamp(roughnessFactor+(hs(floor(vB.xy*300.0))-0.5)*0.18,0.25,0.8);')};return mt};
+  const mTop=suitMat(o.col!=null?o.col:0x1d1f24,'top');
+  const mBot=suitMat(o.pro?0xe9e9e6:0x202227,'bot'),mDark=sk(0x0d0e10,.05,.72),mBoot=sk(0x0e0f11,.25,.32);
   m.traverse(x=>{if(!x.isMesh)return;const n=x.name;x.frustumCulled=false;x.castShadow=true;
     if(/Head|Hair|Teeth|Eye|Beard|Glass|Headwear|Facewear|Mask/i.test(n)){x.visible=false;return}
-    x.material=/Top/i.test(n)?mTop:/Bottom/i.test(n)?mBot:/Foot/i.test(n)?mBoot:mDark});
+    if(/Foot/i.test(n)){x.visible=false;return}
+    x.material=/Top/i.test(n)?mTop:/Bottom/i.test(n)?mBot:mDark});
   // dinlenme (A/T) pozundan oturma pozuna: kollar aşağı, sonra sürüş açıları
   const mx=new T.AnimationMixer(m),idle=PA_HUMAN.animations.find(a=>a.name==='idle')||PA_HUMAN.animations[0];if(idle){const ac=mx.clipAction(idle);ac.play();mx.update(0);ac.stop()}
   const a=o.lean,B={s:[a*.62,0,0],s1:[a*.5,0,0],s2:[a*.3,0,0],n:[-a*.42,0,0],hd:[-a*.62,0,0],lu:[-1.45,0,.22],ru:[-1.45,0,-.22],ll:[2.0,0,0],rl:[2.0,0,0],lft:[.35,0,0],rft:[.35,0,0],la:[-1.1,0,.25],ra:[-1.1,0,-.25],lf:[-.6,0,0],rf:[-.6,0,0]};
@@ -2317,6 +2329,22 @@ function mkRiderHuman(rider,o){const m=T.SkeletonUtils.clone(PA_HUMAN.scene);rid
     if(bk[L+'h'])rbIK(bk[L+'a'],bk[L+'f'],bk[L+'h'],G,S.clone().add(V3(sx*.6,-.25,-.15)));
     const Hh=wpos(bk[L+'u']),F=rider.localToWorld(o.foot(sx).clone());rbIK(bk[L+'u'],bk[L+'l'],bk[L+'ft'],F,Hh.clone().add(V3(sx*.25,.35,.8)));
     const ft=bk[L+'ft'];ft.updateWorldMatrix(true,true);const toe=ft.children.find(c=>c.isBone);if(toe)rbAim(ft,toe,wpos(ft).add(V3(sx*.02,-.06,.16)))}
+  // aksesuarlar: kemiklere bağlı (sırt kamburu, diz slider, yarış botu konçu, eldiven bilekliği)
+  {m.updateWorldMatrix(true,true);const accM=new T.MeshStandardMaterial({color:accC,roughness:.4,metalness:.05}),suitM=new T.MeshStandardMaterial({color:baseC,roughness:.45,metalness:.05}),bootM=new T.MeshStandardMaterial({color:0x0e0f11,roughness:.3,metalness:.25}),sldM=new T.MeshStandardMaterial({color:0x2a2d33,roughness:.6});
+    const put=(bone,mesh,at,toward)=>{mesh.position.copy(rider.worldToLocal(at.clone()));if(toward){const d=rider.worldToLocal(toward.clone()).sub(mesh.position).normalize();mesh.quaternion.setFromUnitVectors(V3(0,1,0),d)}mesh.castShadow=true;rider.add(mesh);bone.attach(mesh);return mesh};
+    const Hh=wpos(bk.h),N=wpos(bk.n),S2=wpos(bk.s2),td=N.clone().sub(Hh).normalize(),back=V3(0,td.z,-td.y).normalize();
+    const hump=new T.Mesh(new T.SphereGeometry(.1,18,14),suitM);hump.scale.set(1.25,1.6,.8);put(bk.s2,hump,S2.clone().lerp(N,.55).addScaledVector(back,.1),N.clone().addScaledVector(back,.2));
+    const hs2=new T.Mesh(new T.SphereGeometry(.1,14,10),accM);hs2.scale.set(.5,1.5,.82);put(bk.s2,hs2,S2.clone().lerp(N,.55).addScaledVector(back,.115),N.clone().addScaledVector(back,.215));
+    for(const sx of[-1,1]){const L=sx<0?'r':'l',K=wpos(bk[L+'l']),A=wpos(bk[L+'ft']),F=wpos(bk[L+'f']),Hd2=bk[L+'h']?wpos(bk[L+'h']):F;
+      const out=V3(sx,0,0);
+      const sl=new T.Mesh(box(.04,.06,.11),sldM);put(bk[L+'l'],sl,K.clone().addScaledVector(out,.075).add(V3(0,0,.02)),null);
+      const shin=new T.Mesh(new T.CylinderGeometry(.064,.06,.24,16),bootM);put(bk[L+'l'],shin,A.clone().lerp(K,.24),K);
+      const bs=new T.Mesh(box(.016,.16,.05),accM);put(bk[L+'l'],bs,A.clone().lerp(K,.26).addScaledVector(out,.064),K);
+      {const fb=bk[L+'ft'],tb=fb.children.find(c=>c.isBone),Fp=wpos(fb),Tp=tb?wpos(tb):Fp.clone().add(V3(0,-.05,.15)),fd=Tp.clone().sub(Fp);
+        const foot=new T.Mesh(new T.SphereGeometry(.1,18,12),bootM);foot.scale.set(.62,1.35,.6);put(fb,foot,Fp.clone().addScaledVector(fd,.55).add(V3(0,-.015,0)),Tp.clone().addScaledVector(fd,.4));
+        const heel=new T.Mesh(new T.SphereGeometry(.07,14,10),bootM);heel.scale.set(.95,1,1);put(fb,heel,Fp.clone().add(V3(0,-.03,-.02)),null);
+        const ts=new T.Mesh(box(.05,.06,.035),sldM);put(fb,ts,Fp.clone().addScaledVector(fd,.75).addScaledVector(out,.05),Tp);}
+      const cuff=new T.Mesh(new T.CylinderGeometry(.05,.046,.1,14),mDark.clone());cuff.material.skinning=false;put(bk[L+'f'],cuff,F.clone().lerp(Hd2,.8),Hd2);}}
   // kask: kafa kemiğine bağla
   m.updateWorldMatrix(true,true);const hb=bk.hd,top=hb.children.find(c=>c.isBone&&/Top/i.test(c.name)),hp=wpos(hb),hc=top?hp.clone().lerp(wpos(top),.45):hp.clone().add(V3(0,.1,.01));
   const hg=new T.Group();hg.position.copy(rider.worldToLocal(hc.clone()));rider.add(hg);o.helmet(hg);hb.attach(hg);

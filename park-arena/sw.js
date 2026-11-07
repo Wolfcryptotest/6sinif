@@ -1,6 +1,6 @@
 // Park Arena: oyun ilk açılışta cihaza kaydedilir, sonra hızlı ve internetsiz açılır.
 // Sayfa (index.html) her açılışta önce internetten denenir; böylece güncellemeler kendiliğinden gelir.
-const SURUM = "park-arena-v2.6";
+const SURUM = "park-arena-v2.6.1";
 const MODEL = "park-arena-model-1"; // araç modelleri (değişmedikçe yeniden inmez)
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(["./", "manifest.webmanifest", "ikon-192.png", "ikon-512.png"])).then(() => self.skipWaiting()));
