@@ -15,7 +15,7 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET" || url.origin !== location.origin) return; // YouTube vb. dış istekler internetten
   const kapsam = self.registration.scope;
   if (!e.request.url.startsWith(kapsam)) return; // kapsam dışı
-  if (/^(\d+sinif|minik|v2|park-arena)\//.test(e.request.url.slice(kapsam.length))) return; // aynı sitedeki diğer sınıflara karışma
+  if (/^(\d+sinif|minik|v2|park-arena|gol-arena)\//.test(e.request.url.slice(kapsam.length))) return; // aynı sitedeki diğer sınıflara karışma
   e.respondWith(
     caches.open(SURUM).then((ca) => ca.match(e.request, { ignoreSearch: true }).then((c) => c || fetch(e.request).then((r) => {
       if (r.ok) ca.put(e.request, r.clone()); // hatalı yanıtlar (404) önbelleğe alınmaz
