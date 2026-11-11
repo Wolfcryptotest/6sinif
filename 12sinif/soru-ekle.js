@@ -175,11 +175,11 @@
     const a2 = "aıou".includes(v) ? "a" : "e", d4 = { a: "ı", ı: "ı", o: "u", u: "u", e: "i", i: "i", ö: "ü", ü: "ü" }[v], e = ek.toLocaleLowerCase("tr");
     let tur;
     if (/^(n?[iıuü]n)$/.test(e)) tur = "in"; else if (/^(y?[ea])$/.test(e)) tur = "e"; else if (/^[dt][ea]n$/.test(e)) tur = "den"; else if (/^[dt][ea]$/.test(e)) tur = "de";
-    else if (/^s?[iıuü]$/.test(e)) tur = yuzde || /^s/.test(e) ? "si" : "i"; else if (/^y?[iıuü]$/.test(e)) tur = "i"; else return m;
-    const yeni = { in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, den: (st ? "t" : "d") + a2 + "n", de: (st ? "t" : "d") + a2, si: (sl ? "s" : "") + d4, i: (sl ? "y" : "") + d4 }[tur];
+    else if (/^[dt][iıuü]r$/.test(e)) tur = "dir"; else if (/^s?[iıuü]$/.test(e)) tur = yuzde || /^s/.test(e) ? "si" : "i"; else if (/^y?[iıuü]$/.test(e)) tur = "i"; else return m;
+    const yeni = { in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, den: (st ? "t" : "d") + a2 + "n", de: (st ? "t" : "d") + a2, si: (sl ? "s" : "") + d4, i: (sl ? "y" : "") + d4, dir: (st ? "t" : "d") + d4 + "r" }[tur];
     return (yuzde || "") + sayi + "'" + yeni;
   }
-  const ekDuzelt = (t) => typeof t !== "string" ? t : t.replace(/(^|[^\d.,:\/])(%?)((?:\d+\/)?(?:\d{1,3}(?:[ .]\d{3})+|\d+)(?:,\d+)?)'(nin|nın|nun|nün|in|ın|un|ün|ye|ya|e|a|den|dan|ten|tan|de|da|te|ta|si|sı|su|sü|yi|yı|yu|yü|i|ı|u|ü)(?![a-zçğıöşü])/g, (m, o, y, n, e) => (n.includes("/") ? m : o + ekSayi(m.slice(o.length), n, y, e)));
+  const ekDuzelt = (t) => typeof t !== "string" ? t : t.replace(/(^|[^\d.,:\/])(%?)((?:\d+\/)?(?:\d{1,3}(?:[ .]\d{3})+|\d+)(?:,\d+)?)'(nin|nın|nun|nün|in|ın|un|ün|ye|ya|e|a|den|dan|ten|tan|de|da|te|ta|dir|dır|dur|dür|tir|tır|tur|tür|si|sı|su|sü|yi|yı|yu|yü|i|ı|u|ü)(?![a-zçğıöşü])/g, (m, o, y, n, e) => (n.includes("/") ? m : o + ekSayi(m.slice(o.length), n, y, e)));
   const ekleriDuzelt = (q) => { try { if (!q) return q; return { ...q, soru: ekDuzelt(q.soru), secenekler: Array.isArray(q.secenekler) ? q.secenekler.map(ekDuzelt) : q.secenekler, cozum: ekDuzelt(q.cozum) }; } catch (e) { return q; } };
   // Çözüm sonucu yazılmamışsa (ör. "P = F/S = 200/0,5.") ve işlem doğru şıkkı veriyorsa sonucu ekler: "… = 400 Pa"
   const SUP = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" };
