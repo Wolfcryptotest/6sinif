@@ -96,9 +96,11 @@ Bilge'nin kuralları:
 ### D. Deneyim
 - [ ] D1. Minik'teki Animasyonlu Anlatım'ın 1–4. sınıflara da eklenmesi.
 - [ ] D2. Erişilebilirlik: yazı boyutu ayarı, renk körlüğüne uygun doğru/yanlış renkleri.
+- [ ] D3. Video–konu eşleşme taraması: her `video:` kimliğinin YouTube başlığı (oEmbed) konu adıyla karşılaştırılır; uymayan video kaldırılır ya da doğrusuyla değiştirilir. (Adem'in bildirdiği smu1k1 "Dört İşlem Problemleri" ↔ "Kesir Problemleri" hatası 2026-11-11'de düzeltildi.)
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-11 — Adem'in bildirimi: Matematik Uygulamaları › Dört İşlem Problemleri (smu1k1) konusunda "Kesir Problemleri" videosu vardı; video kaldırıldı, konu YouTube arama bağlantısına döndü (6, 5, 7, 8, v2). D3 eklendi. Denetim: sorun yok.
 - 2026-11-11 — Denetim temizdi. A0 (kısmi): Bilge'ye Sor 5, 7–12'ye eklendi; ustalık puanından eksik listesi, günlük çalışma planı ve son yanlışın açıklaması. Sırada A0'ın YKS ayağı. Denetim: sorun yok.
 - 2026-11-11 — Öğretmen = uygulama içi asistan öğretmen Bilge (Adem'in açıklaması); A0 eklendi.
 - 2026-11-11 — Öğretmen görünümü iş listesinden çıkarıldı (şimdilik öğretmen ayağı yok).

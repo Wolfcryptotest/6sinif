@@ -300,7 +300,6 @@ window.ICERIK.s_matuyg = {
           "Örneğin bir defter 35 TL ve 4 defter alırsak 35 × 4 = 140 TL öderiz. 200 TL verirsek para üstü 200 − 140 = 60 TL olur. 60 TL'yi 3 kardeş eşit paylaşırsa her biri 60 ÷ 3 = 20 TL alır.",
           "Birden fazla işlem varsa işlem sırasına dikkat edilir: önce parantez içi, sonra çarpma ve bölme, en son toplama ve çıkarma yapılır. Sonucu kabaca tahmin etmek, hatayı fark etmeye yardım eder."
         ],
-        video: "IC5OCZe2-Zg",
         sorular: [
           S("Tanesi 35 TL olan defterlerden 4 tane alan Ayşe kaç TL öder?", ["140", "39", "120", "135"], "35 × 4 = 140"),
           S("200 TL ile 140 TL'lik alışveriş yapan biri kaç TL para üstü alır?", ["60", "340", "40", "70"], "200 − 140 = 60"),
