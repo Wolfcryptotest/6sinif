@@ -7,6 +7,7 @@ window.VIDEO = {
   s9: [["p sesi", "NFVrf6tfDQY"], ["h sesi", "SCLs2oErcsQ"], ["v sesi", "eWcKgQshf-o"]], s10: [["ğ sesi", "F-GTBeFG3Mc"], ["f sesi", "SrqzSgYZyQ8"], ["j sesi", "hHcPuTfUQFI"]],
   t1: "qkavTc5pKqQ", t2: "QIhq-9qj0Mw", t3: "L8r9GqaCesY", t4: "laJhxt_x1gw", t5: "HsKDXnAXlg4", t6: "N4VOoXnBwXA",
   m1: "pdsH7q45Axc", m2: "TqNoZx9k7pc", m3: "fjTNmhIBpZ4", m4: "E9elzurEWEI", m5: "cXxKjeJtM8U", m6: "Vyj4wdqkxZ8", m7: "2mR3EmwajXA", m8: "GrJb_I8vfyg", m9: "gKJv2A7geOw", m10: "GOuxGcDnpNY", m11: "EWwOe47VWLg", m12: "biSDHHNEI-U", m13: "OoH_j4Q-C_w", m14: "-335AukT7n4", m15: "cAXSpHrlH2o", m16: "NxfO4He1rPI",
-  h1: "WweyE22sXRg", h2: "rnYBSGDm0gc", h3: "w9CE8AfTDGI", h4: "Cdbsw4x9Dyk", h5: "3dFP2k_-Icw", h6: "hALiq65eDsg", h7: "mOm_rOLidgQ", h8: "eZ78MAaOiEI", h9: "2R9IIPPlmzI", h10: "V5DQFTpwJho", h11: "PWzv9F9_nn4", h12: "0FFxkiN9wQI", h14: "skqwQPB3BgU", h15: "rsXPa_ktgUU", h16: "iUFmxfFhOgY"
+  h1: "WweyE22sXRg", h2: "rnYBSGDm0gc", h3: "w9CE8AfTDGI", h4: "Cdbsw4x9Dyk", h5: "3dFP2k_-Icw", h6: "hALiq65eDsg", h7: "mOm_rOLidgQ", h8: "eZ78MAaOiEI", h9: "2R9IIPPlmzI", h10: "V5DQFTpwJho", h11: "PWzv9F9_nn4", h12: "0FFxkiN9wQI", h14: "skqwQPB3BgU", h15: "rsXPa_ktgUU", h16: "iUFmxfFhOgY",
+  h13: "ovu1OvxmNBw", "hb-trafik": "VpoyiYCE6YE", "hb-tabak": "QLGCUUCKsTo", "hb-guven": "K-lPpGl7OyU"
 };
 Object.values(window.DERS).forEach((d) => d.temalar.forEach((t) => t.konular.forEach((k) => { if (window.VIDEO[k.id]) k.video = window.VIDEO[k.id]; })));
