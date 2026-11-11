@@ -183,6 +183,14 @@
 .om-sinav{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--kart);border:1px solid var(--sinir);border-radius:14px;padding:10px 12px;margin-bottom:8px}
 .om-sinav b.yakin{color:#dc2626}
 .om-hoca{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.om-pencere{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center}
+.om-pencere-ic{background:var(--kart);color:var(--yazi);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px 22px;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+@media (min-width:700px){.om-pencere{align-items:center}.om-pencere-ic{border-radius:20px}}
+.om-pencere-dersler{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.om-pencere-dersler .kart{min-height:78px;padding:10px 12px}.om-pencere-dersler .ikon{font-size:26px}.om-pencere-dersler b{font-size:15.5px}
+.om-ders-btn{width:100%;margin:4px 0 6px;padding:12px 14px;font-size:17px;border-radius:12px}
+.om-pdf{display:inline-flex;flex-direction:column;align-items:flex-start;text-decoration:none;padding:12px 16px;border-radius:12px;margin:4px 0}
+.om-pdf small{font-weight:400;font-size:13px;opacity:.9}
 .om-ders-kutu{background:color-mix(in srgb,#2563eb 7%,var(--kart));border:1px solid color-mix(in srgb,#2563eb 30%,var(--sinir));border-radius:16px;padding:12px 14px;margin:0 0 16px}
 .om-ders-kutu h3{margin:0 0 8px;font-size:18px}
 .om-ders-kutu .om-satir{border-top:1px dashed var(--sinir);padding:8px 0}
@@ -208,8 +216,8 @@
       <div class="om-ust"><span>${m.kimden ? "👤 " + esc(m.kimden) : "👤 Gönderen yazılmadı"}</span><span>🕒 ${esc(zaman)}</span></div>
       ${m.metin ? `<p class="om-metin">${esc(m.metin)}</p>` : ""}
       ${m.ek ? `<div class="om-ek" data-ek="${m.id}"><span class="not">📎 ${esc(m.ek.ad)} yükleniyor…</span></div>` : ""}
-      ${duzenle ? `<div class="om-izgara">
-          <label>Ders<select data-alan="ders">${dersSecenek(m.ders)}</select></label>
+      ${duzenle ? `<button class="${m.ders ? "btn2" : "btn"} om-ders-btn" data-pencere="${m.id}">${m.ders ? `${d.ikon} ${esc(d.ad)} · değiştir` : "📚 Hangi ders? Seç"}</button>
+        <div class="om-izgara">
           <label>Türü<select data-alan="tur">${Object.entries(TUR).map(([k, v]) => `<option value="${k}" ${k === m.tur ? "selected" : ""}>${v}</option>`).join("")}</select></label>
           <label>${m.tur === "sinav" ? "Sınav tarihi" : m.tur === "odev" ? "Teslim tarihi" : "Tarih (isteğe bağlı)"}<input type="date" data-alan="tarih" value="${esc(m.tarih || "")}"></label>
           <label>Gönderen<input type="text" data-alan="kimden" value="${esc(m.kimden || "")}" placeholder="örn: Ayşe Hanım"></label>
@@ -231,7 +239,7 @@
         const url = URL.createObjectURL(blob);
         el.innerHTML = /^image\//.test(blob.type)
           ? `<a href="${url}" target="_blank" rel="noopener"><img class="om-resim" src="${url}" alt="${esc(m.ek.ad)}"></a>`
-          : `<a class="btn2" style="display:inline-block;text-decoration:none;padding:9px 12px" href="${url}" target="_blank" rel="noopener" download="${esc(m.ek.ad)}">📄 ${esc(m.ek.ad)} — aç</a>`;
+          : `<a class="btn om-pdf" href="${url}" target="_blank" rel="noopener" download="${esc(m.ek.ad)}">📄 PDF'i aç<small>${esc(m.ek.ad)}</small></a>`;
       } catch (e) { el.innerHTML = `<span class="not">📎 ${esc(m.ek.ad)} açılamadı</span>`; }
     }
   }
@@ -240,13 +248,15 @@
       const m = O.gelen.find((x) => x.id === el.closest(".om-kart").dataset.id); if (!m) return;
       m[el.dataset.alan] = el.value.trim ? el.value.trim() : el.value;
       if (el.dataset.alan === "kimden" && O.hocalar && !m.dersElle) { const d = dersTahmin(m.metin, m.kimden); if (d) m.ders = d; }
-      if (el.dataset.alan === "ders") { m.dersElle = true; if (m.tur === "odev" && !tarihTahmin(m.metin)) m.tarih = varsayilanTeslim(m.ders); }
+      if (el.dataset.alan === "ders") dersSec(m, m.ders);
+      if (el.dataset.alan === "kimden" && m.kimden && m.dersElle && m.ders) ogren(m.kimden, m.ders);
       if (el.dataset.alan === "tur" && m.tur === "odev" && !m.tarih) m.tarih = varsayilanTeslim(m.ders);
       kaydet(); yenile();
     }));
+    kap.querySelectorAll("[data-pencere]").forEach((b) => (b.onclick = () => { const m = O.gelen.find((x) => x.id === b.dataset.pencere); if (m) dersPenceresi(m, yenile); }));
     kap.querySelectorAll("[data-aktar]").forEach((b) => (b.onclick = () => {
       const m = O.gelen.find((x) => x.id === b.dataset.aktar); if (!m) return;
-      if (!m.ders) { alert("Önce mesajın hangi derse ait olduğunu seç."); return; }
+      if (!m.ders) { dersPenceresi(m, yenile); return; }
       if (m.tur === "sinav" && !m.tarih) { alert("Sınavın tarihini seç."); return; }
       aktar(m); kaydet(); yenile();
     }));
@@ -265,6 +275,54 @@
     }));
     ekleriGoster(kap);
   }
+  // Gönderen → ders ilişkisini öğren: bir kez seçilince o gönderenin sonraki mesajları kendiliğinden o derse gider
+  function ogren(ad, dk) {
+    ad = String(ad || "").trim(); if (!ad || !dk) return;
+    const n = norm(ad);
+    for (const [d, l] of Object.entries(O.hocalar)) {
+      const kalan_ = String(l).split(",").map((x) => x.trim()).filter((x) => x && norm(x) !== n);
+      if (kalan_.length) O.hocalar[d] = kalan_.join(", "); else delete O.hocalar[d];
+    }
+    O.hocalar[dk] = O.hocalar[dk] ? O.hocalar[dk] + ", " + ad : ad;
+    O.gelen.filter((x) => x.durum === "yeni" && !x.dersElle && x.kimden && norm(x.kimden) === n).forEach((x) => { x.ders = dk; if (x.tur === "odev" && !tarihTahmin(x.metin)) x.tarih = varsayilanTeslim(dk); });
+  }
+  function dersSec(m, dk) {
+    m.ders = dk; m.dersElle = true;
+    if (m.tur === "odev" && !tarihTahmin(m.metin)) m.tarih = varsayilanTeslim(dk);
+    if (m.kimden) ogren(m.kimden, dk);
+  }
+  // Ders seçme penceresi: büyük ders düğmeleri; gönderen yazılırsa o ad o derse kaydedilir
+  function dersPenceresi(m, sonra) {
+    const eski = document.getElementById("omPencere"); if (eski) eski.remove();
+    const p = document.createElement("div");
+    p.id = "omPencere"; p.className = "om-pencere";
+    const ozet = (m.metin || (m.ek ? "📎 " + m.ek.ad : "")).replace(/\s+/g, " ").slice(0, 160);
+    const bilinen = [...new Set(Object.values(O.hocalar).flatMap((l) => String(l).split(",").map((x) => x.trim()).filter(Boolean)))];
+    p.innerHTML = `<div class="om-pencere-ic" role="dialog" aria-label="Ders seç">
+      <b style="font-size:19px">📚 Bu mesaj hangi dersle ilgili?</b>
+      <p class="om-metin not" style="margin:6px 0 10px">${esc(ozet)}</p>
+      <label class="not" style="display:block;margin-bottom:10px">Gönderen (isteğe bağlı — yazarsan bir dahakine ders kendiliğinden seçilir)
+        <input type="text" id="omPKimden" list="omPListe" value="${esc(m.kimden || "")}" placeholder="örn: Halit Hoca Türkçe" style="font:inherit;font-size:16px;padding:9px 10px;border-radius:10px;border:1px solid var(--sinir);background:var(--bg);color:var(--yazi);width:100%;margin-top:4px">
+        <datalist id="omPListe">${bilinen.map((x) => `<option value="${esc(x)}">`).join("")}</datalist></label>
+      <div class="om-pencere-dersler">${dersler().filter((d) => d.key !== "secmeli").map((d) => `<button class="kart ders" style="--renk:${d.renk}" data-pd="${esc(d.key)}"><span class="ikon">${d.ikon}</span><b>${esc(d.ad)}</b></button>`).join("")}</div>
+      <div class="om-dugmeler" style="margin-top:12px"><button class="btn2" id="omPArsiv">📢 Derse ait değil (arşivle)</button><button class="btn2" id="omPKapat">Sonra seçerim</button></div>
+    </div>`;
+    document.body.appendChild(p);
+    const kapat = () => { p.remove(); sonra && sonra(); };
+    p.querySelectorAll("[data-pd]").forEach((b) => (b.onclick = () => {
+      m.kimden = p.querySelector("#omPKimden").value.trim();
+      dersSec(m, b.dataset.pd); kaydet(); kapat();
+    }));
+    p.querySelector("#omPArsiv").onclick = () => { m.durum = "arsiv"; kaydet(); kapat(); };
+    p.querySelector("#omPKapat").onclick = () => { p.remove(); git(okulAna, "📩 Okul Mesajları", false); };
+  }
+  // Dersi bulunamayan yeni mesajlar için pencereyi sırayla aç
+  function sirayla(liste) {
+    const m = liste.find((x) => x.durum === "yeni" && !x.ders);
+    if (!m) { git(okulAna, "📩 Okul Mesajları", false); return; }
+    dersPenceresi(m, () => sirayla(liste.filter((x) => x !== m)));
+  }
+
   function aktar(m) {
     m.durum = "aktarildi";
     if (m.tur === "duyuru") return;
@@ -281,13 +339,13 @@
     const hocaSay = Object.values(O.hocalar).filter((x) => String(x).trim()).length;
     ekran.innerHTML = `
       <a class="om-bip" href="${BIP_WEB}" target="_blank" rel="noopener"><span style="font-size:32px">💬</span><span>BiP Web'i aç<small>Okul grubundaki mesajı seç → Kopyala → buraya dön, yapıştır</small></span></a>
-      ${hocaSay ? "" : `<div class="om-giris" style="border-color:#f59e0b"><b>👩‍🏫 Önce hocaları tanıtalım</b><p class="not" style="margin:4px 0 8px">Hangi hoca hangi dersin? Bir kez yazınca mesajlar kendiliğinden doğru derse ayrılır.</p><button class="btn" id="omHocaIlk">Hocaları yaz</button></div>`}
+      ${hocaSay ? "" : `<p class="not" style="margin:0 0 12px">💡 Hoca adı yazmana gerek yok: dersi bulunamayan mesajda ders penceresi açılır, sen seçersin; gönderen adı varsa uygulama bir dahakine o dersi kendisi seçer.</p>`}
       <div class="om-giris">
         <b>➕ Yeni okul mesajı</b>
         <textarea id="omMetin" placeholder="BiP'ten kopyaladığın mesajı buraya yapıştır…"></textarea>
         <div class="om-izgara">
-          <label>Kimden? (isteğe bağlı)<select id="omKimden"><option value="">—</option>${Object.entries(O.hocalar).flatMap(([d, a]) => String(a).split(",").map((x) => x.trim()).filter(Boolean).slice(0, 1).map((x) => `<option value="${esc(x)}">${esc(x)} · ${esc(dersBul(d).ad)}</option>`)).join("")}</select></label>
-          <label>Resim / PDF (isteğe bağlı)<input type="file" id="omDosya" accept="image/*,application/pdf"></label>
+          <label>Kimden? (isteğe bağlı)<select id="omKimden"><option value="">—</option>${Object.entries(O.hocalar).flatMap(([d, a]) => String(a).split(",").map((x) => x.trim()).filter(Boolean).map((x) => `<option value="${esc(x)}">${esc(x)} · ${esc(dersBul(d).ad)}</option>`)).join("")}</select></label>
+          <label>Resim / PDF (isteğe bağlı, birden çok seçilebilir)<input type="file" id="omDosya" accept="image/*,application/pdf" multiple></label>
         </div>
         <div class="om-dugmeler"><button class="btn" id="omEkle">➕ Ekle</button><button class="btn2" id="omYapistir">📋 Panodan yapıştır</button></div>
       </div>
@@ -316,12 +374,18 @@
     });
     if (!kutu.children.length) kutu.outerHTML = '<p class="not">Derse aktardığın mesajlar burada ders ders toplanır.</p>';
     $("omEkle").onclick = async () => {
-      const metin = $("omMetin").value, dosya = $("omDosya").files[0], kimden = $("omKimden").value;
-      if (!metin.trim() && !dosya) { alert("Önce mesajı yapıştır ya da bir resim seç."); return; }
-      let ek = null;
-      const eklenen = mesajEkle(metin, kimden, dosya ? { ad: dosya.name || "ek", tip: dosya.type } : null);
-      if (dosya) { try { await ekYaz(eklenen[0].id, await kucult(dosya)); } catch (e) { alert("Resim bu cihaza kaydedilemedi; mesaj metni kaydedildi."); eklenen[0].ek = null; kaydet(); } }
-      yenile();
+      const metin = $("omMetin").value, dosyalar = [...$("omDosya").files], kimden = $("omKimden").value;
+      if (!metin.trim() && !dosyalar.length) { alert("Önce mesajı yapıştır ya da bir resim/PDF seç."); return; }
+      const hepsi = [];
+      if (metin.trim() || !dosyalar.length) hepsi.push(...mesajEkle(metin, kimden, null));
+      for (const dosya of dosyalar) {
+        const [m] = mesajEkle("", kimden || (hepsi[0] && hepsi[0].kimden) || "", { ad: dosya.name || "ek", tip: dosya.type });
+        if (hepsi[0] && !m.ders && hepsi[0].ders) { m.ders = hepsi[0].ders; m.tur = hepsi[0].tur; m.tarih = hepsi[0].tarih; }
+        try { await ekYaz(m.id, await kucult(dosya)); } catch (e) { alert(dosya.name + " bu cihaza kaydedilemedi."); m.ek = null; }
+        hepsi.push(m);
+      }
+      kaydet();
+      sirayla(hepsi);
     };
     $("omYapistir").onclick = async () => {
       try { const t = await navigator.clipboard.readText(); if (t) { $("omMetin").value = t; return; } } catch (e) {}
@@ -369,7 +433,7 @@
       <p><b>2. Mesaj gelince (en hızlı yol):</b> BiP Web'de mesajı seçip kopyala, buraya dön, <b>📋 Panodan yapıştır</b> → <b>➕ Ekle</b>.</p>
       <p><b>3. Paylaş menüsüyle:</b> Mesaj yazısını seçip <b>Paylaş</b>'a dokun ve listeden bu uygulamayı seç; mesaj kendiliğinden buraya düşer.</p>
       <p><b>4. Resim ya da PDF:</b> BiP Web'de resmi/PDF'i indir, sonra burada <b>Resim / PDF</b> kutusundan seç. Resmin altına kısa bir not yazarsan (örn. "Matematik s. 45") ders daha kolay bulunur.</p>
-      <p><b>5. Derse ayır:</b> Uygulama dersi, ödev mi sınav mı olduğunu ve tarihi tahmin eder. Doğruysa <b>✅ Derse aktar</b>'a dokun. Ödevler <b>Ders Programım → Ödevlerim</b>'e eklenir; sınavlar "Yaklaşan sınavlar"da geri sayılır.</p>
+      <p><b>5. Derse ayır:</b> Ders bulunamazsa <b>ders penceresi</b> açılır; dersi sen seçersin. Gönderen adını da yazarsan (telefonda nasıl kayıtlıysa, örn. "Halit Hoca Türkçe") uygulama bunu öğrenir ve o kişinin sonraki mesajlarında dersi kendisi seçer. Ödev mi sınav mı olduğunu ve tarihi de tahmin eder. Doğruysa <b>✅ Derse aktar</b>'a dokun. Ödevler <b>Ders Programım → Ödevlerim</b>'e eklenir; sınavlar "Yaklaşan sınavlar"da geri sayılır.</p>
       <p class="not">Mesajlar sadece bu telefonda saklanır; başka öğrenciler görmez.</p></div>`;
   }
 
@@ -401,7 +465,7 @@
     if (q.has("paylas")) {
       const metin = [q.get("baslik"), q.get("metin"), q.get("link")].filter(Boolean).join("\n").trim();
       history.replaceState(null, "", location.pathname);
-      if (metin) { mesajEkle(metin, "", null); setTimeout(() => git(okulAna, "📩 Okul Mesajları"), 0); }
+      if (metin) { const e = mesajEkle(metin, "", null); setTimeout(() => { git(okulAna, "📩 Okul Mesajları"); sirayla(e); }, 0); }
     }
   } catch (e) {}
 
