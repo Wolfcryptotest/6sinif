@@ -1,11 +1,14 @@
-// 🦉 Bilge'ye Sor (6. sınıf): ücretsiz, internete veri göndermeyen sohbet öğretmeni.
-// Cevapları sitedeki konu anlatımlarından, özet notlardan, İngilizce sözlükten ve öğrencinin ders programından (program.js) üretir.
+// 🦉 Bilge'ye Sor (5–12. sınıflar): ücretsiz, internete veri göndermeyen sohbet öğretmeni.
+// ANA KOPYA kökteki sohbet.js'dir; 5, 7–12 klasörlerine aynen kopyalanır (eylul-bilge kökü kullanır).
+// Cevapları sitedeki konu anlatımlarından, özet notlardan, İngilizce sözlükten, öğrencinin ders programından (program.js)
+// ve öğrencinin kendi ustalık puanlarından (ustalik.js → kayit.ustalik) ve yanlışlarından (kayit.yanlislar) üretir.
 // Basit işlemleri hesaplar. Cevap bulamazsa güvenli kaynaklarda arama bağlantısı ve "öğretmenine sor" önerisi verir.
 // Yazılanlar hiçbir yere gönderilmez ve kaydedilmez (yalnızca ekranda, sayfa kapanınca silinir).
 (function () {
   if (typeof kayit === "undefined" || !window.ICERIK) return;
   const mesajlar = []; // { kim: "ben"|"bilge", html }
   const P = () => kayit.program || {};
+  const SN = (() => { const m = /(\d+)sinif\/[^/]*$/.exec(location.pathname); return m ? +m[1] : 6; })();
 
   // ---------- Metin yardımcıları ----------
   const kucuk = (s) => s.toLocaleLowerCase("tr").normalize("NFC");
@@ -117,6 +120,11 @@
         "Yapamıyorum yerine <b>henüz</b> yapamıyorum diyelim. 💪 Beynimiz çalıştıkça güçlenen bir kas gibidir. İstersen kolay bir konudan 5 soru çözerek ısınalım.",
         "Kısa bir mola, bir bardak su ve derin bir nefes… Sonra en sevdiğin dersten bir test çözerek başla. Başladığın an en zor kısım biter! ⭐"]) };
 
+    // Öğrencinin kendi verisinden: eksikler, bugünkü çalışma, son yanlış
+    if (/neyi bilmiyorum|eksikler|eksiğim|eksik konu|zayıf olduğum|zayıf konu|bilmediğim konu|nerede kötüyüm|hangi konularda kötü/.test(q)) return eksiklerim();
+    if (/ne çalış|neyi çalış|bugün ne yap|ne yapsam|nereden başla|plan yap/.test(q)) return bugunCalis();
+    if (/yanlış yaptım|yanlışım|neden yanlış|niye yanlış|yanlışımı|hatamı|son yanlış/.test(q)) return sonYanlis();
+
     // Ders programı ve ödevler
     const pr = P();
     if (ICERDE(q, "ödev")) {
@@ -169,9 +177,71 @@
     // Bulunamadı: güvenli kaynaklar
     const aranan = encodeURIComponent(girdi.trim().slice(0, 100));
     return {
-      html: `Bu sorunun cevabını sitedeki 6. sınıf konularında bulamadım. 🤔<br>Şunları deneyebilirsin:<br>• Sorunu başka kelimelerle yaz (örn. konunun adını kullan).<br>• Güvenli kaynaklarda ara: <a href="https://tr.wikipedia.org/w/index.php?search=${aranan}" target="_blank" rel="noopener">📘 Vikipedi'de ara</a> · <a href="https://www.eba.gov.tr/" target="_blank" rel="noopener">🏫 EBA</a><br>• En iyisi: <b>öğretmenine ya da ailene sor</b>. 🙂`
+      html: `Bu sorunun cevabını sitedeki ${SN}. sınıf konularında bulamadım. 🤔<br>Şunları deneyebilirsin:<br>• Sorunu başka kelimelerle yaz (örn. konunun adını kullan).<br>• Güvenli kaynaklarda ara: <a href="https://tr.wikipedia.org/w/index.php?search=${aranan}" target="_blank" rel="noopener">📘 Vikipedi'de ara</a> · <a href="https://www.eba.gov.tr/" target="_blank" rel="noopener">🏫 EBA</a><br>• En iyisi: <b>öğretmenine ya da ailene sor</b>. 🙂`
     };
   }
+  // ---------- Ustalık verisini okuyan cevaplar ----------
+  const UST = () => (window.USTALIK && USTALIK.U) || kayit.ustalik || {};
+  const GUN = 86400000;
+  const dersA = (dk) => (ICERIK[dk] && ICERIK[dk].ad) || dersAd(dk);
+  function konuB(id) { for (const [dk, D] of Object.entries(ICERIK)) for (const u of D.uniteler) for (const k of u.konular) if (k.id === id) return { dk, un: u, k }; return null; }
+  const calisilan = () => Object.entries(UST()).filter(([id, u]) => u && u.n && konuB(id)).map(([id, u]) => ({ id, u, ...konuB(id) }));
+  const satir = (x, ek) => `• <b>${esc(x.k.ad)}</b> <small>(${esc(dersA(x.dk))}${ek ? " · " + ek : ""})</small>`;
+  const btn = (x, i = "✏️") => [`${i} ${x.k.ad.length > 22 ? x.k.ad.slice(0, 21) + "…" : x.k.ad}`, "test:" + x.k.id];
+  function eksiklerim() {
+    const l = calisilan();
+    if (!l.length) return { html: `Henüz yeterince soru çözmedin, o yüzden eksiklerini bilemiyorum. 🦉<br>Her dersten birkaç konuda <b>5'er soru</b> çöz; ben de puanlarına bakıp sana neyi bilmediğini söyleyeyim.` };
+    const zayif = l.filter((x) => x.u.p < 60).sort((a, b) => a.u.p - b.u.p);
+    const unutulan = l.filter((x) => x.u.p >= 60 && x.u.sonraki <= Date.now()).sort((a, b) => a.u.sonraki - b.u.sonraki);
+    if (!zayif.length && !unutulan.length) return { html: `Çözdüğün ${l.length} konunun hepsinde iyisin! 🌟 Şimdi yeni bir konuya geçebilirsin. Hangi konuya geçeceğini bilmiyorsan <i>"Bugün ne çalışayım?"</i> diye sor.` };
+    const dersSay = {}; zayif.forEach((x) => (dersSay[x.dk] = (dersSay[x.dk] || 0) + 1));
+    const enDers = Object.entries(dersSay).sort((a, b) => b[1] - a[1])[0];
+    return {
+      html: `${zayif.length ? `🔎 Puanına göre <b>henüz oturmamış</b> konuların:<br>${zayif.slice(0, 5).map((x) => satir(x, x.u.p + "/100")).join("<br>")}` : ""}` +
+        `${unutulan.length ? `${zayif.length ? "<br><br>" : ""}🧠 Bildiğin ama <b>tekrar zamanı gelen</b> konular (tekrar etmezsen unutulur):<br>${unutulan.slice(0, 3).map((x) => satir(x)).join("<br>")}` : ""}` +
+        `${enDers && enDers[1] > 1 ? `<br><br>En çok eksiğin <b>${esc(dersA(enDers[0]))}</b> dersinde.` : ""}<br><small>Önce konu anlatımını oku, sonra 5 soru çöz. Doğru yaptıkça puanın artar. 💪</small>`,
+      btn: [...zayif.slice(0, 2), ...unutulan.slice(0, 1)].map((x) => btn(x))
+    };
+  }
+  function bugunCalis() {
+    const l = calisilan(), simdi = Date.now(), plan = [];
+    const tekrar = l.filter((x) => x.u.sonraki <= simdi).sort((a, b) => a.u.p - b.u.p);
+    tekrar.slice(0, 2).forEach((x) => plan.push({ x, neden: x.u.p < 60 ? "eksik, pekiştirelim" : "tekrar zamanı geldi" }));
+    l.filter((x) => x.u.p < 60 && !plan.some((y) => y.x.id === x.id)).sort((a, b) => a.u.p - b.u.p).slice(0, 3 - plan.length).forEach((x) => plan.push({ x, neden: "puanın düşük" }));
+    if (plan.length < 3) {
+      // Yeni konu: önce ders programında kaldığı yer, sonra en az çalışılan derste ilk denenmemiş konu
+      const U = UST(), son = Object.values(P().son || {});
+      const sira = [];
+      son.forEach((id) => { const b = konuB(id); if (b) { const i = b.un.konular.findIndex((k) => k.id === id); sira.push(...b.un.konular.slice(i).map((k) => ({ dk: b.dk, un: b.un, k }))); } });
+      const dersN = (dk) => calisilan().filter((x) => x.dk === dk).length;
+      Object.keys(ICERIK).sort((a, b) => dersN(a) - dersN(b)).forEach((dk) => { for (const u of ICERIK[dk].uniteler) for (const k of u.konular) sira.push({ dk, un: u, k }); });
+      for (const x of sira) { if (plan.length >= 3) break; if ((U[x.k.id] && U[x.k.id].n) || plan.some((y) => y.x.k.id === x.k.id) || plan.some((y) => y.x.dk === x.dk && y.neden === "yeni konu")) continue; plan.push({ x, neden: "yeni konu" }); }
+    }
+    if (!plan.length) return { html: "Bugün için her şey yolunda! 🎉 İstediğin bir konudan soru çözebilirsin." };
+    return {
+      html: `📋 <b>Bugünkü çalışma planın</b> (yaklaşık ${plan.length * 10} dakika):<br>${plan.map((p, i) => `${i + 1}. <b>${esc(p.x.k.ad)}</b> <small>(${esc(dersA(p.x.dk))} · ${p.neden})</small>`).join("<br>")}<br><small>Her konuda önce kısa anlatımı oku, sonra 5 soru çöz. Bitirince bir sonrakine geç. Ara vermeyi unutma! 🦉</small>`,
+      btn: plan.map((p) => btn(p.x, p.neden === "yeni konu" ? "📖" : "✏️")).map((b, i) => (plan[i].neden === "yeni konu" ? [b[0], "konu:" + plan[i].x.k.id] : b))
+    };
+  }
+  function sonYanlis() {
+    const y = (kayit.yanlislar || []).filter((z) => z && z.soru && z.secenekler).slice(-1)[0];
+    if (!y) return { html: "Kayıtlı bir yanlışın yok! 🎉 Bir test çözüp yanlış yaparsan bana <i>\"Bu soruyu neden yanlış yaptım?\"</i> diye sorabilirsin; sana açıklarım." };
+    const b = konuB(y.konuId), ayni = (kayit.yanlislar || []).filter((z) => z.konuId === y.konuId).length;
+    // Soruyla en çok örtüşen özet satırı (cevap + çözüm kelimeleri iki kat sayılır); örtüşme yoksa gösterilmez
+    const qk = new Set(kelimeler(y.soru).map(kok)), ck = new Set(kelimeler(`${y.secenekler[y.dogru]} ${y.cozum || ""}`).map(kok));
+    let ozet = null, enO = 0;
+    if (b) for (const t of b.k.ozet || []) { let o = 0; for (const w of new Set(kelimeler(t).map(kok))) o += (ck.has(w) ? 2 : 0) + (qk.has(w) ? 1 : 0); if (o > enO) { enO = o; ozet = t; } }
+    if (enO < 2) ozet = null;
+    return {
+      html: `Son yanlış yaptığın soru 👇<br><i>${esc(y.soru.length > 160 ? y.soru.slice(0, 159) + "…" : y.soru)}</i><br>✅ Doğru cevap: <b>${esc(y.secenekler[y.dogru])}</b>` +
+        `${y.cozum ? `<br>💡 <b>Neden?</b> ${esc(y.cozum)}` : ""}` +
+        `${ozet ? `<br><br>📌 Bu konunun anahtar bilgisi: ${esc(ozet)}` : ""}` +
+        `${ayni > 1 ? `<br><br>Bu konuda <b>${ayni}</b> yanlışın birikmiş. Konuyu bir kez daha okuyup yanlışlarını tekrar çözmek iyi gelir.` : ""}` +
+        `<br><small>Yanlış yapmak öğrenmenin parçasıdır. Şimdi benzer sorularla dene! 🌱</small>`,
+      btn: b ? [["📖 Konuyu aç", "konu:" + b.k.id], ["✏️ Benzer 5 soru", "test:" + b.k.id]] : []
+    };
+  }
+
   function konuBulAd(id) { for (const D of Object.values(ICERIK)) for (const u of D.uniteler) for (const k of u.konular) if (k.id === id) return k.ad; return null; }
   function konuBulK(id) { for (const D of Object.values(ICERIK)) for (const u of D.uniteler) for (const k of u.konular) if (k.id === id) return k; return null; }
 
@@ -204,8 +274,12 @@
   window.BILGE_AC = () => git(sohbet, "🦉 Bilge'ye Sor");
 
   // ---------- Sohbet ekranı ----------
+  // Öneri soruları: 6. sınıfta el ile seçilmiş; diğer sınıflarda içerikten (her dersin ilk konusu)
+  const ornekler = () => SN === 6 ? ["Deyim nedir?", "Asal sayı nedir?", "Güneş tutulması nasıl olur?", "apple ne demek?"]
+    : Object.values(ICERIK).slice(0, 3).map((D) => ((D.uniteler[0] || {}).konular || [])[0]).filter(Boolean).map((k) => `${k.ad.replace(/\s*\(.*\)$/, "")} nedir?`);
   function sohbet() {
-    if (!mesajlar.length) mesajlar.push({ kim: "bilge", html: `Merhaba! Ben <b>Bilge</b> 🦉 Sana derslerinde yardım ederim.<br>Bir konu sor (<i>"Asal sayı nedir?"</i>), bir İngilizce kelime sor (<i>"apple ne demek?"</i>), bir işlem yaz (<i>"125 ÷ 5"</i>) ya da ödevlerini, yarınki derslerini sor.<br><small>Cevaplarımı sitedeki ders anlatımlarından veriyorum. Yazdıkların hiçbir yere gönderilmez.</small>` });
+    const ornek = ornekler();
+    if (!mesajlar.length) mesajlar.push({ kim: "bilge", html: `Merhaba! Ben <b>Bilge</b> 🦉 Sana derslerinde yardım ederim.<br>Bir konu sor (<i>"${esc(ornek[0])}"</i>), bir işlem yaz (<i>"125 ÷ 5"</i>), <i>"Neyi bilmiyorum?"</i> ya da <i>"Bugün ne çalışayım?"</i> diye sor; ödevlerini, yarınki derslerini de sorabilirsin.<br><small>Cevaplarımı sitedeki ders anlatımlarından veriyorum. Yazdıkların hiçbir yere gönderilmez.</small>` });
     ekran.innerHTML = `<div class="sh-kutu" id="shKutu"></div>
       <div class="sh-giris"><input id="shIn" type="text" placeholder="Sorunu yaz…" autocomplete="off" enterkeyhint="send" maxlength="200" aria-label="Sorunu yaz"><button class="btn" id="shGon">Gönder</button></div>`;
     ciz();
@@ -224,7 +298,7 @@
     function ciz() {
       const kutu = $("shKutu"); if (!kutu) return;
       kutu.innerHTML = mesajlar.map((m, i) => `<div class="sh-m ${m.kim}">${m.html}${m.btn ? `<div class="sh-btn">${m.btn.map(([a, eylem]) => `<button class="btn2" data-e="${esc(eylem)}">${esc(a)}</button>`).join("")}</div>` : ""}</div>`).join("") +
-        (mesajlar.length <= 1 ? `<div class="sh-oneri">${["Deyim nedir?", "Asal sayı nedir?", "Güneş tutulması nasıl olur?", "apple ne demek?", "Yarın hangi derslerim var?", "Ödevlerim neler?", "12 × 15 kaç?"].map((x) => `<button data-s="${esc(x)}">${esc(x)}</button>`).join("")}</div>` : "");
+        (mesajlar.length <= 1 ? `<div class="sh-oneri">${["Neyi bilmiyorum?", "Bugün ne çalışayım?", "Bu soruyu neden yanlış yaptım?", ...ornek, "Yarın hangi derslerim var?", "12 × 15 kaç?"].map((x) => `<button data-s="${esc(x)}">${esc(x)}</button>`).join("")}</div>` : "");
       kutu.querySelectorAll("[data-s]").forEach((b) => (b.onclick = () => gonder(b.dataset.s)));
       kutu.querySelectorAll("[data-e]").forEach((b) => (b.onclick = () => {
         const e = b.dataset.e;
@@ -239,6 +313,6 @@
     setTimeout(() => { const i = $("shIn"); if (i && matchMedia("(pointer:fine)").matches) i.focus(); }, 50);
   }
 
-  window.BILGE_TEST = { cevapla, hesapla, ara };
+  window.BILGE_TEST = { cevapla, hesapla, ara, eksiklerim, bugunCalis, sonYanlis };
   if (window.ANA_YENILE) window.ANA_YENILE();
 })();

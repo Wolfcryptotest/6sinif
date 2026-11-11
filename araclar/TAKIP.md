@@ -38,7 +38,7 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
 
 ## Yapı (kısa)
 - **Kök:** 6. sınıf. **5–12:** `sinif/` klasörleri. İçerik `ICERIK[ders].uniteler[].konular[]` yapısındadır, soru üreticileri `URETEC[id]` içindedir.
-  - Ana kopyalar: `soru-ekle.js` için `8sinif/soru-ekle.js`; `takip.js` ve `ustalik.js` 5–12 arasında ortaktır.
+  - Ana kopyalar: `soru-ekle.js` için `8sinif/soru-ekle.js`; `sohbet.js` için kökteki dosya; `takip.js` ve `ustalik.js` 5–12 arasında ortaktır.
 - **Minik ve 1–4:** `DERS[dk].temalar[].konular[]`. Videolar `videolar.js` içindedir.
 - **YKS:** `yks/index.html` tek sayfadır. Ek dosyalar:
   - `yks/havuz.js`: 5–12'den otomatik üretilir.
@@ -56,8 +56,10 @@ Ayrı bir gerçek öğretmen bölümü yoktur. Aşağıdaki işlerin hepsi Bilge
 Bilge'nin kuralları:
 - Ücretsizdir ve internete veri göndermez. Cevaplarını sitedeki içerikten ve öğrencinin kendi verisinden üretir.
 - Yapay zekâ servisi (ücretli API) bağlamak Adem'in kararıdır.
-- Bilge'ye Sor (`sohbet.js`) şu an yalnızca 6. sınıfta var.
+- Bilge'ye Sor (`sohbet.js`) 5–12'de var (ana kopya kökteki `sohbet.js`; değişince 5, 7–12 klasörlerine aynen kopyalanır). YKS'de henüz yok.
 - [ ] **A0. Bilge her sınıfta.** Bilge'ye Sor 5, 7–12 ve YKS'ye taşınır. Bilge, öğrencinin ustalık puanlarını okuyarak "Neyi bilmiyorum?", "Bugün ne çalışayım?" ve "Bu soruyu neden yanlış yaptım?" sorularına cevap verir.
+  - [x] 5, 7–12'ye taşındı; "Neyi bilmiyorum?", "Bugün ne çalışayım?", "Bu soruyu neden yanlış yaptım?" cevapları eklendi (2026-11-11).
+  - [ ] YKS'ye taşınması (yks/index.html farklı yapıda; ustalık verisi ve konu yapısına uyarlanacak).
 - [ ] **A1. Seviye tespit sınavı.** 5–12'de her derse ilk girişte ünite başına 2–3 soruluk kısa bir tanılama yapılır. Sonuç `kayit.ustalik` puanlarına başlangıç değeri olarak yazılır ve "eksik haritası" gösterilir.
 - [ ] **A2. Ön koşul haritası.** `araclar/onkosul.json` dosyasında her konunun önceki sınıflardaki ön koşul konuları tutulur (ör. 8 mat2k1 → 7 m1k2).
   - Bir konuda ustalık puanı düşükse ön koşul konudan 3 soruluk bir kontrol yapılır.
@@ -97,6 +99,7 @@ Bilge'nin kuralları:
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-11 — Denetim temizdi. A0 (kısmi): Bilge'ye Sor 5, 7–12'ye eklendi; ustalık puanından eksik listesi, günlük çalışma planı ve son yanlışın açıklaması. Sırada A0'ın YKS ayağı. Denetim: sorun yok.
 - 2026-11-11 — Öğretmen = uygulama içi asistan öğretmen Bilge (Adem'in açıklaması); A0 eklendi.
 - 2026-11-11 — Öğretmen görünümü iş listesinden çıkarıldı (şimdilik öğretmen ayağı yok).
 - 2026-11-11 — Bot kuruldu; denetim aracı, yol haritası. Denetim: sorun yok.
