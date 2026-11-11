@@ -7,4 +7,7 @@ window.VIDEO = {
   f1: "fFwzBLsdv1c", f2: "fFwzBLsdv1c", f3: "bhJ6Rsuq8HE", f4: "TQKwHq1eTYE", f5: "DvMcpwM7EC8", f6: "wxUqXNf81F8", f8: "-r-hh8TXJnA", f9: "8q51ESFGN1A", f11: "OOj2VQRshqA", f12: "jPsCsNYibBE", f13: "J9_yr257Jog", f14: "Yco0yiSXoUI",
   e1: "hQvudH8MhHM", e2: "hQvudH8MhHM", e3: "hQvudH8MhHM", e4: "AzGGtaj8EfA", e5: "AzGGtaj8EfA", e6: "AzGGtaj8EfA", e7: "sDGJIEIUiRM", e9: "GuXeRjCmjsc", e10: "XKY95jpkatk", e11: "y-UU2nrEpIk", e12: "8nQtNSPD9io", e13: "8nQtNSPD9io", e14: "4A4plyorE9c", e15: "Ze2awJaESno", e16: "CpxHffd4KUg", e17: "aRy7LKxeTCQ"
 };
-Object.values(window.DERS).forEach((d) => d.temalar.forEach((t) => t.konular.forEach((k) => { if (window.VIDEO[k.id]) k.video = window.VIDEO[k.id]; })));
+Object.assign(window.VIDEO, {
+  "m18": "zrMb4v86wwE", "t14": "arKFogqqKJ8", "hayat:h7": "04Rm-NJqpkg", "hayat:h9": "cXsEtRWP3qU", "hayat:h17": "ytSG5O7YwTM", "f7": "V6VktQrgO0s", "f10": "jAfZentJ9B8", "f15": "E-Fn9aQLo8o", "f18": "sCB8Svq4css", "ingilizce:e8": "BcnboBYy-tA", "ingilizce:e18": "LqEjVDgs-ms", "ingilizce:e19": "v6MBO7aw0cY", "ingilizce:e20": "X00IqbDx-gw", "ingilizce:h7": "v6MBO7aw0cY", "ingilizce:h9": "f7U4UW2BAvE"
+});
+Object.entries(window.DERS).forEach(([dk, d]) => d.temalar.forEach((t) => t.konular.forEach((k) => { const v = window.VIDEO[dk + ":" + k.id] || window.VIDEO[k.id]; if (v) k.video = v; })));

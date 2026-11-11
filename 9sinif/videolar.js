@@ -48,5 +48,6 @@ window.VIDEO = {
   "din1k1": "ix1EVi0bVp4",  // Din Kültürü 9.Sınıf 1.Ünite Bilgi ve İnanç
   "din2k1": "kePHYyCDw8k",  // 9. Sınıf Din Kültürü İslam'da İbadet ve Kapsamı
   "din3k1": "1elKdj9m4Zc",  // Bir Genç Olarak Hz. Muhammed
+  "din4k1": "6iskw4h1Y6Q",  // Gönül Coğrafyamız / Din, kültür ve birlikte yaşam
 };
 Object.values(window.ICERIK || {}).forEach((d) => d.uniteler.forEach((u) => u.konular.forEach((k) => { if (window.VIDEO[k.id]) k.video = window.VIDEO[k.id]; })));
