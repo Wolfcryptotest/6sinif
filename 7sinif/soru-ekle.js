@@ -204,7 +204,33 @@
     } catch (e) { return q; }
   }
   // ---------- Tekrar önleme + sabit soruların payı ----------
+  // 🧩 Çözümlü örneği olmayan ana ders konularına, konunun üretecinden ve çözümlü sabit sorularından örnek çözüm ekler.
+  //    (Örnekler doğrulanmış üreteç/soru bankası içeriğinden gelir; çözüm metni yoksa örnek yapılmaz.)
+  function ornekleriTamamla() {
+    for (const [dk, D] of Object.entries(window.ICERIK || {})) {
+      if (/^s_/.test(dk) || !D || !D.uniteler) continue;
+      for (const u of D.uniteler) for (const k of u.konular || []) {
+        try {
+          if ((k.ornekler || []).length) continue;
+          const aday = [], gor = new Set();
+          const ekle = (q) => { if (!q || !q.soru || !q.secenekler) return; const kal = String(q.soru).replace(/[−-]?\d+(?:,\d+)?/g, "#"); if (gor.has(kal)) return; const c = String(q.cozum || "").trim(); if (c.length < 12) return; gor.add(kal); aday.push(ekleriDuzelt(cozumTamamla(q))); };
+          const U = window.URETEC && window.URETEC[k.id];
+          if (U) for (let i = 0; i < 25 && aday.length < 2; i++) { try { ekle(U()); } catch (e) {} }
+          const sabit = (k.sorular || []).filter((q) => !q.otomatik && String(q.cozum || "").length >= 25);
+          for (const q of karistir(sabit)) { if (aday.length >= 3) break; ekle(q); }
+          if (!aday.length) continue;
+          k.ornekler = aday.slice(0, 3).map((q0) => {
+            const dogruM = q0.secenekler[q0.dogru], kar = karistir(q0.secenekler.slice()), q = { ...q0, secenekler: kar, dogru: kar.indexOf(dogruM) };
+            const harf = "ABCD"[q.dogru] || "", sec = q.secenekler.map((x, i) => `${"ABCD"[i]}) ${x}`).join("   ");
+            return [`${q.soru}   ${sec}`, `Doğru cevap: ${harf}) ${q.secenekler[q.dogru]}. ${String(q.cozum).trim()}`];
+          });
+          k._ornekOto = true;
+        } catch (e) {}
+      }
+    }
+  }
   function sar() {
+    try { if (!window._ornekTamam) { window._ornekTamam = true; ornekleriTamamla(); } } catch (e) {}
     if (typeof window.soruHazirla !== "function" || window.soruHazirla._sarili) return;
     const asil = window.soruHazirla;
     // kayit, app.js'te "let" ile tanımlı (window özelliği değil); çağrı anında global adla okunur. Yoksa oturum içi bellek kullanılır.
