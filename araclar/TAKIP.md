@@ -47,7 +47,17 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
 
 ## Öncelikli iş listesi (sırayla; biten işaretlenir)
 
-### A. Eksik ölçme ve "özel ders öğretmeni"
+### A. Eksik ölçme ve asistan öğretmen "Bilge"
+Sistemin öğretmeni, uygulamanın içindeki asistan öğretmendir: 5–12'de ve YKS'de **Bilge** (baykuş), Minik–4'te **Bilgin**.
+Ayrı bir gerçek öğretmen bölümü yoktur. Aşağıdaki işlerin hepsi Bilge'nin ağzından, onun karakteriyle sunulur:
+- Bilge seviye tespitini yapar, eksikleri söyler ve "Bugünkü dersin"i anlatır.
+- Yanlışta ipucu verir, hatanın nedenini açıklar.
+- Öğrenciyi cesaretlendirir, tekrar zamanını hatırlatır.
+Bilge'nin kuralları:
+- Ücretsizdir ve internete veri göndermez. Cevaplarını sitedeki içerikten ve öğrencinin kendi verisinden üretir.
+- Yapay zekâ servisi (ücretli API) bağlamak Adem'in kararıdır.
+- Bilge'ye Sor (`sohbet.js`) şu an yalnızca 6. sınıfta var.
+- [ ] **A0. Bilge her sınıfta.** Bilge'ye Sor 5, 7–12 ve YKS'ye taşınır. Bilge, öğrencinin ustalık puanlarını okuyarak "Neyi bilmiyorum?", "Bugün ne çalışayım?" ve "Bu soruyu neden yanlış yaptım?" sorularına cevap verir.
 - [ ] **A1. Seviye tespit sınavı.** 5–12'de her derse ilk girişte ünite başına 2–3 soruluk kısa bir tanılama yapılır. Sonuç `kayit.ustalik` puanlarına başlangıç değeri olarak yazılır ve "eksik haritası" gösterilir.
 - [ ] **A2. Ön koşul haritası.** `araclar/onkosul.json` dosyasında her konunun önceki sınıflardaki ön koşul konuları tutulur (ör. 8 mat2k1 → 7 m1k2).
   - Bir konuda ustalık puanı düşükse ön koşul konudan 3 soruluk bir kontrol yapılır.
@@ -87,5 +97,6 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-11 — Öğretmen = uygulama içi asistan öğretmen Bilge (Adem'in açıklaması); A0 eklendi.
 - 2026-11-11 — Öğretmen görünümü iş listesinden çıkarıldı (şimdilik öğretmen ayağı yok).
 - 2026-11-11 — Bot kuruldu; denetim aracı, yol haritası. Denetim: sorun yok.
