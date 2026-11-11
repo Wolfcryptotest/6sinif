@@ -88,7 +88,7 @@ window.URETEC = window.URETEC || {};
     () => { const a = rnz(-9, 9), b = rnz(-9, 9), c = rnz(-9, 9), d = rnz(-9, 9); if (a - c === 0) return null; return soru(`(${ifade(a, b)}) − (${ifade(c, d)}) işleminin sonucu hangisidir?`, ifade(a - c, b - d), [ifade(a - c, b + d), ifade(a + c, b - d), ifade(a - c, d - b)], "Parantezin önündeki eksi, içindeki terimlerin işaretini değiştirir."); },
     () => { const k = rnz(-6, 6), a = rnz(-5, 5), b = rnz(-9, 9); if (Math.abs(k) === 1) return null; return soru(`${z(k)}(${ifade(a, b)}) ifadesinin eşiti hangisidir?`, ifade(k * a, k * b), [ifade(k * a, b), ifade(k * a, -k * b), ifade(a, k * b)], `Dağılma: ${z(k)}·${terim(a, "x")} ve ${z(k)}·${p(b)}`); },
     () => { const a = rnz(-8, 8), b = rnz(-15, 15), x = rnz(-6, 6); return soru(`x = ${z(x)} için ${ifade(a, b)} ifadesinin değeri kaçtır?`, z(a * x + b), [z(a * x - b), z(-a * x + b), z(a + x + b)], `${z(a)}·${p(x)} + ${p(b)} = ${z(a * x + b)}`); },
-    () => { const a = rnz(-9, 9), b = rnz(-9, 9), c = rnz(-9, 9); if (Math.abs(a) === 1) return null; return soru(`${terim(a, "a")} ${b < 0 ? "−" : "+"} ${Math.abs(b)}b ${c < 0 ? "−" : "+"} ${Math.abs(c)} ifadesinde a'nın katsayısı kaçtır?`, z(a), [z(b), z(c), z(-a)], `a'nın önündeki sayı ${z(a)}.`); }
+    () => { const a = rnz(-9, 9), b = rnz(-9, 9), c = rnz(-9, 9); if (Math.abs(a) === 1) return null; return soru(`${terim(a, "a")} ${b < 0 ? "−" : "+"} ${Math.abs(b) === 1 ? "" : Math.abs(b)}b ${c < 0 ? "−" : "+"} ${Math.abs(c)} ifadesinde a'nın katsayısı kaçtır?`, z(a), [z(b), z(c), z(-a)], `a'nın önündeki sayı ${z(a)}.`); }
   ]);
 
   U.m3k2 = tip([

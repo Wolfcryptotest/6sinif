@@ -164,7 +164,7 @@
 
   // Sayılara gelen ekleri okunuşa göre düzeltir: "6'e" → "6'ya", "10'in" → "10'un", "%50'i" → "%50'si", "5'den" → "5'ten"
   const SAYI_OKU = (n) => {
-    const p = String(n).split(","), t = (p.length > 1 ? p.pop() : p[0]).replace(/[ .]/g, ""); const x = +t;
+    const p = String(n).split("/")[0].split(","), t = (p.length > 1 ? p.pop() : p[0]).replace(/[ .]/g, ""); const x = +t;
     if (!x) return "sıfır";
     const B = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"], O = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"];
     if (x % 10) return B[x % 10]; if (x % 100) return O[(x % 100) / 10]; if (x % 1000) return "yüz";
@@ -179,7 +179,7 @@
     const yeni = { in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, den: (st ? "t" : "d") + a2 + "n", de: (st ? "t" : "d") + a2, si: (sl ? "s" : "") + d4, i: (sl ? "y" : "") + d4 }[tur];
     return (yuzde || "") + sayi + "'" + yeni;
   }
-  const ekDuzelt = (t) => typeof t !== "string" ? t : t.replace(/(%?)((?:\d{1,3}(?:[ .]\d{3})+|\d+)(?:,\d+)?)'(nin|nın|nun|nün|in|ın|un|ün|ye|ya|e|a|den|dan|ten|tan|de|da|te|ta|si|sı|su|sü|yi|yı|yu|yü|i|ı|u|ü)(?![a-zçğıöşü])/g, (m, y, n, e) => ekSayi(m, n, y, e));
+  const ekDuzelt = (t) => typeof t !== "string" ? t : t.replace(/(^|[^\d.,:\/])(%?)((?:\d+\/)?(?:\d{1,3}(?:[ .]\d{3})+|\d+)(?:,\d+)?)'(nin|nın|nun|nün|in|ın|un|ün|ye|ya|e|a|den|dan|ten|tan|de|da|te|ta|si|sı|su|sü|yi|yı|yu|yü|i|ı|u|ü)(?![a-zçğıöşü])/g, (m, o, y, n, e) => (n.includes("/") ? m : o + ekSayi(m.slice(o.length), n, y, e)));
   const ekleriDuzelt = (q) => { try { if (!q) return q; return { ...q, soru: ekDuzelt(q.soru), secenekler: Array.isArray(q.secenekler) ? q.secenekler.map(ekDuzelt) : q.secenekler, cozum: ekDuzelt(q.cozum) }; } catch (e) { return q; } };
   // Çözüm sonucu yazılmamışsa (ör. "P = F/S = 200/0,5.") ve işlem doğru şıkkı veriyorsa sonucu ekler: "… = 400 Pa"
   const SUP = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" };
