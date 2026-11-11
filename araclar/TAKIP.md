@@ -29,7 +29,7 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
    - Çeviriler çevirmenin telifine tabidir. Yalnızca telifsiz çeviriler ya da özgün metinler kullanılır.
    - Kaynak olarak Vikikaynak (tr.wikisource.org) ve Project Gutenberg kullanılır, kaynak her zaman belirtilir.
    - Hikâyeler yaşa uygun seçilir. Gerekiyorsa sadeleştirme yapılır ve sadeleştirildiği belirtilir.
-9. **Öğrenci verisi cihazda kalır** (localStorage). Hesap ya da sunucu yoktur. Veli ve öğretmen paylaşımı bağlantı veya QR ile yapılır. Buluta geçiş ancak Adem'in kararıyla olur.
+9. **Öğrenci verisi cihazda kalır** (localStorage). Hesap ya da sunucu yoktur. Veli paylaşımı bağlantı veya QR ile yapılır. **Sistemde şimdilik öğretmen bölümü yoktur;** öğretmen sayfası ya da öğretmen özelliği eklenmez (Adem'in kararı, 2026-11-11). Buluta geçiş ancak Adem'in kararıyla olur.
 10. **Her değişiklikten sonra:**
     - `python3 araclar/swbump.py <klasör> [yeni-dosya.js]` çalıştırılır. Yeni dosya sw.js'deki DOSYALAR listesine eklenmezse çevrimdışı çalışma bozulur.
     - `node araclar/denetle.js` çalıştırılır ve "Sorun yok" görülmeden yayınlanmaz.
@@ -59,8 +59,7 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
 - [ ] **A4. Hata türü teşhisi.** Yanlış şıklara yanılgı etiketi eklenir (ör. "yön dikkate alınmadı", "birim çevrilmedi").
   - Karnede "bilmiyor" ile "dikkat hatası" ayrı gösterilir.
   - Önce 6–8 fen ve matematik üreticilerinden başlanır.
-- [ ] **A5. Öğretmen görünümü.** Öğrenci karnesinden kısa bir paylaşım kodu ya da QR üretilir. Öğretmen sayfası (`ogretmen/`) bu kodları toplayıp sınıfın zayıf konularını listeler. Sunucu kullanılmaz.
-- [ ] **A6. Minik–4 için aynı ölçme**, oyunlaştırılmış olarak. Yanlış yapılan görevler zaten 1-3-7 gün aralıkla tekrar ediliyor. Konu bazında "ustalık yıldızları" ve veliye özet eklenir.
+- [ ] **A5. Minik–4 için aynı ölçme**, oyunlaştırılmış olarak. Yanlış yapılan görevler zaten 1-3-7 gün aralıkla tekrar ediliyor. Konu bazında "ustalık yıldızları" ve veliye özet eklenir.
 
 ### B. Kitaplık (okumayı sevenlere)
 - [ ] **B1. Ortak kitaplık altyapısı:** `kitaplik/`
@@ -88,4 +87,5 @@ Bot her çalışmada önce bu dosyayı okur, sonunda "Çalışma günlüğü" b�
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-11 — Öğretmen görünümü iş listesinden çıkarıldı (şimdilik öğretmen ayağı yok).
 - 2026-11-11 — Bot kuruldu; denetim aracı, yol haritası. Denetim: sorun yok.
