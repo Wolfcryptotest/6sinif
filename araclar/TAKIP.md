@@ -102,10 +102,12 @@ Bilge'nin kuralları:
   - Not: 6. sınıf İngilizce "Görünüş/Kişilik" konusunda 7. sınıf videosu (7ING1) var; içerik uygun olduğu için bırakıldı.
 - [ ] D4. Konu başına 2. ve 3. video (soru çözümü, farklı anlatım, deney). Altyapı: kökte `video-ek.js` (`window.VIDEO_EK = { konuId: [[etiket, kimlik], ...] }`) ve app.js'teki video düğmeleri. Her kimlik eklenmeden önce oEmbed ile doğrulanır (başlık konuyla uyumlu, oynatılabilir, sınıf düzeyine uygun); bulunamazsa eklenmez.
   - [x] 6. sınıf Matematik ve Fen: 40 konuya 63 video (2026-11-11).
-  - [ ] 6. sınıf Türkçe, Sosyal, İngilizce, Din; sonra 5, 7–12 (app.js kopyalarına video düğmesi ve sınıf klasörüne video-ek.js).
+  - [x] 6. sınıf Türkçe, Sosyal, İngilizce, Din: 49 konuya 67 video (2026-11-11). Toplam 89 konu, 130 ek video.
+  - [ ] 6. sınıf seçmeli dersler; sonra 5, 7–12 (app.js kopyalarına video düğmesi ve sınıf klasörüne video-ek.js).
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-11 — D4: 6. sınıf Türkçe, Sosyal, İngilizce ve Din'e doğrulanmış ek videolar (toplam 89 konu, 130 video). Genel "sureler" videosu gibi konuya tam uymayanlar eklenmedi. Denetim: sorun yok.
 - 2026-11-11 — D4 (Adem'in isteği): konu sayfasında çoklu video desteği; 6. sınıf Matematik ve Fen'de 40 konuya 63 doğrulanmış ek video. Denetim: sorun yok.
 - 2026-11-11 — D3 (6. sınıf): 165 video tarandı; açılmayan 8 video ve konuyla uyuşmayan 3 video (Akıcı Okuma, Amaca Göre Okuma, Yazım Kuralları ve Gözden Geçirme) kaldırıldı, aynı kimlikler diğer sınıf kopyalarından da çıkarıldı. Denetim: sorun yok.
 - 2026-11-11 — Adem'in bildirimi: Matematik Uygulamaları › Dört İşlem Problemleri (smu1k1) konusunda "Kesir Problemleri" videosu vardı; video kaldırıldı, konu YouTube arama bağlantısına döndü (6, 5, 7, 8, v2). D3 eklendi. Denetim: sorun yok.
