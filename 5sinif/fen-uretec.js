@@ -11,7 +11,7 @@
   const EVRE = [["Yeni Ay", "Ay hiç görünmez"], ["İlk Dördün", "Ay'ın sağ yarısı aydınlık görünür"], ["Dolunay", "Ay'ın tamamı aydınlık görünür"], ["Son Dördün", "Ay'ın sol yarısı aydınlık görünür"]];
   U.f1k2 = tiplerden([
     () => { const [e, t] = pick(EVRE); return soru(`${t.charAt(0).toLocaleUpperCase("tr") + t.slice(1)}. Bu hangi evredir?`, e, EVRE.filter((x) => x[0] !== e).map((x) => x[0]), `${e}: ${t}.`); },
-    () => { const i = r(0, 3); return soru(`Ay'ın ana evreleri sırasında ${EVRE[i][0]} evresinden sonra hangi evre gelir?`, EVRE[(i + 1) % 4][0], EVRE.filter((_, j) => j !== (i + 1) % 4).map((x) => x[0]), `Sıra: Yeni Ay → İlk Dördün → Dolunay → Son Dördün → Yeni Ay`); },
+    () => { const i = r(0, 3); return soru(`Ay'ın ana evreleri sırasında ${EVRE[i][0]} evresinden sonra hangi evre gelir?`, EVRE[(i + 1) % 4][0], EVRE.filter((_, j) => j !== (i + 1) % 4 && j !== i).map((x) => x[0]).concat(["Hilal"]), `Sıra: Yeni Ay → İlk Dördün → Dolunay → Son Dördün → Yeni Ay`); },
     ifadeler(["Ay, Dünya'nın tek doğal uydusudur.", "Ay'ın kendi ışığı yoktur.", "Ay'da atmosfer bulunmaz.", "Ay'ın yüzeyinde kraterler vardır.", "Ay'ın hep aynı yüzünü görürüz.", "Ay'ın dönme ve dolanma süreleri eşittir.", "Ay hem Dünya'nın hem de Dünya ile birlikte Güneş'in etrafında dolanır.", "Bir Yeni Ay'dan diğerine yaklaşık 29,5 gün geçer."],
       ["Ay bir yıldızdır.", "Ay kendi ışığını üretir.", "Ay'da bol miktarda sıvı su vardır.", "Ay'ın atmosferi çok kalındır.", "Ay'ın her yüzünü görebiliriz.", "Ay kendi ekseni etrafında dönmez.", "Ay'ın evreleri 365 günde tamamlanır.", "Ay, Dünya'dan büyüktür."], "Ay")
   ]);
@@ -47,7 +47,7 @@
   U.f3k1 = tiplerden([
     eslestir(ORG, (a) => `${a.charAt(0).toLocaleUpperCase("tr") + a.slice(1)} hücrede hangi görevi yapar?`, (b) => `Hücrede "${b}" görevi yapan yapı hangisidir?`, (a, b) => `${a}: ${b}`),
     siniflandir({ "yalnızca bitki hücresinde bulunan yapı": ["kloroplast", "hücre duvarı"], "her iki hücrede de bulunan yapı": ["çekirdek", "hücre zarı", "sitoplazma", "mitokondri", "ribozom"] }, (g) => `Hangisi ${dir(g)}?`, (d, g) => `${d}: ${g}.`),
-    () => { const S = ["hücre", "doku", "organ", "sistem", "organizma"]; const i = r(0, 3); return soru(`Canlının yapısındaki düzende "${S[i]}"den sonra hangisi gelir?`, S[i + 1].charAt(0).toLocaleUpperCase("tr") + S[i + 1].slice(1), S.filter((_, j) => j !== i + 1).map((x) => x.charAt(0).toLocaleUpperCase("tr") + x.slice(1)), `Sıralama: ${S.join(" → ")}`); }
+    () => { const S = ["hücre", "doku", "organ", "sistem", "organizma"]; const i = r(0, 3); return soru(`Canlının yapısındaki düzende "${S[i]}" basamağından sonra hangisi gelir?`, S[i + 1].charAt(0).toLocaleUpperCase("tr") + S[i + 1].slice(1), S.filter((_, j) => j !== i + 1 && j !== i).map((x) => x.charAt(0).toLocaleUpperCase("tr") + x.slice(1)), `Sıralama: ${S.join(" → ")}`); }
   ]);
 
   U.f3k2 = tiplerden([
@@ -59,7 +59,7 @@
 
   U.f4k1 = tiplerden([
     siniflandir({ "saydam": ["pencere camı", "temiz su", "hava", "şeffaf naylon", "gözlük camı"], "yarı saydam": ["buzlu cam", "tül perde", "yağlı kâğıt", "aydınger kâğıdı", "sisli hava"], "saydam olmayan (opak)": ["tahta", "demir", "karton", "taş", "alüminyum folyo"] }, (g) => `Hangisi ${g} bir maddedir?`, (d, g) => `${d}: ${g}.`, (d) => `"${d}" ışığı geçirme durumuna göre nasıl bir maddedir?`),
-    siniflandir({ "doğal ışık kaynağı": ["Güneş", "yıldızlar", "ateş böceği", "yıldırım"], "yapay ışık kaynağı": ["ampul", "mum", "el feneri", "trafik lambası"], "ışık kaynağı olmayan": ["Ay", "ayna", "kitap", "masa"] }, (g) => `Hangisi ${dir(g)}?`, (d, g) => `${d}: ${g}.`)
+    siniflandir({ "doğal ışık kaynağı": ["Güneş", "yıldızlar", "ateş böceği", "yıldırım"], "yapay ışık kaynağı": ["ampul", "mum", "el feneri", "trafik lambası"], "ışık kaynağı olmayan": ["Ay", "ayna", "kitap", "masa"] }, (g) => (g === "ışık kaynağı olmayan" ? "Hangisi bir ışık kaynağı değildir?" : `Hangisi ${dir(g)}?`), (d, g) => `${d}: ${g}.`)
   ]);
 
   U.f4k2 = tiplerden([
@@ -105,8 +105,8 @@
   ]);
 
   U.f7k1 = tiplerden([
-    siniflandir({ "kâğıt-karton kutusuna": ["gazete", "karton koli", "defter", "dergi"], "cam kutusuna": ["cam şişe", "kavanoz", "kırık bardak"], "plastik kutusuna": ["pet şişe", "deterjan kutusu", "plastik poşet"], "metal kutusuna": ["konserve kutusu", "içecek kutusu", "metal kapak"], "atık pil kutusuna": ["kalem pil", "saat pili"] }, (g) => `Hangisi ${g} atılmalıdır?`, (d, g) => `${d} → ${g}.`, (d) => `"${d}" hangi geri dönüşüm kutusuna atılmalıdır?`),
-    () => { const S = ["önleme", "azaltma", "yeniden kullanım", "geri dönüşüm", "geri kazanım", "uzaklaştırma"]; const i = r(0, 4); return soru(`Sıfır atık hiyerarşisinde "${S[i]}" basamağından sonra hangisi gelir?`, S[i + 1].charAt(0).toLocaleUpperCase("tr") + S[i + 1].slice(1), S.filter((_, j) => j !== i + 1).map((x) => x.charAt(0).toLocaleUpperCase("tr") + x.slice(1)), `Sıra: ${S.join(" → ")}`); },
+    siniflandir({ "kâğıt-karton kutusuna": ["gazete", "karton koli", "defter", "dergi"], "cam kutusuna": ["cam şişe", "kavanoz", "cam meyve suyu şişesi"], "plastik kutusuna": ["pet şişe", "deterjan kutusu", "plastik poşet"], "metal kutusuna": ["konserve kutusu", "içecek kutusu", "metal kapak"], "atık pil kutusuna": ["kalem pil", "saat pili"] }, (g) => `Hangisi ${g} atılmalıdır?`, (d, g) => `${d} → ${g}.`, (d) => `"${d}" hangi geri dönüşüm kutusuna atılmalıdır?`),
+    () => { const S = ["önleme", "azaltma", "yeniden kullanım", "geri dönüşüm", "geri kazanım", "uzaklaştırma"]; const i = r(0, 4); return soru(`Sıfır atık hiyerarşisinde "${S[i]}" basamağından sonra hangisi gelir?`, S[i + 1].charAt(0).toLocaleUpperCase("tr") + S[i + 1].slice(1), S.filter((_, j) => j !== i + 1 && j !== i).map((x) => x.charAt(0).toLocaleUpperCase("tr") + x.slice(1)), `Sıra: ${S.join(" → ")}`); },
     siniflandir({ "ileri dönüşüm": ["eski kot pantolondan çanta dikmek", "kavanozdan kalemlik yapmak", "tahta kasadan kitaplık yapmak"], "yeniden kullanım": ["cam şişeyi yıkayıp tekrar su doldurmak", "bez çantayı her alışverişte kullanmak", "eski kıyafeti kardeşe vermek"], "kompost": ["meyve kabuklarını toprağa gübre yapmak", "sebze artıklarını kompost kutusunda çürütmek"] }, (g) => `Hangisi "${g}" örneğidir?`, (d, g) => `${d}: ${g}.`)
   ]);
 })();

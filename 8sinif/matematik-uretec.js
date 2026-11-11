@@ -44,7 +44,8 @@ window.URETEC = window.URETEC || {};
   ]);
   U.mat2k2 = tip([
     () => { const a = pick([2, 3, 5, 7]), m = r(-4, 8), n = r(-4, 8), k = r(-3, 6); const s = m + n - k;
-      return soru(`${a}${us(m)} · ${a}${us(n)} ÷ ${a}${us(k)} işleminin sonucu hangisidir?`, `${a}${us(s)}`, [`${a}${us(m * n - k)}`, `${a}${us(m + n + k)}`, `${a}${us(m - n - k)}`], `Üsler: ${m} + ${n} − ${k} = ${s}`); },
+      const P = (x) => (x < 0 ? `(−${-x})` : String(x));
+      return soru(`${a}${us(m)} · ${a}${us(n)} ÷ ${a}${us(k)} işleminin sonucu hangisidir?`, `${a}${us(s)}`, [`${a}${us(m * n - k)}`, `${a}${us(m + n + k)}`, `${a}${us(m - n - k)}`], `Tabanlar aynı: çarpmada üsler toplanır, bölmede çıkarılır. Üs: ${P(m)} + ${P(n)} − ${P(k)} = ${String(s).replace("-", "−")} → ${a}${us(s)}`); },
     () => { const bas = r(11, 99), e = r(3, 9), sayi = String(bas) + "0".repeat(e - 1), a = (bas / 10).toFixed(1).replace(".", ",");
       return soru(`${sayi.replace(/\B(?=(\d{3})+(?!\d))/g, " ")} sayısının bilimsel gösterimi hangisidir?`, `${a} × 10${us(e)}`, [`${a} × 10${us(e - 1)}`, `${bas} × 10${us(e - 1)}`, `${a} × 10${us(e + 1)}`], `1 ≤ a < 10 olmalı: ${a} × 10${us(e)}`); },
     () => { const bas = r(11, 99), e = r(3, 7), a = (bas / 10).toFixed(1).replace(".", ","), sayi = "0," + "0".repeat(e - 1) + bas;

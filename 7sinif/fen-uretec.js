@@ -4,14 +4,14 @@
   const B = (s) => s.charAt(0).toLocaleUpperCase("tr") + s.slice(1);
 
   U.f1k1 = tiplerden([
-    eslestir([["roket", "araçları ve uyduları uzaya taşır"], ["yapay uydu", "Dünya çevresinde dolanarak iletişim ve gözlem yapar"], ["uzay istasyonu", "astronotların aylarca kalıp deney yaptığı yapı"], ["uzay teleskobu", "atmosfer dışından net gözlem yapar"], ["uzay sondası", "uzak gezegenlere gönderilen insansız araç"], ["uzay mekiği", "tekrar kullanılabilen uzay aracı"]], (a) => `${B(a)} ne işe yarar?`, (b) => `Hangisi "${b}"?`, (a, b) => `${a}: ${b}.`),
+    eslestir([["roket", "araçları ve uyduları uzaya taşır"], ["yapay uydu", "Dünya çevresinde dolanarak iletişim ve gözlem yapar"], ["uzay istasyonu", "astronotların aylarca kalıp deney yaptığı yapı"], ["uzay teleskobu", "atmosfer dışından net gözlem yapar"], ["uzay sondası", "uzak gezegenlere gönderilen insansız araç"], ["uzay mekiği", "tekrar kullanılabilen uzay aracı"]], (a) => `${B(a)} ne işe yarar?`, (b) => `"${b.charAt(0).toLocaleUpperCase("tr") + b.slice(1)}" ifadesi hangisini tanımlar?`, (a, b) => `${a}: ${b}.`),
     ifadeler(["Türkiye Uzay Ajansı 2018'de kuruldu.", "İMECE yerli üretim bir yer gözlem uydusudur.", "Türksat uyduları iletişim sağlar.", "Uzay teleskopları atmosferin dışındadır.", "Uzay çöpleri çalışan uydulara zarar verebilir.", "Yapay uydular hava tahmininde kullanılır.", "Alper Gezeravcı ilk Türk astronottur."], ["Uzay çöpleri tamamen zararsızdır.", "Yer teleskopları atmosferden etkilenmez.", "Yapay uydular yalnızca eğlence için kullanılır.", "Türkiye'nin hiç uydusu yoktur.", "Uzay istasyonunda kimse kalamaz.", "Roketler yalnızca havai fişek içindir."], "Uzay teknolojileri")
   ]);
   const EVRE = [["bulutsu (nebula)", "yıldızların doğduğu gaz ve toz bulutu"], ["kırmızı dev", "yakıtı azalan yıldızın genişlemiş hâli"], ["beyaz cüce", "Güneş gibi yıldızların son evresi"], ["süpernova", "çok büyük yıldızların ölürken yaptığı büyük patlama"], ["kara delik", "ışığın bile kaçamadığı çok yoğun bölge"], ["nötron yıldızı", "süpernovadan geriye kalan çok yoğun küçük yıldız"]];
   U.f1k2 = tiplerden([
     eslestir(EVRE, (a) => `"${a}" ne demektir?`, (b) => `${B(b)} hangisidir?`, (a, b) => `${a}: ${b}.`),
     siniflandir({ "takımyıldız": ["Büyükayı", "Küçükayı", "Avcı (Orion)", "Kraliçe (Kassiopeia)"], "galaksi": ["Samanyolu", "Andromeda", "Macellan Bulutu"], "yıldız": ["Güneş", "Kutup Yıldızı", "Sirius"] }, (g) => `Hangisi bir ${dir(g)}?`, (d, g) => `${d}: ${g}.`, (d) => `"${d}" nedir?`),
-    () => { const S = ["bulutsu", "ana yıldız", "kırmızı dev", "beyaz cüce"]; const i = r(0, 2); return soru(`Güneş gibi bir yıldızın yaşamında "${S[i]}" evresinden sonra hangisi gelir?`, B(S[i + 1]), S.filter((_, j) => j !== i + 1).map(B), `Sıra: ${S.join(" → ")}`); }
+    () => { const S = ["bulutsu", "ana yıldız", "kırmızı dev", "beyaz cüce"]; const i = r(0, 2); return soru(`Güneş gibi bir yıldızın yaşamında "${S[i]}" evresinden sonra hangisi gelir?`, B(S[i + 1]), ((S.length > 4 ? S : S.concat(["süpernova", "kara delik"])).filter((_, j, A) => A[j] !== S[i + 1] && A[j] !== S[i])).map(B), `Sıra: ${S.join(" → ")}`); }
   ]);
 
   U.f2k1 = tiplerden([
@@ -32,18 +32,18 @@
   U.f3k1 = tiplerden([
     eslestir(SIN, (a) => `Sindirim sisteminde ${a} hangi görevi yapar?`, (b) => `Sindirim sisteminde "${b}" hangisidir?`, (a, b) => `${a}: ${b}.`),
     siniflandir({ "sindirim kanalı organı": ["ağız", "yutak", "yemek borusu", "mide", "ince bağırsak", "kalın bağırsak"], "sindirime yardımcı organ": ["karaciğer", "pankreas"] }, (g) => `Hangisi bir ${dir(g)}?`, (d, g) => `${d}: ${g}.`),
-    () => { const S = ["ağız", "yutak", "yemek borusu", "mide", "ince bağırsak", "kalın bağırsak"]; const i = r(0, 4); return soru(`Besinler sindirim kanalında ${S[i]} bölümünden sonra hangi organa geçer?`, B(S[i + 1]), S.filter((_, j) => j !== i + 1).map(B), `Sıra: ${S.join(" → ")}`); }
+    () => { const S = ["ağız", "yutak", "yemek borusu", "mide", "ince bağırsak", "kalın bağırsak"]; const i = r(0, 4); return soru(`Besinler sindirim kanalında ${S[i]} bölümünden sonra hangi organa geçer?`, B(S[i + 1]), ((S.length > 4 ? S : S.concat([])).filter((_, j, A) => A[j] !== S[i + 1] && A[j] !== S[i])).map(B), `Sıra: ${S.join(" → ")}`); }
   ]);
   U.f3k2 = tiplerden([
-    eslestir([["alyuvar", "oksijen taşır"], ["akyuvar", "mikroplara karşı savunma yapar"], ["kan pulcuğu", "kanın pıhtılaşmasını sağlar"], ["plazma", "kanın sıvı kısmıdır"], ["atardamar", "kalpten çıkan kanı taşır"], ["toplardamar", "kalbe kan getirir"], ["kılcal damar", "hücrelerle madde alışverişinin yapıldığı ince damar"]], (a) => `${B(a)} ne işe yarar?`, (b) => `Hangisi "${b}"?`, (a, b) => `${a}: ${b}.`),
+    eslestir([["alyuvar", "oksijen taşır"], ["akyuvar", "mikroplara karşı savunma yapar"], ["kan pulcuğu", "kanın pıhtılaşmasını sağlar"], ["plazma", "kanın sıvı kısmıdır"], ["atardamar", "kalpten çıkan kanı taşır"], ["toplardamar", "kalbe kan getirir"], ["kılcal damar", "hücrelerle madde alışverişinin yapıldığı ince damar"]], (a) => `${B(a)} ne işe yarar?`, (b) => `"${b.charAt(0).toLocaleUpperCase("tr") + b.slice(1)}" ifadesi hangisini tanımlar?`, (a, b) => `${a}: ${b}.`),
     ifadeler(["Kalbin dört odacığı vardır.", "Küçük kan dolaşımı kalp ile akciğerler arasında olur.", "Kan bağışı toplumsal dayanışmanın bir örneğidir.", "Spor yapmak dolaşım sistemi için faydalıdır.", "Kulakçıklar kalbin üst odacıklarıdır."], ["Kalbin iki odacığı vardır.", "Büyük kan dolaşımında kan yalnızca akciğerlere gider.", "Toplardamarlar kanı kalpten götürür.", "Sigara dumanı dolaşım sistemine faydalıdır.", "Akyuvarlar oksijen taşır."], "Dolaşım sistemi")
   ]);
   U.f3k3 = tiplerden([
-    () => { const S = ["burun", "yutak", "gırtlak", "soluk borusu", "bronşlar", "bronşçuklar", "alveoller"]; const i = r(0, 5); return soru(`Soluduğumuz hava "${S[i]}" yapısından sonra nereye geçer?`, B(S[i + 1]), S.filter((_, j) => j !== i + 1).map(B), `Sıra: ${S.join(" → ")}`); },
+    () => { const S = ["burun", "yutak", "gırtlak", "soluk borusu", "bronşlar", "bronşçuklar", "alveoller"]; const i = r(0, 5); return soru(`Soluduğumuz hava "${S[i]}" yapısından sonra nereye geçer?`, B(S[i + 1]), ((S.length > 4 ? S : S.concat([])).filter((_, j, A) => A[j] !== S[i + 1] && A[j] !== S[i])).map(B), `Sıra: ${S.join(" → ")}`); },
     ifadeler(["Gaz alışverişi alveollerde olur.", "Soluk alırken diyafram kasılır ve aşağı iner.", "Burun havayı ısıtır, nemlendirir ve temizler.", "Sigara akciğerlere zarar verir.", "Oksijen alveollerden kana geçer."], ["Gaz alışverişi midede olur.", "Soluk alırken diyafram yukarı çıkar.", "Karbondioksit kandan hiç atılmaz.", "Sigara akciğerleri güçlendirir.", "Alveollerde sindirim olur."], "Solunum sistemi")
   ]);
   U.f3k4 = tiplerden([
-    () => { const S = ["böbrek", "üreter (idrar borusu)", "idrar kesesi", "üretra (idrar kanalı)"]; const i = r(0, 2); return soru(`Boşaltım sisteminde idrar "${S[i]}" yapısından sonra nereye geçer?`, B(S[i + 1]), S.filter((_, j) => j !== i + 1).map(B), `Sıra: ${S.join(" → ")}`); },
+    () => { const S = ["böbrek", "üreter (idrar borusu)", "idrar kesesi", "üretra (idrar kanalı)"]; const i = r(0, 2); return soru(`Boşaltım sisteminde idrar "${S[i]}" yapısından sonra nereye geçer?`, B(S[i + 1]), ((S.length > 4 ? S : S.concat(["böbrek atardamarı", "böbrek toplardamarı"])).filter((_, j, A) => A[j] !== S[i + 1] && A[j] !== S[i])).map(B), `Sıra: ${S.join(" → ")}`); },
     siniflandir({ "boşaltıma yardım eden organ": ["böbrek", "akciğer", "deri"], "boşaltım sistemiyle ilgisi olmayan organ": ["mide", "yemek borusu", "kalp kapakçığı"] }, (g) => `Hangisi ${dir(g)}?`, (d, g) => `${d}: ${g}.`),
     ifadeler(["Böbrekler kanı süzerek idrar oluşturur.", "Deri ter yoluyla boşaltıma yardım eder.", "Bol su içmek böbrek sağlığını korur.", "Organ bağışı hayat kurtarır.", "Akciğerler karbondioksiti dışarı atar."], ["İdrar akciğerlerde oluşur.", "Çok tuz tüketmek böbreklere iyi gelir.", "Üreter idrar kesesinden dışarı açılır.", "Boşaltım sistemi yalnızca deriden oluşur.", "İdrarı uzun süre tutmak sağlıklıdır."], "Boşaltım sistemi")
   ]);
@@ -62,7 +62,7 @@
   const BIL = [["H₂O", "su"], ["CO₂", "karbondioksit"], ["NaCl", "sofra tuzu"], ["NH₃", "amonyak"], ["CH₄", "metan"], ["HCl", "hidroklorik asit"], ["CaCO₃", "kireç taşı"]];
   U.f5k1 = tiplerden([
     eslestir([["proton", "çekirdekte bulunan pozitif yüklü tanecik"], ["nötron", "çekirdekte bulunan yüksüz tanecik"], ["elektron", "katmanlarda hareket eden negatif yüklü tanecik"], ["çekirdek", "atomun proton ve nötronların bulunduğu merkezi"]], (a) => `Atomda ${a} nedir?`, (b) => `Atomda "${b}" hangisidir?`, (a, b) => `${a}: ${b}.`),
-    () => { const S = ["Demokritos", "Dalton", "Thomson", "Rutherford", "Bohr"]; const i = r(0, 3); return soru(`Atom modelinin gelişiminde "${S[i]}" modelinden sonra hangi bilim insanının modeli gelir?`, S[i + 1], S.filter((_, j) => j !== i + 1), `Sıra: ${S.join(" → ")} → modern model`); },
+    () => { const S = ["Demokritos", "Dalton", "Thomson", "Rutherford", "Bohr"]; const i = r(0, 3); return soru(`Atom modelinin gelişiminde "${S[i]}" modelinden sonra hangi bilim insanının modeli gelir?`, S[i + 1], S.filter((_, j) => j !== i + 1 && j !== i).concat(["Aristoteles"]), `Sıra: ${S.join(" → ")} → modern model`); },
     () => { const p = r(1, 18); return soru(`Nötr bir atomda ${p} proton varsa kaç elektron vardır?`, String(p), [String(p + 1), String(p * 2), String(Math.max(0, p - 1)) === String(p) ? "0" : String(Math.max(0, p - 1))], "Nötr atomda proton sayısı = elektron sayısı."); }
   ]);
   U.f5k2 = tiplerden([
@@ -89,7 +89,7 @@
 
   U.f7k1 = tiplerden([
     siniflandir({ "üretici": ["ot", "buğday", "alg", "meşe ağacı", "yosun"], "otçul tüketici": ["tavşan", "çekirge", "inek", "geyik", "koyun"], "etçil tüketici": ["kurt", "kartal", "aslan", "yılan", "tilki"], "ayrıştırıcı": ["çürükçül bakteri", "şapkalı mantar", "küf mantarı"] }, (g) => `Hangisi ${dir(g)}?`, (d, g) => `${d}: ${g}.`, (d) => `"${d}" besin zincirinde hangi gruptadır?`),
-    () => { const Z = pick([["ot", "çekirge", "kurbağa", "yılan", "kartal"], ["alg", "küçük balık", "büyük balık", "fok", "kutup ayısı"], ["buğday", "fare", "yılan", "şahin"], ["ot", "tavşan", "tilki", "kurt"]]); const i = r(0, Z.length - 2); return soru(`"${Z.join(" → ")}" besin zincirinde ${Z[i]} hangi canlının besinidir?`, B(Z[i + 1]), Z.filter((_, j) => j !== i + 1).map(B), `${Z[i]} → ${Z[i + 1]}`); },
+    () => { const Z = pick([["ot", "çekirge", "kurbağa", "yılan", "kartal"], ["alg", "küçük balık", "büyük balık", "fok", "kutup ayısı"], ["buğday", "fare", "yılan", "şahin"], ["ot", "tavşan", "tilki", "kurt"]]); const i = r(0, Z.length - 2); return soru(`"${Z.join(" → ")}" besin zincirinde ${Z[i]} hangi canlının besinidir?`, B(Z[i + 1]), ((Z.length > 4 ? Z : Z.concat(["çekirge", "tavşan", "kurbağa"])).filter((_, j, A) => A[j] !== Z[i + 1] && A[j] !== Z[i])).map(B), `${Z[i]} → ${Z[i + 1]}`); },
     ifadeler(["Besin zinciri üreticilerle başlar.", "Ekoloji piramidinde tepeye doğru enerji azalır.", "Ayrıştırıcılar ölü canlıları çürütür.", "Biyolojik birikim en çok zincirin sonundaki canlıları etkiler.", "Enerji besin zincirinde üreticiden tüketiciye akar."], ["Besin zinciri etçillerle başlar.", "Ekoloji piramidinde tepeye doğru canlı sayısı artar.", "Ayrıştırıcıların doğaya hiçbir faydası yoktur.", "Biyolojik birikim yalnızca üreticileri etkiler.", "Enerji tüketicilerden üreticilere akar."], "Besin zinciri")
   ]);
   U.f7k2 = tiplerden([

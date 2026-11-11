@@ -1,5 +1,6 @@
 // 6. sınıf Din Kültürü soru üreteçleri (ortak-uretec.js'ten sonra yüklenir)
 (function () {
+  const EK = (w, t) => { const l = String(w).toLocaleLowerCase("tr"), son = l.slice(-1), V = "aeıioöuü", v = [...l].reverse().find((c) => V.includes(c)) || "e", a2 = "aıou".includes(v) ? "a" : "e", d4 = { a: "ı", ı: "ı", o: "u", u: "u", e: "i", i: "i", ö: "ü", ü: "ü" }[v], sl = V.includes(son), st = "fstkçşhp".includes(son); return w + "'" + ({ in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, i: (sl ? "y" : "") + d4, de: (st ? "t" : "d") + a2, den: (st ? "t" : "d") + a2 + "n" })[t]; };
   const U = window.URETEC, { pick, buyuk, soru, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
 
   U.d1k1 = tiplerden([
@@ -11,7 +12,7 @@
 
   U.d1k2 = tiplerden([
     eslestir([["Tevrat", "Hz. Musa"], ["Zebur", "Hz. Davut"], ["İncil", "Hz. İsa"], ["Kur'an-ı Kerim", "Hz. Muhammed"]],
-      (a) => `${a} hangi peygambere indirilmiştir?`, (b) => `${b}'e indirilen ilahi kitap hangisidir?`, (a, b) => `${a} → ${b}.`),
+      (a) => `${a} hangi peygambere indirilmiştir?`, (b) => `${EK(b, "e")} indirilen ilahi kitap hangisidir?`, (a, b) => `${a} → ${b}.`),
     ifadeler(["Vahiy meleği Cebrail'dir.", "Kur'an-ı Kerim son ilahi kitaptır.", "Kur'an-ı Kerim 114 sureden oluşur.", "Kur'an'ın ilk suresi Fatiha'dır.", "Kur'an'ın son suresi Nas'tır.", "Bazı peygamberlere suhuf gönderilmiştir."],
       ["Vahiy meleği Mikail'dir.", "Kur'an-ı Kerim ilk ilahi kitaptır.", "Kur'an-ı Kerim 40 sureden oluşur.", "Kur'an bir günde tamamen indirilmiştir.", "Zebur Hz. İsa'ya indirilmiştir.", "Tevrat Hz. Muhammed'e indirilmiştir."], "İlahi kitaplar")
   ]);

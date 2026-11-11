@@ -1,5 +1,6 @@
 // 6. sınıf Sosyal Bilgiler soru üreteçleri (ortak-uretec.js'ten sonra yüklenir)
 (function () {
+  const EK = (w, t) => { const l = String(w).toLocaleLowerCase("tr"), son = l.slice(-1), V = "aeıioöuü", v = [...l].reverse().find((c) => V.includes(c)) || "e", a2 = "aıou".includes(v) ? "a" : "e", d4 = { a: "ı", ı: "ı", o: "u", u: "u", e: "i", i: "i", ö: "ü", ü: "ü" }[v], sl = V.includes(son), st = "fstkçşhp".includes(son); return w + "'" + ({ in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, i: (sl ? "y" : "") + d4, de: (st ? "t" : "d") + a2, den: (st ? "t" : "d") + a2 + "n" })[t]; };
   const U = window.URETEC, { r, pick, buyuk, soru, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
 
   U.s1k1 = tiplerden([
@@ -86,7 +87,7 @@
 
   U.s3k4 = tiplerden([
     eslestir([["Kutadgu Bilig", "Yusuf Has Hacip"], ["Divanü Lügati't-Türk", "Kaşgarlı Mahmut"], ["Atabetü'l-Hakayık", "Edip Ahmet Yükneki"], ["Divan-ı Hikmet", "Ahmet Yesevi"]],
-      (a) => `"${a}" adlı eserin yazarı kimdir?`, (b) => `${b}'in yazdığı eser hangisidir?`, (a, b) => `${a} → ${b}.`),
+      (a) => `"${a}" adlı eserin yazarı kimdir?`, (b) => `${EK(b, "in")} yazdığı eser hangisidir?`, (a, b) => `${a} → ${b}.`),
     eslestir([["Talas Savaşı", "751"], ["Dandanakan Savaşı", "1040"], ["Malazgirt Savaşı", "1071"], ["Miryokefalon Savaşı", "1176"]],
       (a) => `${a} hangi yılda yapılmıştır?`, (b) => `${b} yılında hangi savaş yapılmıştır?`, (a, b) => `${a}: ${b}.`),
     eslestir(DEVLET.slice(3).filter((x) => x[0] !== "Çaka Beyliği"), (a) => `${a} için hangisi doğrudur?`, (b) => `Hangi devlet ${b}?`, (a, b) => `${a} ${b}.`)

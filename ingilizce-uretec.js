@@ -1,5 +1,6 @@
 // 6. sınıf İngilizce soru üreteçleri (ortak-uretec.js ve ingilizce.js'ten sonra yüklenir)
 (function () {
+  const EK = (w, t) => { const l = String(w).toLocaleLowerCase("tr"), son = l.slice(-1), V = "aeıioöuü", v = [...l].reverse().find((c) => V.includes(c)) || "e", a2 = "aıou".includes(v) ? "a" : "e", d4 = { a: "ı", ı: "ı", o: "u", u: "u", e: "i", i: "i", ö: "ü", ü: "ü" }[v], sl = V.includes(son), st = "fstkçşhp".includes(son); return w + "'" + ({ in: (sl ? "n" : "") + d4 + "n", e: (sl ? "y" : "") + a2, i: (sl ? "y" : "") + d4, de: (st ? "t" : "d") + a2, den: (st ? "t" : "d") + a2 + "n" })[t]; };
   const U = window.URETEC, { r, pick, karistir, soru, tiplerden, eslestir } = window.UR;
 
   // ---------- Sayılar ----------
@@ -33,7 +34,7 @@
   const TR_ULKE = { "Turkey": "Türkiye", "Germany": "Almanya", "France": "Fransa", "Italy": "İtalya", "Spain": "İspanya", "Japan": "Japonya", "China": "Çin", "Russia": "Rusya", "Greece": "Yunanistan", "Brazil": "Brezilya", "Mexico": "Meksika", "the USA": "ABD", "the UK": "Birleşik Krallık", "Egypt": "Mısır", "Portugal": "Portekiz", "Canada": "Kanada", "Argentina": "Arjantin", "Korea": "Kore" };
   U.en6k1 = tiplerden([
     () => { const [u, m] = pick(ULKE); return soru(`"I'm from ${u}. I'm ___." Boşluğa hangisi gelir?`, m, ULKE.map((x) => x[1]).filter((x) => x !== m), `${u} → ${m}`); },
-    () => { const [u, , d] = pick(ULKE); return soru(`"What language do people speak in ${u}?" sorusunun cevabı hangisidir?`, `They speak ${d}.`, ULKE.map((x) => `They speak ${x[2]}.`).filter((x) => x !== `They speak ${d}.`), `${TR_ULKE[u]}'da ${d} konuşulur.`); },
+    () => { const [u, , d] = pick(ULKE); return soru(`"What language do people speak in ${u}?" sorusunun cevabı hangisidir?`, `They speak ${d}.`, ULKE.map((x) => `They speak ${x[2]}.`).filter((x) => x !== `They speak ${d}.`), `${EK(TR_ULKE[u], "de")} ${d} konuşulur.`); },
     () => { const [u, m] = pick(ULKE); return soru(`"He is ${m}." Bu kişi hangi ülkedendir?`, u.replace("the ", "The "), ULKE.map((x) => x[0].replace("the ", "The ")).filter((x) => x !== u.replace("the ", "The ")), `${m} → ${u}`); },
     () => { const [u] = pick(ULKE); return soru(`"${TR_ULKE[u]}" ülkesinin İngilizcesi hangisidir?`, u, ULKE.map((x) => x[0]).filter((x) => x !== u), `${TR_ULKE[u]} = ${u}`); }
   ]);

@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: bütün uygulama dosyaları ilk açılışta tablete kaydedilir.
 // Bu dosya otomatik üretilir; içerik değişince SURUM değişir ve tablet yeni sürümü indirir.
 const ONEK = "ders8-";
-const SURUM = ONEK + "4212f145";
-const DOSYALAR = ["hata-bildir.js", secmeli-video.js", videolar.js", sayisal-uretec.js", "soru-ekle.js", "soru-bank-turkce.js", "soru-bank-sozel.js", "soru-bank-mf.js", "isinma.js", "oyun.js", "deney.js", "ustalik.js", "secmeli.js", "secmeli-ortak.js", "secmeli-ortak2.js", "yedek.js", "takip.js", "secmeli-siyer.js", "okuma-atolyesi.js", "program.js", "./", "anlatim.js", "app.js", "apple-touch-icon.png", "ayar.js", "din.js", "fen.js", "havuz.js", "hazirlik.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce.js", "inkilap.js", "islem-alani.js", "lgs.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "turkce.js", "veri.js"];
+const SURUM = ONEK + "b15edbb2";
+const DOSYALAR = ["lgs-uretec.js", "hata-bildir.js", "secmeli-video.js", "videolar.js", "sayisal-uretec.js", "soru-ekle.js", "soru-bank-turkce.js", "soru-bank-sozel.js", "soru-bank-mf.js", "isinma.js", "oyun.js", "deney.js", "ustalik.js", "secmeli.js", "secmeli-ortak.js", "secmeli-ortak2.js", "yedek.js", "takip.js", "secmeli-siyer.js", "okuma-atolyesi.js", "program.js", "./", "anlatim.js", "app.js", "apple-touch-icon.png", "ayar.js", "din.js", "fen.js", "havuz.js", "hazirlik.js", "ikon-192.png", "ikon-512.png", "ikon-maskable-512.png", "index.html", "ingilizce.js", "inkilap.js", "islem-alani.js", "lgs.js", "manifest.webmanifest", "matematik-uretec.js", "matematik.js", "ortak-uretec.js", "ses.js", "turkce.js", "veri.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SURUM).then((c) => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));

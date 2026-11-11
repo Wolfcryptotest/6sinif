@@ -6,8 +6,8 @@
   // ---------- Güneş sistemi ----------
   const GEZ = ["Merkür", "Venüs", "Dünya", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün"];
   U.f1k1 = tiplerden([
-    () => { const i = r(0, 6); return soru(`Güneş'e yakınlık sırasına göre ${GEZ[i]}'den sonra gelen gezegen hangisidir?`, GEZ[i + 1], GEZ.filter((_, j) => j !== i + 1 && j !== i), `Sıralama: ${GEZ.join(", ")}.`); },
-    () => { const i = r(1, 7); return soru(`Güneş'e yakınlık sırasına göre ${GEZ[i]}'den önce gelen gezegen hangisidir?`, GEZ[i - 1], GEZ.filter((_, j) => j !== i - 1 && j !== i), `Sıralama: ${GEZ.join(", ")}.`); },
+    () => { const i = r(0, 6); return soru(`Güneş'e yakınlık sırasına göre ${GEZ[i]}'${({Venüs:"ten",Mars:"tan",Dünya:"dan",Uranüs:"ten"})[GEZ[i]]||"den"} sonra gelen gezegen hangisidir?`, GEZ[i + 1], GEZ.filter((_, j) => j !== i + 1 && j !== i), `Sıralama: ${GEZ.join(", ")}.`); },
+    () => { const i = r(1, 7); return soru(`Güneş'e yakınlık sırasına göre ${GEZ[i]}'${({Venüs:"ten",Mars:"tan",Dünya:"dan",Uranüs:"ten"})[GEZ[i]]||"den"} önce gelen gezegen hangisidir?`, GEZ[i - 1], GEZ.filter((_, j) => j !== i - 1 && j !== i), `Sıralama: ${GEZ.join(", ")}.`); },
     () => { const i = r(0, 7); return soru(`Güneş'e yakınlık sırasına göre ${i + 1}. gezegen hangisidir?`, GEZ[i], GEZ.filter((_, j) => j !== i), `Sıralama: ${GEZ.join(", ")}.`); },
     siniflandir({ "iç gezegen": GEZ.slice(0, 4), "dış gezegen": GEZ.slice(4) }, (g) => `Hangisi bir ${g}dir?`, (d, g) => `${d} bir ${g}dir. İç gezegenler: Merkür, Venüs, Dünya, Mars.`),
     ifadeler([
@@ -50,7 +50,7 @@
   U.f2k1 = tiplerden([
     () => { const a = r(2, 30) * 5, b = r(2, 30) * 5, [y] = pick(YON); return soru(`Bir cisme aynı yönde (${y}) ${a} N ve ${b} N büyüklüğünde iki kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, `${a + b} N, ${y}`, [`${Math.abs(a - b)} N, ${y}`, `${a + b} N, ters yöne`, `${a * b} N, ${y}`, `${Math.max(a, b)} N, ${y}`], `Aynı yönlü kuvvetler toplanır: ${a} + ${b} = ${a + b} N. Yön değişmez: ${y}.`); },
     () => { let a, b; do { a = r(2, 30) * 5; b = r(2, 30) * 5; } while (a === b); const [y1, y2] = pick(YON), by = a > b ? y1 : y2; return soru(`Bir cisme ${a} N ${y1}, ${b} N ${y2} doğru iki kuvvet uygulanıyor. Bileşke kuvvet hangisidir?`, `${Math.abs(a - b)} N, ${by}`, [`${Math.abs(a - b)} N, ${by === y1 ? y2 : y1}`, `${a + b} N, ${by}`, `${a + b} N, ${by === y1 ? y2 : y1}`, "0 N"], `Zıt yönlü kuvvetlerde büyükten küçük çıkarılır: ${Math.max(a, b)} − ${Math.min(a, b)} = ${Math.abs(a - b)} N. Yön büyük kuvvetin yönü: ${by}.`); },
-    () => { const a = r(2, 30) * 5, [y1, y2] = pick(YON); return soru(`Bir cisme ${a} N ${y1}, ${a} N ${y2} doğru kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, "0", [String(2 * a), String(a), String(a / 2)], "Eşit büyüklükte ve zıt yönlü kuvvetlerin bileşkesi 0'dır."); },
+    () => { const a = r(2, 15) * 10, [y1, y2] = pick(YON); return soru(`Bir cisme ${a} N ${y1}, ${a} N ${y2} doğru kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, "0", [String(2 * a), String(a), String(a / 2)], "Eşit büyüklükte ve zıt yönlü kuvvetlerin bileşkesi 0'dır."); },
     () => { const a = r(3, 25) * 5, b = r(1, 15) * 5, [y1, y2] = pick(YON); return soru(`Halat çekme yarışında A takımı ${a + b} N ile ${y1}, B takımı ${a} N ile ${y2} çekiyor. Halat hangi yöne, kaç N'luk bileşke kuvvetle hareket eder?`, `${y1}, ${b} N`, [`${y2}, ${b} N`, `${y1}, ${2 * a + b} N`, `${y2}, ${2 * a + b} N`, "Hareket etmez"], `${a + b} − ${a} = ${b} N. Halat büyük kuvvetin yönüne, ${y1} hareket eder.`); },
     () => { const top = r(6, 30) * 5, a = r(1, top / 5 - 1) * 5, [y] = pick(YON); return soru(`Aynı yönlü iki kuvvetin bileşkesi ${top} N'dur. Kuvvetlerden biri ${a} N ise diğeri kaç N'dur?`, String(top - a), [String(top + a), String(a), String(top)], `${top} − ${a} = ${top - a} N.`); }
   ]);
@@ -85,7 +85,7 @@
       "rejenerasyon": ["deniz yıldızı", "planarya", "toprak solucanı"],
       "sporla üreme": ["şapkalı mantar", "eğrelti otu", "küf mantarı", "kara yosunu"],
       "vejetatif üreme": ["patates yumrusu", "çilek", "söğüt çeliği", "soğan", "menekşe yaprağı"]
-    }, (g) => `Hangisinde ${g} ile eşeysiz üreme görülür?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g} ile çoğalır.`, (d) => `"${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}" hangi yolla çoğalır?`),
+    }, (g) => `Hangisi ${g} ile çoğalır?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g} ile çoğalır.`, (d) => `"${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}" hangi yolla çoğalır?`),
     siniflandir({ "dış döllenme": ["alabalık", "kurbağa", "hamsi", "kurbağa ve balıklar"], "iç döllenme": ["kedi", "tavuk", "kertenkele", "yılan", "inek", "güvercin"] },
       (g) => `Hangisinde ${g} görülür?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}: ${g}.`),
     ifadeler([
@@ -114,7 +114,7 @@
     eslestir([["Büyük beyin", "düşünme, öğrenme ve hafıza"], ["Beyincik", "denge ve hareketlerin uyumu"], ["Omurilik soğanı", "kalp atışı ve solunum kontrolü"], ["Omurilik", "refleks hareketler"], ["Hipofiz", "büyüme hormonu salgılama"], ["Tiroit", "metabolizma hızını ayarlama"], ["Pankreas", "kan şekerini düzenleme"], ["Böbreküstü bezi", "korku ve heyecan anında adrenalin salgılama"]],
       (a) => `${a} hangi görevi yapar?`, (b) => `Hangi yapı ${b} görevini yapar?`, (a, b) => `${a}: ${b}.`),
     siniflandir({ "sinir sistemi": ["beyincik", "omurilik", "büyük beyin", "omurilik soğanı"], "iç salgı bezi": ["tiroit", "hipofiz", "pankreas", "böbreküstü bezi"] },
-      (g) => `Hangisi ${g === "sinir sistemi" ? "sinir sistemine ait bir yapıdır" : "bir iç salgı bezidir"}?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} bir ${g === "sinir sistemi" ? "sinir sistemi yapısı" : "iç salgı bezi"}dir.`),
+      (g) => `Hangisi ${g === "sinir sistemi" ? "sinir sistemine ait bir yapıdır" : "bir iç salgı bezidir"}?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g === "sinir sistemi" ? "sinir sistemine ait bir yapıdır" : "bir iç salgı bezidir"}.`),
     siniflandir({ "refleks": ["sıcak sobadan eli hemen çekmek", "dizine çekiçle vurulunca bacağın sıçraması", "göze yaklaşan cisim karşısında gözü kırpmak", "batan iğneden eli çekmek"], "istemli": ["kitap okumak", "bisiklet sürmeyi öğrenmek", "resim yapmak", "şiir ezberlemek"] },
       (g) => `Hangisi ${g === "refleks" ? "bir refleks davranıştır" : "istemli (düşünerek yapılan) bir davranıştır"}?`, (d, g) => `"${d}" ${g === "refleks" ? "omurilik tarafından yönetilen bir reflekstir" : "büyük beyin tarafından yönetilen istemli bir harekettir"}.`)
   ]);
