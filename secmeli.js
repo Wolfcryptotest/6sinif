@@ -127,7 +127,6 @@ window.ICERIK.s_siyer = {
           "Mus'ab bin Umeyr, Medinelilere İslam'ı öğretmek için gönderilen ilk öğretmendir. Zeyd bin Sabit genç yaşta vahiy kâtipliği yapmış ve Peygamberimizin isteğiyle başka diller öğrenmiştir. Üsame bin Zeyd ise henüz on sekiz yaşlarındayken ordu komutanı yapılmıştır.",
           "Bu gençler Peygamberimizi çok sever, onu kendilerine rehber edinirdi. Peygamberimiz de gençliği 'yaşlılık gelmeden önce değerlendirilmesi gereken bir nimet' olarak görürdü."
         ],
-        video: "RbyXxwNjfuE",
         sorular: [
           S("Medine'ye İslam'ı öğretmek için gönderilen genç sahabi kimdir?", ["Mus'ab bin Umeyr", "Ebu Cehil", "Ebu Leheb", "Ümeyye"], "Mus'ab bin Umeyr ilk öğretmen olarak gönderildi."),
           S("Genç yaşta ordu komutanı yapılan sahabi kimdir?", ["Üsame bin Zeyd", "Hz. Ebubekir", "Hz. Ömer", "Hz. Osman"], "Üsame bin Zeyd genç yaşta komutan oldu."),
@@ -369,7 +368,6 @@ window.ICERIK.s_fenuyg = {
           "Isıtılan bir deney tüpünün ağzı kimseye doğru tutulmaz. Kazada hemen öğretmene haber verilir. Deney bitince masa temizlenir ve eller yıkanır.",
           "Deneylerde doğru ölçüm yapmak gerekir: uzunluk cetvelle, kütle teraziyle, sıcaklık termometreyle, sıvıların hacmi dereceli silindirle ölçülür. Ölçülen değerin yanına birimi (cm, g, °C, mL) mutlaka yazılır."
         ],
-        video: "vulUypD0KAM",
         sorular: [
           S("Sıcaklık hangi aletle ölçülür?", ["Termometre", "Terazi", "Cetvel", "Dereceli silindir"], "Sıcaklık termometreyle ölçülür."),
           S("Bir sıvının hacmini ölçmek için hangi araç kullanılır?", ["Dereceli silindir", "Termometre", "Cetvel", "Pusula"], "Hacim dereceli silindirle ölçülür."),
@@ -394,7 +392,6 @@ window.ICERIK.s_okuma = {
           "İyi bir okur okumadan önce başlığa ve görsellere bakarak metnin ne anlatacağını tahmin eder. Okurken bilmediği bir kelimeyle karşılaşırsa cümlenin gelişinden anlamını çıkarmaya çalışır; gerekirse sözlüğe bakar.",
           "Okuduktan sonra metnin konusu (neyden söz ettiği) ve ana fikri (okura vermek istediği mesaj) bulunur. Ana fikri destekleyen diğer düşüncelere yardımcı fikir denir. Metni kendi hayatıyla ilişkilendirmek anlamayı güçlendirir."
         ],
-        video: "gisK0LBBH8I",
         sorular: [
           S("Metnin okura vermek istediği temel mesaja ne denir?", ["Ana fikir", "Başlık", "Konu", "Kelime"], "Ana fikir metnin temel mesajıdır."),
           S("Okumadan önce başlık ve görsellere bakmak neye yardım eder?", ["Metnin içeriğini tahmin etmeye", "Daha hızlı yazmaya", "Kelimeleri ezberlemeye", "Hiçbir şeye"], "Tahmin, anlamaya hazırlar."),
@@ -411,7 +408,6 @@ window.ICERIK.s_okuma = {
           "Metinlerdeki tablo, grafik ve resimler bilgiyi daha anlaşılır hâle getirir. İyi bir okur görselle metin arasındaki ilişkiyi kurar.",
           "İnternette okurken bilginin güvenilir olup olmadığı kontrol edilmelidir: Yazar kim? Ne zaman yazılmış? Resmî bir kurumun sitesi mi? Bir bilgiyi en az iki farklı güvenilir kaynaktan doğrulamak yanlış bilgiye kanmamızı önler."
         ],
-        video: "COGSrvoy5A0",
         sorular: [
           S("Sözlükte bir kelimeyi hızlıca bulmak için hangi okuma türü kullanılır?", ["Tarama", "Ayrıntılı okuma", "Sesli okuma", "Tekrar okuma"], "Belli bir bilgiyi aramak taramadır."),
           S("Ders çalışırken hangi okuma türü uygundur?", ["Ayrıntılı okuma", "Göz gezdirme", "Tarama", "Hiç okumamak"], "Ders için dikkatli, ayrıntılı okunur."),
@@ -451,7 +447,6 @@ window.ICERIK.s_yazarlik = {
           "Sık yapılan hatalara dikkat edilmelidir: 'Ben de geliyorum' cümlesindeki 'de' bağlaçtır ve ayrı yazılır; 'Evde kaldım' cümlesindeki '-de' ise hâl ekidir ve bitişik yazılır. 'Duydum ki gelmişsin' cümlesindeki 'ki' de ayrı yazılır.",
           "İlk yazılan metin bir taslaktır. Yazı bitince baştan okunur; anlatım bozuklukları, gereksiz tekrarlar ve yazım yanlışları düzeltilir. Gözden geçirme, iyi yazarların vazgeçmediği bir alışkanlıktır."
         ],
-        video: "mrfmjsfsHWA",
         sorular: [
           S("Hangi cümlede 'de' doğru yazılmıştır?", ["Ben de seninle geleceğim.", "Bende seninle geleceğim.", "Ev de oturuyorum.", "Okul da kaldım ve uyudum."], "Bağlaç olan 'de' ayrı yazılır; 'Ben de'."),
           S("Özel isimler nasıl yazılır?", ["Büyük harfle başlayarak", "Tamamen küçük harfle", "Tırnak içinde", "Ayrı satırda"], "Özel isimler büyük harfle başlar."),
