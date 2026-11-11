@@ -41,5 +41,6 @@ window.VIDEO = {
   "ing3k1": "Z8RXsOTwD4w",  // If Clause Type 0/1/2/3 Özet Konu Anlatımı
   "ing3k2": "m7PBx7lZtZ0",  // As, Since, Because & Due to, Owing to, Because of Kullanımı
   "mattr1": "3zOBSmNwj8A", "mattr2": "tDFmmN4Jfiw", "matdn1": "iNxMMnDf_bA", "matlm1": "5auLxAhhWWg", "matcm1": "0miKsYpJR1g",
+  "fizcm2": "BRMsp1B5Yy4", "fizdg2": "x-H9f6pZato", "fiztk1": "yW37SqFfm60",
 };
 Object.values(window.ICERIK || {}).forEach((d) => d.uniteler.forEach((u) => u.konular.forEach((k) => { if (window.VIDEO[k.id]) k.video = window.VIDEO[k.id]; })));
