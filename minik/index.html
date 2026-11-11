@@ -169,6 +169,25 @@ input.ad{font:inherit;font-size:24px;padding:12px 16px;border-radius:16px;border
 @keyframes dus{to{transform:translateY(110vh) rotate(720deg)}}
 .yukle-btn{background:var(--yesil);color:#fff;padding:6px 12px;font-weight:800;font-size:16px}
 @media (max-width:520px){html,body{font-size:18px}.soru{font-size:22px}.sec{font-size:21px}.blon{width:44%;height:140px}.dugum{width:104px}.dugum .daire{width:72px;height:72px;font-size:34px}.hikaye{font-size:21px;padding:16px}}
+.an-sahne{position:relative;overflow:hidden;border-radius:28px;min-height:330px;padding:26px 18px 34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--renk,var(--ana)) 22%,var(--kart)),var(--kart));border:4px solid var(--renk,var(--ana))}
+.an-sus{position:absolute;inset:0;pointer-events:none}
+.an-sus span{position:absolute;bottom:-50px;font-size:30px;opacity:.22;animation:anYuz linear infinite}
+@keyframes anYuz{to{transform:translateY(-440px) rotate(25deg)}}
+.an-em{position:relative;font-size:110px;line-height:1.1}
+.an-gir.an-a{animation:anZipla .9s cubic-bezier(.3,1.6,.5,1) both,anSalla 2.6s 1s ease-in-out infinite}
+.an-gir.an-b{animation:anDon .9s cubic-bezier(.3,1.5,.5,1) both,anSalla 2.6s 1s ease-in-out infinite}
+.an-gir.an-c{animation:anKay .8s cubic-bezier(.3,1.4,.5,1) both,anSalla 2.6s 1s ease-in-out infinite}
+.an-gir{animation:anZipla .9s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes anZipla{0%{transform:translateY(-160px) scale(.4);opacity:0}100%{transform:none;opacity:1}}
+@keyframes anDon{0%{transform:scale(0) rotate(-200deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes anKay{0%{transform:translateX(-120%) rotate(-20deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes anSalla{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg) translateY(-6px)}}
+.an-yazi{position:relative;font-size:26px;font-weight:800;line-height:1.35;max-width:560px}
+.an-yazi span{display:inline-block;opacity:0;animation:anKelime .45s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes anKelime{0%{opacity:0;transform:translateY(18px) scale(.6)}100%{opacity:1;transform:none}}
+.an-cubuk{position:absolute;left:18px;right:18px;bottom:14px;height:8px;border-radius:8px;background:color-mix(in srgb,var(--renk,var(--ana)) 20%,transparent)}
+.an-cubuk i{display:block;height:100%;width:0;border-radius:8px;background:var(--renk,var(--ana));transition:width .6s}
+@media (prefers-reduced-motion:reduce){.an-sus{display:none}.an-gir,.an-gir.an-a,.an-gir.an-b,.an-gir.an-c{animation:none}.an-yazi span{animation-duration:.01s}}
 </style>
 <style id="telefon-duzen">
 /* Telefon düzeni: küçük ekranlarda butonlar ve kartlar derli toplu, yazılar okunaklı */

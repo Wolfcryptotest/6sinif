@@ -206,7 +206,9 @@
     b1.onclick = () => git(() => ogren(id, k), "📖 " + k.ad);
     const b2 = $(`<button class="buyukbtn">🎮 Oyna (${S.turGorev} görev)</button>`);
     b2.onclick = () => git(() => oyna(id, k), "🎮 " + k.ad);
-    ekran.appendChild(b1); ekran.appendChild(b2);
+    const bA = $(`<button class="buyukbtn ikincil">🎬 Animasyonlu Anlatım</button>`);
+    bA.onclick = () => git(() => animasyon(id, k), "🎬 " + k.ad);
+    ekran.appendChild(bA); ekran.appendChild(b1); ekran.appendChild(b2);
     if (k.video) {
       const liste = Array.isArray(k.video) ? k.video : [["Video izle", k.video]];
       const sat = $(`<div class="satir"></div>`);
@@ -241,6 +243,61 @@
       if (k.bilgi[i][2]) { APP.sesDur(); APP.konusEn(k.bilgi[i][2]); } else APP.konus(metin);
     }
     goster();
+  }
+
+  // ---------- Animasyonlu anlatım: bilgi kartları hareketli yazı, zıplayan resim ve sesle kendi kendine oynar ----------
+  function animasyon(id, k) {
+    const D = DERS[id], kartlar = k.bilgi || [];
+    ekran.style.setProperty("--renk", D.renk);
+    const sahne = $(`<div class="an-sahne"><div class="an-sus"></div><div class="an-em"></div><div class="an-yazi"></div><div class="an-cubuk"><i></i></div></div>`);
+    const sat = $(`<div class="satir"></div>`);
+    ekran.appendChild(sahne); ekran.appendChild(sat);
+    const sus = sahne.querySelector(".an-sus"), emK = sahne.querySelector(".an-em"), yazi = sahne.querySelector(".an-yazi"), cubuk = sahne.querySelector(".an-cubuk i");
+    // arka planda yavaşça yüzen küçük resimler (konunun kendi resimleri)
+    const resimler = [...new Set(kartlar.map((x) => x[0]))];
+    for (let n = 0; n < 7; n++) {
+      const e = document.createElement("span"); e.textContent = resimler[n % resimler.length] || k.ikon || "⭐";
+      e.style.left = (n * 14 + Math.random() * 8) + "%"; e.style.animationDelay = (-Math.random() * 9) + "s"; e.style.animationDuration = 8 + Math.random() * 5 + "s";
+      sus.appendChild(e);
+    }
+    let i = 0, durdu = false, zaman = [];
+    const temizle = () => { zaman.forEach(clearTimeout); zaman = []; };
+    const sonra = (f, ms) => zaman.push(setTimeout(() => { if (sahne.isConnected) f(); }, ms));
+    const tus = (metin, f, ana) => { const b = $(`<button class="buyukbtn ${ana ? "" : "ikincil"}">${metin}</button>`); b.onclick = f; return b; };
+    function dugmeler(son) {
+      sat.innerHTML = "";
+      if (son) {
+        sat.appendChild(tus("🔁 Yeniden İzle", () => { i = 0; durdu = false; oynat(); }));
+        const o = tus("🎮 Şimdi Oyna!", () => { yigin.pop(); git(() => oyna(id, k), "🎮 " + k.ad); }, true); o.style.setProperty("--renk", "var(--yesil)"); sat.appendChild(o);
+        return;
+      }
+      sat.appendChild(tus(durdu ? "▶ Devam" : "⏸ Durdur", () => { durdu = !durdu; if (durdu) { temizle(); APP.sesDur(); dugmeler(); } else oynat(); }));
+      sat.appendChild(tus("⏭ Sonraki", () => { temizle(); APP.sesDur(); durdu = false; i = Math.min(i + 1, kartlar.length); oynat(); }));
+    }
+    function oynat() {
+      temizle(); dugmeler();
+      if (i >= kartlar.length) {
+        emK.className = "an-em an-gir"; emK.textContent = "🎉"; yazi.innerHTML = ""; yazi.textContent = "Harika! Şimdi oynayarak öğrenelim mi?";
+        cubuk.style.width = "100%"; konfeti(); APP.konus("Harika! Şimdi oynayarak öğrenelim mi?"); dugmeler(true); return;
+      }
+      const [em, metin, en] = kartlar[i];
+      cubuk.style.width = (i / kartlar.length * 100) + "%";
+      emK.className = "an-em"; void emK.offsetWidth; emK.className = "an-em an-gir " + ["an-a", "an-b", "an-c"][i % 3];
+      emK.textContent = em;
+      const kelimeler = metin.split(/\s+/);
+      yazi.innerHTML = kelimeler.map((w, n) => `<span style="animation-delay:${0.35 + n * 0.28}s">${esc(w)}</span>`).join(" ");
+      // sonraki karta geçiş: ses bitince (ses kapalıysa okuma süresi kadar bekleyince)
+      const enAz = 1800 + kelimeler.length * 420, enCok = 6000 + kelimeler.length * 900;
+      let sesBitti = false, sureDoldu = false;
+      const ilerle = () => { if (sesBitti && sureDoldu && !durdu) { temizle(); sonra(() => { i++; oynat(); }, 700); } };
+      sonra(() => { sureDoldu = true; ilerle(); }, enAz);
+      sonra(() => { sesBitti = true; ilerle(); }, enCok);
+      sonra(() => {
+        if (en) { APP.sesDur(); APP.konusEn(en); sesBitti = false; sonra(() => { sesBitti = true; ilerle(); }, 1500 + en.length * 120); }
+        else APP.konus(metin, () => { sesBitti = true; ilerle(); });
+      }, 350);
+    }
+    oynat();
   }
 
   // ---------- Oyun ----------
