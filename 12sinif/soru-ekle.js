@@ -148,6 +148,28 @@
   for (const dk of Object.keys(ICERIK)) { try { dersUret(dk); } catch (e) { console.warn("Otomatik soru üretilemedi:", dk, e); } }
   for (const dk of Object.keys(ICERIK)) for (const u of ICERIK[dk].uniteler || []) for (const k of u.konular || []) delete k._var;
 
+  // Çözüm sonucu yazılmamışsa (ör. "P = F/S = 200/0,5.") ve işlem doğru şıkkı veriyorsa sonucu ekler: "… = 400 Pa"
+  const SUP = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" };
+  function cozumTamamla(q) {
+    try {
+      if (!q || !q.cozum || !q.secenekler) return q;
+      const d = String(q.secenekler[q.dogru]);
+      const dn = d.replace(/−/g, "-").replace(/(\d) (\d{3})(?!\d)/g, "$1$2").match(/-?\d+(?:,\d+)?/g);
+      if (!dn || dn.length !== 1) return q;
+      const hedef = +dn[0].replace(",", ".");
+      const cz = String(q.cozum).trim();
+      const yaln = cz.replace(/\.$/, "");
+      const sonParca = yaln.split(/[=:]/).pop().trim();
+      const tum = cz.replace(/−/g, "-").replace(/(\d) (\d{3})(?!\d)/g, "$1$2").match(/-?\d+(?:,\d+)?/g) || [];
+      if (tum.length && +tum[tum.length - 1].replace(",", ".") === hedef) return q;
+      let t = sonParca.replace(/−/g, "-").replace(/×|·/g, "*").replace(/÷/g, "/").replace(/(\d),(\d)/g, "$1.$2").replace(/(\d) (\d{3})(?!\d)/g, "$1$2");
+      t = t.replace(/([0-9)])([⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+)/g, (m, a, b) => a + "**(" + b.split("").map((c) => SUP[c]).join("") + ")");
+      if (!/[+\-*\/]/.test(t.replace(/^-/, "")) || !/^[\d\s+\-*\/().]+$/.test(t)) return q;
+      const v = Function("return (" + t + ")")();
+      if (!isFinite(v) || Math.abs(v - hedef) > 1e-6 * Math.max(1, Math.abs(hedef))) return q;
+      return { ...q, cozum: yaln + " = " + d + "." };
+    } catch (e) { return q; }
+  }
   // ---------- Tekrar önleme + sabit soruların payı ----------
   function sar() {
     if (typeof window.soruHazirla !== "function" || window.soruHazirla._sarili) return;
@@ -156,7 +178,7 @@
     const bellek = {}, uretGor = {};
     const sonlar = () => { try { const k = typeof kayit !== "undefined" ? kayit : null; if (!k) return bellek; return (k.sonSoru = k.sonSoru || {}); } catch (e) { return bellek; } };
     const yeni = function (k, n) {
-      if (!k || !Array.isArray(k.sorular) || (k.sorular.length < 6 && !(window.URETEC && window.URETEC[k.id]))) return asil.apply(this, arguments);
+      if (!k || !Array.isArray(k.sorular) || (k.sorular.length < 6 && !(window.URETEC && window.URETEC[k.id]))) return (asil.apply(this, arguments) || []).map(cozumTamamla);
       const S = sonlar(), son = new Set(S[k.id] || []), tum = k.sorular, adet = n || 10;
       let kullan = karistir(tum.filter((s) => !son.has(s.soru)));
       if (kullan.length < adet) {
@@ -191,7 +213,7 @@
         for (const s of liste) if (!s.uretildi && tum.some((t) => t.soru === s.soru)) yeniSon.push(s.soru);
         S[k.id] = yeniSon.slice(-Math.max(8, Math.floor(tum.length * 0.7)));
       } catch (e) {}
-      return liste;
+      return liste.map(cozumTamamla);
     };
     yeni._sarili = true;
     window.soruHazirla = yeni;
