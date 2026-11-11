@@ -175,6 +175,8 @@ sup,sub{font-size:.72em}
 <nav class="tabs" id="tabs"></nav>
 <div id="layer"></div>
 
+<script src="havuz.js"></script>
+<script src="yks-ek.js"></script>
 <script>
 "use strict";
 /* ============ Yardımcılar ============ */
@@ -430,7 +432,7 @@ function streak(){let n=0;const d=new Date();if(!S.days[todayKey(d)])d.setDate(d
 /* ============ Soru seçimi ============ */
 function prep(q){
   q=JSON.parse(JSON.stringify(q));
-  if(!q.fixed&&!q.gen){const idx=shuf([0,1,2,3,4]);q.o=idx.map(i=>q.o[i]);q.a=idx.indexOf(q.a)}
+  if(!q.fixed&&!q.gen){const idx=shuf(q.o.map((_,i)=>i));q.o=idx.map(i=>q.o[i]);q.a=idx.indexOf(q.a)}
   return q;
 }
 function genQ(g){const r=g.f();return{id:"g-"+g.id+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),d:g.d,k:g.k,s:g.s,z:g.z,gen:true,...r}}
@@ -440,11 +442,12 @@ function sources(f){
 }
 function draw(f,n,used){
   used=used||new Set();const {st,gn}=sources(f);const out=[];
-  let stl=shuf(st.filter(q=>!used.has(q.id)));
+  const usedT=used.T||(used.T=new Set());
+  let stl=shuf(st.filter(q=>!used.has(q.id)&&!usedT.has(q.q)));
   for(let i=0;i<n;i++){
     const useGen=gn.length&&(!stl.length||Math.random()<gn.length/(gn.length+stl.length*0.9));
     if(useGen)out.push(genQ(pick(gn)));
-    else if(stl.length){const q=stl.pop();used.add(q.id);out.push(prep(q))}
+    else{while(stl.length&&usedT.has(stl[stl.length-1].q))stl.pop();if(stl.length){const q=stl.pop();used.add(q.id);usedT.add(q.q);out.push(prep(q))}}
   }
   return out;
 }
@@ -578,6 +581,21 @@ const MUF=[
  ["İslam ve Bilim"],["Anadolu’da İslam"],["İslam Düşüncesinde Tasavvufi Yorumlar","LKNeSVn73Pc"],["Güncel Dinî Meseleler"],["Hint ve Çin Dinleri"]]}
 ];
 
+/* 5–12. sınıf soru havuzu (havuz.js): her YKS konusuna, o konunun işlendiği sınıfların soruları eklenir. Kaynak: araclar/yks-esleme.json */
+(function(){
+  const ekle=(m,k)=>{k[2]=k[2]||[];if(!k[2].includes(k[0]))k[2].push(k[0])};
+  (window.YKS_EK||[]).forEach((r,i)=>{const m=MUF.find(x=>x.id===r[0]),k=m&&m.k.find(x=>x[0]===r[1]);if(!k)return;BANK.push({id:"e"+i,d:m.d,k:r[1],s:m.sinav,z:r[2],q:r[3],o:r[4],a:0,c:r[5]});ekle(m,k)});
+  (window.YKS_GEN||[]).forEach(g=>{const m=MUF.find(x=>x.id===g.m),k=m&&m.k.find(x=>x[0]===g.k);if(!k)return;GEN.push(Object.assign(g,{d:m.d}));ekle(m,k)});
+  if(!window.HAVUZ||!window.HAVUZ_ESLE)return;let n=0;
+  MUF.forEach(m=>{const es=HAVUZ_ESLE[m.id]||[];m.k.forEach((k,i)=>{
+    const refs=es[i]||[];let ek=0;
+    refs.forEach(ref=>{const g=+ref.split(":")[0];(HAVUZ[ref]||[]).forEach((r,j)=>{BANK.push({id:"h"+ref+"-"+j+"-"+m.id,d:m.d,k:k[0],s:m.sinav,z:g<=8?1:g<=10?2:3,q:r[0],o:r[1],a:r[2],c:r[3]||"Doğru cevap: "+r[1][r[2]],src:g});ek++;n++})});
+    if(ek){k[2]=k[2]||[];if(!k[2].includes(k[0]))k[2].push(k[0]);k.havuz=ek}
+    if(!k[1]&&window.HAVUZ_VIDEO){const r=refs.slice().sort((a,b)=>{const ga=+a.split(":")[0],gb=+b.split(":")[0];return (gb>=9)-(ga>=9)||gb-ga}).find(x=>HAVUZ_VIDEO[x]);if(r){k[1]=HAVUZ_VIDEO[r];k.vsrc=+r.split(":")[0]}}
+  })});
+  window.HAVUZ_SAYI=n;
+})();
+
 /* ============ Dersler ve videolar ============ */
 let dersSel=null;
 const kKey=(m,k)=>m.id+"|"+k[0];
@@ -623,9 +641,9 @@ function dersDetay(m){
   </div>
   <div class="sec"><h2>Konular</h2><div class="sheet">${m.k.map((k,i)=>{const st=S.konu[kKey(m,k)]||{};const s=kStat(m,k);const q=hasQ(m,k);return`<div class="list-row" style="align-items:flex-start">
     <button class="bub" style="flex:none;margin-top:2px;${st.d?"background:var(--lead);border-color:var(--lead);color:var(--lead-ink)":""}" aria-pressed="${!!st.d}" aria-label="${k[0]} tamamlandı olarak işaretle" onclick="A.konuDone('${m.id}',${i})">${st.d?"✓":i+1}</button>
-    <div style="flex:1;min-width:0"><b>${k[0]}</b><div class="note">${k[1]?"Konuya özel video":"Ders oynatma listesinde"}${st.w?" · izlendi":""}${s.t?` · ${s.t} soru, %${Math.round(s.c/s.t*100)} doğru`:""}</div>
+    <div style="flex:1;min-width:0"><b>${k[0]}</b><div class="note">${k[1]?(k.vsrc?`Konu videosu (${k.vsrc}. sınıf anlatımı)`:"Konuya özel video"):"Ders oynatma listesinde"}${k.havuz?` · ${k.havuz} soru`:""}${st.w?" · izlendi":""}${s.t?` · ${s.t} soru, %${Math.round(s.c/s.t*100)} doğru`:""}</div>
      <div class="row" style="gap:6px;margin-top:8px"><button class="btn sm" onclick="A.video('${m.id}',${i})">▶ Video</button>${q?`<button class="btn sm ink" onclick="A.konuQ('${m.id}',${i})">Soru çöz</button>`:""}</div></div></div>`}).join("")}</div>
-   <div class="note" style="margin-top:8px">Numaraya dokunarak bitirdiğin konuları işaretle. “Soru çöz” düğmesi, soru bankasında o konuya ait sorular olan konularda görünür.</div></div>`;
+   <div class="note" style="margin-top:8px">Numaraya dokunarak bitirdiğin konuları işaretle. “Soru çöz” düğmesi, soru bankasında o konuya ait sorular olan konularda görünür. Sorular ve konu videolarının bir kısmı sitenin 5–12. sınıf bölümlerinden gelir.</div></div>`;
 }
 function videoModal(m,i){
   let v,title,konu=null;
@@ -863,7 +881,7 @@ function quizView(){
   <div class="ticks" style="opacity:.25;height:5px"></div>
   ${Z.showOptik?`<div class="sheet" style="margin-top:10px"><div class="optik">${Z.qs.map((x,j)=>`<button class="oc ${Z.ans[j]!==null?"ans":""} ${j===i?"cur":""} ${Z.flag[j]?"flag":""}" onclick="A.jump(${j})">${j+1}${Z.ans[j]!==null?LET[Z.ans[j]]:""}</button>`).join("")}</div><div class="note" style="margin-top:8px">${answered} işaretli · ${n-answered} boş · ${Z.flag.filter(Boolean).length} işaretlenmiş soru</div></div>`:""}
   <div class="sheet" style="margin-top:12px">
-   <div class="q-meta"><span class="pill f">${DERS[q.d].ad}</span><span class="pill">${q.k}</span><span class="pill">${q.s}</span><span class="pill">${"●".repeat(q.z)}${"○".repeat(3-q.z)}</span>${q.gen?`<span class="pill">üretilen</span>`:""}</div>
+   <div class="q-meta"><span class="pill f">${DERS[q.d].ad}</span><span class="pill">${q.k}</span><span class="pill">${q.s}</span><span class="pill">${"●".repeat(q.z)}${"○".repeat(3-q.z)}</span>${q.gen?`<span class="pill">üretilen</span>`:""}${q.src?`<span class="pill">${q.src}. sınıf kaynağı</span>`:""}</div>
    <div class="q-text">${q.q}</div>
    <div class="opts">${q.o.map((o,j)=>{let c="opt";if(Z.ans[i]===j)c+=" sel";if(Z.elim[i].includes(j))c+=" elim";if(learn&&rev){if(j===q.a)c+=" right";else if(Z.ans[i]===j)c+=" wrong"}return`<button class="${c}" ${learn&&rev?"disabled":""} onclick="A.pick(${j})"><span class="bub">${LET[j]}</span><span class="otx">${o}</span></button>`}).join("")}</div>
    ${learn&&rev?`<div class="stack" style="margin-top:14px"><div class="verdict ${Z.ans[i]===q.a?"ok":"bad"}">${Z.ans[i]===q.a?"Doğru":Z.ans[i]===null?"Boş bırakıldı":"Yanlış · doğru cevap "+LET[q.a]}</div><div class="sol">${q.c}</div></div>`:""}
