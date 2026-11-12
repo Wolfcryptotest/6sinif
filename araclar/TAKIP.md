@@ -56,10 +56,10 @@ Ayrı bir gerçek öğretmen bölümü yoktur. Aşağıdaki işlerin hepsi Bilge
 Bilge'nin kuralları:
 - Ücretsizdir ve internete veri göndermez. Cevaplarını sitedeki içerikten ve öğrencinin kendi verisinden üretir.
 - Yapay zekâ servisi (ücretli API) bağlamak Adem'in kararıdır.
-- Bilge'ye Sor (`sohbet.js`) 5–12'de var (ana kopya kökteki `sohbet.js`; değişince 5, 7–12 klasörlerine aynen kopyalanır). YKS'de henüz yok.
-- [ ] **A0. Bilge her sınıfta.** Bilge'ye Sor 5, 7–12 ve YKS'ye taşınır. Bilge, öğrencinin ustalık puanlarını okuyarak "Neyi bilmiyorum?", "Bugün ne çalışayım?" ve "Bu soruyu neden yanlış yaptım?" sorularına cevap verir.
+- Bilge'ye Sor (`sohbet.js`) 5–12'de var (ana kopya kökteki `sohbet.js`; değişince 5, 7–12 klasörlerine aynen kopyalanır). YKS'de ayrı bir uyarlama var: `yks/yks-bilge.js` (panelde kart, `#bilge` görünümü; S.stats, S.defter ve MUF'tan cevap üretir). YKS'de sw.js yok, swbump gerekmez.
+- [x] **A0. Bilge her sınıfta.** Bilge'ye Sor 5, 7–12 ve YKS'ye taşınır. Bilge, öğrencinin ustalık puanlarını okuyarak "Neyi bilmiyorum?", "Bugün ne çalışayım?" ve "Bu soruyu neden yanlış yaptım?" sorularına cevap verir.
   - [x] 5, 7–12'ye taşındı; "Neyi bilmiyorum?", "Bugün ne çalışayım?", "Bu soruyu neden yanlış yaptım?" cevapları eklendi (2026-11-11).
-  - [ ] YKS'ye taşınması (yks/index.html farklı yapıda; ustalık verisi ve konu yapısına uyarlanacak).
+  - [x] YKS'ye taşındı: `yks/yks-bilge.js`. Eksikler (konu başarı oranı + yanlış defteri), puan türüne göre günlük plan (tekrar → zayıf konu → yeni konu, günlük hedef), son yanlışın çözümü, konu adıyla arama (video, çözümlü örnek, soru çöz, konunun anlatıldığı sınıf bölümü), sınav takvimi ve net hesabı (2026-11-12).
 - [ ] **A1. Seviye tespit sınavı.** 5–12'de her derse ilk girişte ünite başına 2–3 soruluk kısa bir tanılama yapılır. Sonuç `kayit.ustalik` puanlarına başlangıç değeri olarak yazılır ve "eksik haritası" gösterilir.
 - [ ] **A2. Ön koşul haritası.** `araclar/onkosul.json` dosyasında her konunun önceki sınıflardaki ön koşul konuları tutulur (ör. 8 mat2k1 → 7 m1k2).
   - Bir konuda ustalık puanı düşükse ön koşul konudan 3 soruluk bir kontrol yapılır.
@@ -107,6 +107,7 @@ Bilge'nin kuralları:
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-12 — Denetim temizdi. A0 tamamlandı: Bilge'ye Sor YKS'ye eklendi (yks/yks-bilge.js; panelde kart). Eksiklerim, bugünkü plan, son yanlışın nedeni, konu araması ve çözümlü örnek; telefon boyutunda denendi. Sırada A1 (seviye tespit sınavı). Denetim: sorun yok.
 - 2026-11-11 — D4: 6. sınıf Türkçe, Sosyal, İngilizce ve Din'e doğrulanmış ek videolar (toplam 89 konu, 130 video). Genel "sureler" videosu gibi konuya tam uymayanlar eklenmedi. Denetim: sorun yok.
 - 2026-11-11 — D4 (Adem'in isteği): konu sayfasında çoklu video desteği; 6. sınıf Matematik ve Fen'de 40 konuya 63 doğrulanmış ek video. Denetim: sorun yok.
 - 2026-11-11 — D3 (6. sınıf): 165 video tarandı; açılmayan 8 video ve konuyla uyuşmayan 3 video (Akıcı Okuma, Amaca Göre Okuma, Yazım Kuralları ve Gözden Geçirme) kaldırıldı, aynı kimlikler diğer sınıf kopyalarından da çıkarıldı. Denetim: sorun yok.

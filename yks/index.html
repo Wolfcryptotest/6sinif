@@ -423,8 +423,8 @@ function record(q,ok,ms){
 function toDefter(q){
   const e=S.defter[q.id];
   const clean={id:q.id,d:q.d,k:q.k,s:q.s,z:q.z,q:q.q,o:q.o,a:q.a,c:q.c,fixed:q.fixed};
-  if(e){e.box=1;e.due=Date.now()+DAY;e.wrong=(e.wrong||1)+1;e.q=clean}
-  else S.defter[q.id]={q:clean,box:1,due:Date.now()+DAY,added:Date.now(),wrong:1};
+  if(e){e.box=1;e.due=Date.now()+DAY;e.wrong=(e.wrong||1)+1;e.q=clean;e.son=Date.now()}
+  else S.defter[q.id]={q:clean,box:1,due:Date.now()+DAY,added:Date.now(),son:Date.now(),wrong:1};
 }
 function dueList(){const now=Date.now();return Object.values(S.defter).filter(e=>e.box<=5&&e.due<=now)}
 function streak(){let n=0;const d=new Date();if(!S.days[todayKey(d)])d.setDate(d.getDate()-1);while(S.days[todayKey(d)]){n++;d.setDate(d.getDate()-1)}return n}
@@ -661,13 +661,13 @@ function videoModal(m,i){
 
 /* ============ Görünümler ============ */
 const VIEWS=[["panel","Panel","M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"],["dersler","Dersler","M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5zM7 8h2M16 8h2"],["deneme","Deneme","M8 3h8l3 3v15H5V3zM9 9h6M9 13h6M9 17h3"],["defter","Defter","M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"],["analiz","Analiz","M4 20V10M10 20V4M16 20v-7M22 20H2"],["araclar","Araçlar","M14 7a4 4 0 0 0-5 5l-6 6 3 3 6-6a4 4 0 0 0 5-5l-3 3-3-3z"]];
-let view=(location.hash||"").slice(1);if(!VIEWS.some(v=>v[0]===view))view="panel";
+let view=(location.hash||"").slice(1);if(!VIEWS.some(v=>v[0]===view)&&view!=="bilge")view="panel";
 let Z=null; /* aktif sınav */
 let daily=null; /* panel günün sorusu */
 let soruF={d:"mat",k:"",s:"",z:0,n:20,mode:"learn"};
 
 function go(v){if(v!==view||v==="dersler")dersSel=null;view=v;Z=null;try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}render();window.scrollTo(0,0)}
-window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if(VIEWS.some(x=>x[0]===v)&&v!==view&&!Z){view=v;render()}});
+window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if((VIEWS.some(x=>x[0]===v)||v==="bilge")&&v!==view&&!Z){view=v;render()}});
 
 function tabs(){
   const due=dueList().length;
@@ -678,7 +678,7 @@ function render(){
   tabs();
   const app=document.getElementById("app");
   if(Z){app.innerHTML=Z.done?resultView():quizView();bindQuiz();return}
-  app.innerHTML=`<div class="wrap">${({panel,dersler,deneme,defter,analiz,araclar})[view]()}</div>`;
+  app.innerHTML=`<div class="wrap">${({panel,dersler,deneme,defter,analiz,araclar,bilge:()=>window.YKS_BILGE?YKS_BILGE.gorunum():""})[view]()}</div>`;
   if(view==="araclar")pomoPaint();
 }
 
@@ -712,6 +712,7 @@ function panel(){
     </div>
   </div>
   <div class="tiles" style="margin-top:12px">
+    ${window.YKS_BILGE?`<button class="tile bilge-t" onclick="A.go('bilge')"><span class="ik" aria-hidden="true">🦉</span><span style="color:var(--ink)"><b>Bilge'ye Sor</b><br><span>Eksiklerin, bugünkü planın ve yanlışlarının nedeni</span></span></button>`:""}
     <button class="tile" onclick="A.smart()"><span class="tag">KİŞİSEL</span><h3>Akıllı Test</h3><span>Zayıf konulardan 20 soru</span></button>
     <button class="tile" onclick="A.review()" ${due?"":""}><span class="tag">${due} SORU HAZIR</span><h3>Tekrar Zamanı</h3><span>Aralıklı tekrar kutuları</span></button>
     <button class="tile" onclick="A.deneme('tyt')"><span class="tag">55 DK</span><h3>TYT Mini Deneme</h3><span>40 soru, net ve puan tahmini</span></button>
@@ -1012,5 +1013,6 @@ function learnDone(){stamp();Z.done=true;clearInterval(Z.iv);
 setInterval(pomoTick,1000);
 render();
 </script>
+<script src="yks-bilge.js"></script>
 
 </body></html>
