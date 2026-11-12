@@ -102,6 +102,13 @@
   }
   document.getElementById("geri").onclick = geri;
   const anaya = () => { yigin.length = 1; ciz(); };
+  // 📕 Kitabım (kitap-rehber.js) için dışa açılanlar
+  Object.assign(window.APP, {
+    git: (f, b) => git(f, b),
+    ekran: () => ekran,
+    konuBul: (d, kid) => DERS[d] && DERS[d].temalar.flatMap((t) => t.konular).find((x) => x.id === kid),
+    konuAc: (d, kid) => { const k = DERS[d] && DERS[d].temalar.flatMap((t) => t.konular).find((x) => x.id === kid); if (k) git(() => konuSayfa(d, k), k.ad); }
+  });
 
   // ---------- Yardımcılar ----------
   const tumKonular = () => SIRA.flatMap((d) => DERS[d].temalar.flatMap((t) => t.konular.map((k) => ({ d, t, k }))));
@@ -171,6 +178,7 @@
   function dersSayfa(id) {
     const D = DERS[id];
     ekran.style.setProperty("--renk", D.renk);
+    if (window.REHBER_UI && REHBER_UI.varMi(id)) { const rb = $(`<button class="buyukbtn" style="margin-top:0">📕 Kitabım: Konu Anlatımı ve Çözümler</button>`); rb.onclick = () => git(() => REHBER_UI.dersRehber(id), "📕 " + D.ad + " Kitabım"); ekran.appendChild(rb); }
     if ((window.KITAPLAR || []).some((k) => k.ders === id)) { const kb = $(`<button class="buyukbtn ikincil" style="margin-top:0">📕 MEB ${esc(D.ad)} kitapları</button>`); kb.onclick = () => git(() => mebKitaplari(id), "📕 " + D.ad + " Kitapları"); ekran.appendChild(kb); }
     let yeniBulundu = false;
     D.temalar.forEach((t, ti) => {
