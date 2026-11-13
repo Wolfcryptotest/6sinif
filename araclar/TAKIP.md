@@ -60,7 +60,8 @@ Bilge'nin kuralları:
 - [x] **A0. Bilge her sınıfta.** Bilge'ye Sor 5, 7–12 ve YKS'ye taşınır. Bilge, öğrencinin ustalık puanlarını okuyarak "Neyi bilmiyorum?", "Bugün ne çalışayım?" ve "Bu soruyu neden yanlış yaptım?" sorularına cevap verir.
   - [x] 5, 7–12'ye taşındı; "Neyi bilmiyorum?", "Bugün ne çalışayım?", "Bu soruyu neden yanlış yaptım?" cevapları eklendi (2026-11-11).
   - [x] YKS'ye taşındı: `yks/yks-bilge.js`. Eksikler (konu başarı oranı + yanlış defteri), puan türüne göre günlük plan (tekrar → zayıf konu → yeni konu, günlük hedef), son yanlışın çözümü, konu adıyla arama (video, çözümlü örnek, soru çöz, konunun anlatıldığı sınıf bölümü), sınav takvimi ve net hesabı (2026-11-12).
-- [ ] **A1. Seviye tespit sınavı.** 5–12'de her derse ilk girişte ünite başına 2–3 soruluk kısa bir tanılama yapılır. Sonuç `kayit.ustalik` puanlarına başlangıç değeri olarak yazılır ve "eksik haritası" gösterilir.
+- [x] **A1. Seviye tespit sınavı.** 5–12'de her derse ilk girişte ünite başına 2–3 soruluk kısa bir tanılama yapılır. Sonuç `kayit.ustalik` puanlarına başlangıç değeri olarak yazılır ve "eksik haritası" gösterilir.
+  - [x] `tanilama.js` (ana kopya kökte; 5, 7–12'ye aynen kopyalanır). Bilge daveti, ünite başına 2–3 soru (en çok 24; tek konulu ünitede o konudan 2 soru), "Bilmiyorum" düğmesi, yalnızca hiç çalışılmamış konulara başlangıç puanı (tam doğru 60, kısmen 40, yanlış 20; yanlışlar bugün tekrar listesine), ünite ünite eksik haritası. Veri: `kayit.tanilama` (2026-11-13).
 - [ ] **A2. Ön koşul haritası.** `araclar/onkosul.json` dosyasında her konunun önceki sınıflardaki ön koşul konuları tutulur (ör. 8 mat2k1 → 7 m1k2).
   - Bir konuda ustalık puanı düşükse ön koşul konudan 3 soruluk bir kontrol yapılır.
   - Ön koşulda da sorun çıkarsa öğrenci, ilgili sınıf bölümündeki o konuya "temel tamamlama" olarak yönlendirilir.
@@ -107,6 +108,7 @@ Bilge'nin kuralları:
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-13 — Denetim temizdi. A1 tamamlandı: 5–12'de derse ilk girişte Bilge'nin seviye tespiti ve eksik haritası (tanilama.js); Bilge'nin "Neyi bilmiyorum?" cevabı seviye tespitine yönlendiriyor. Telefon boyutunda 6, 8 ve 12'de denendi. Soru değişmediği için YKS havuzu yenilenmedi. Sırada A2 (ön koşul haritası). Denetim: sorun yok.
 - 2026-11-12 — Denetim temizdi. A0 tamamlandı: Bilge'ye Sor YKS'ye eklendi (yks/yks-bilge.js; panelde kart). Eksiklerim, bugünkü plan, son yanlışın nedeni, konu araması ve çözümlü örnek; telefon boyutunda denendi. Sırada A1 (seviye tespit sınavı). Denetim: sorun yok.
 - 2026-11-11 — D4: 6. sınıf Türkçe, Sosyal, İngilizce ve Din'e doğrulanmış ek videolar (toplam 89 konu, 130 video). Genel "sureler" videosu gibi konuya tam uymayanlar eklenmedi. Denetim: sorun yok.
 - 2026-11-11 — D4 (Adem'in isteği): konu sayfasında çoklu video desteği; 6. sınıf Matematik ve Fen'de 40 konuya 63 doğrulanmış ek video. Denetim: sorun yok.

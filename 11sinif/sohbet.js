@@ -190,7 +190,7 @@
   const btn = (x, i = "✏️") => [`${i} ${x.k.ad.length > 22 ? x.k.ad.slice(0, 21) + "…" : x.k.ad}`, "test:" + x.k.id];
   function eksiklerim() {
     const l = calisilan();
-    if (!l.length) return { html: `Henüz yeterince soru çözmedin, o yüzden eksiklerini bilemiyorum. 🦉<br>Her dersten birkaç konuda <b>5'er soru</b> çöz; ben de puanlarına bakıp sana neyi bilmediğini söyleyeyim.` };
+    if (!l.length) return { html: `Henüz yeterince soru çözmedin, o yüzden eksiklerini bilemiyorum. 🦉<br>En hızlısı: bir derse gir ve en üstteki <b>🧭 Seviye Tespiti</b>'ni yap; her üniteden 2–3 soru sorup sana bir <b>eksik haritası</b> çıkarayım. Ya da birkaç konuda <b>5'er soru</b> çöz, puanlarına bakıp neyi bilmediğini söyleyeyim.` };
     const zayif = l.filter((x) => x.u.p < 60).sort((a, b) => a.u.p - b.u.p);
     const unutulan = l.filter((x) => x.u.p >= 60 && x.u.sonraki <= Date.now()).sort((a, b) => a.u.sonraki - b.u.sonraki);
     if (!zayif.length && !unutulan.length) return { html: `Çözdüğün ${l.length} konunun hepsinde iyisin! 🌟 Şimdi yeni bir konuya geçebilirsin. Hangi konuya geçeceğini bilmiyorsan <i>"Bugün ne çalışayım?"</i> diye sor.` };
