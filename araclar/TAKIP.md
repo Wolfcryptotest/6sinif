@@ -65,6 +65,8 @@ Bilge'nin kuralları:
 - [ ] **A2. Ön koşul haritası.** `araclar/onkosul.json` dosyasında her konunun önceki sınıflardaki ön koşul konuları tutulur (ör. 8 mat2k1 → 7 m1k2).
   - Bir konuda ustalık puanı düşükse ön koşul konudan 3 soruluk bir kontrol yapılır.
   - Ön koşulda da sorun çıkarsa öğrenci, ilgili sınıf bölümündeki o konuya "temel tamamlama" olarak yönlendirilir.
+  - [x] Altyapı + 6–8 Matematik (60 konu): `araclar/onkosul.json` (harita) → `node araclar/onkosul-uret.js` (yerel sunucu; önceki sınıfın kendi sorularından ön koşul başına 12 soru toplar) → `<sınıf>/onkosul-veri.js`. Çalışma: `onkosul.js` (ana kopya kökte; 5, 7–12'ye aynen kopyalanır). Konu puanı 50'nin altındaysa Bilge 3 soruluk temel kontrolü önerir (anında geri bildirim), sonuç ekranında eksik ön koşula "Temel tamamlama" bağlantısı (`index.html?konu=<id>&temel=<sınıf>:<id>&ad=`), hedef sayfada "geri dön" şeridi. Kayıt `kayit.onkosul`; 7 gün içinde yeniden sorulmaz (2026-11-14).
+  - [ ] Sırada: 9–12 Matematik (lise ön koşulları 7–8'den), sonra 6–8 Fen; 5. sınıfın 4. sınıftaki ön koşulları (1–4 yapısı farklı: `DERS[dk].temalar`) ayrıca düşünülecek.
 - [ ] **A3. Günün özel dersi.** Ana sayfada "Bugünkü dersin" kartı yer alır. En zayıf konu için 10 dakikalık bir akış:
   - kısa anlatım → çözümlü örnek → kolaydan zora 5 soru;
   - yanlışta önce ipucu, sonra benzer yeni soru;
@@ -108,6 +110,7 @@ Bilge'nin kuralları:
 
 ## Çalışma günlüğü
 (Her çalışmada bir satır: tarih — yapılan iş — denetim sonucu)
+- 2026-11-14 — Denetim temizdi. A2 (kısmi): ön koşul haritası altyapısı ve 6–8 Matematik (60 konu → 5–7. sınıflardan 48 ön koşul konusu). Zorlanılan konuda Bilge'nin 3 soruluk temel kontrolü ve önceki sınıfa "temel tamamlama" bağlantısı; telefon boyutunda 6, 7, 8 ve 5'te denendi (8→6 bağlantısı ve geri dönüş çalışıyor). Soru değişmediği için YKS havuzu yenilenmedi. Denetim: sorun yok.
 - 2026-11-13 — Denetim temizdi. A1 tamamlandı: 5–12'de derse ilk girişte Bilge'nin seviye tespiti ve eksik haritası (tanilama.js); Bilge'nin "Neyi bilmiyorum?" cevabı seviye tespitine yönlendiriyor. Telefon boyutunda 6, 8 ve 12'de denendi. Soru değişmediği için YKS havuzu yenilenmedi. Sırada A2 (ön koşul haritası). Denetim: sorun yok.
 - 2026-11-12 — Denetim temizdi. A0 tamamlandı: Bilge'ye Sor YKS'ye eklendi (yks/yks-bilge.js; panelde kart). Eksiklerim, bugünkü plan, son yanlışın nedeni, konu araması ve çözümlü örnek; telefon boyutunda denendi. Sırada A1 (seviye tespit sınavı). Denetim: sorun yok.
 - 2026-11-11 — D4: 6. sınıf Türkçe, Sosyal, İngilizce ve Din'e doğrulanmış ek videolar (toplam 89 konu, 130 video). Genel "sureler" videosu gibi konuya tam uymayanlar eklenmedi. Denetim: sorun yok.
