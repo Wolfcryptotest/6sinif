@@ -178,7 +178,12 @@
   function dersSayfa(id) {
     const D = DERS[id];
     ekran.style.setProperty("--renk", D.renk);
-    if (window.REHBER_UI && REHBER_UI.varMi(id)) { const rb = $(`<button class="buyukbtn" style="margin-top:0">📕 Kitabım: Konu Anlatımı ve Çözümler</button>`); rb.onclick = () => git(() => REHBER_UI.dersRehber(id), "📕 " + D.ad + " Kitabım"); ekran.appendChild(rb); }
+    if (window.REHBER_UI) {
+      const sat = $(`<div class="satir" style="margin-bottom:6px"></div>`);
+      if (REHBER_UI.varMi(id)) { const rb = $(`<button class="buyukbtn" style="margin-top:0">📕 Kitabım: Sayfa Sayfa Cevaplar</button>`); rb.onclick = () => git(() => REHBER_UI.dersRehber(id), "📕 " + D.ad + " Kitabım"); sat.appendChild(rb); }
+      if (D.temalar.some((t) => t.konular.some((k) => k.video))) { const vb = $(`<button class="buyukbtn ikincil" style="margin-top:0">🎬 Konu Videoları</button>`); vb.onclick = () => git(() => REHBER_UI.dersVideolari(id), "🎬 " + D.ad + " Videoları"); sat.appendChild(vb); }
+      if (sat.children.length) ekran.appendChild(sat);
+    }
     if ((window.KITAPLAR || []).some((k) => k.ders === id)) { const kb = $(`<button class="buyukbtn ikincil" style="margin-top:0">📕 MEB ${esc(D.ad)} kitapları</button>`); kb.onclick = () => git(() => mebKitaplari(id), "📕 " + D.ad + " Kitapları"); ekran.appendChild(kb); }
     let yeniBulundu = false;
     D.temalar.forEach((t, ti) => {
