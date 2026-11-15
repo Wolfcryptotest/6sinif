@@ -180,9 +180,9 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
   <div class="sub">TARİH · COĞRAFYA · BİLGİ YARIŞMASI</div>
   <svg class="heroMap" id="heroMap" viewBox="15 140 1020 455"></svg>
   <div class="chips" id="lvChips">
-    <button class="chip" data-l="o">🎒 Ortaokul<small>3 şık · 40 sn</small></button>
-    <button class="chip" data-l="l">📚 Lise<small>4 şık · 30 sn</small></button>
-    <button class="chip" data-l="y">🎓 Yetişkin<small>4 şık · 20 sn</small></button>
+    <button class="chip" data-l="o">🎒 Ortaokul<small>3 şık · 60 sn</small></button>
+    <button class="chip" data-l="l">📚 Lise<small>4 şık · 45 sn</small></button>
+    <button class="chip" data-l="y">🎓 Yetişkin<small>4 şık · 30 sn</small></button>
   </div>
   <div class="modes">
     <button class="mode big" id="mQuick"><b>⚡ Hızlı Yarışma</b><span>Karışık 10 soru · tüm Türkiye</span><i>🇹🇷</i></button>
@@ -553,7 +553,7 @@ const TIX={};IL.forEach(c=>['h','y','t','m','s'].forEach(k=>c[k].forEach(it=>tok
 function conflicts(item,p){return toks(item).some(t=>TIX[t]&&TIX[t].has(p))}
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const LV={o:{n:'Ortaokul',opts:3,time:40,famous:true},l:{n:'Lise',opts:4,time:30},y:{n:'Yetişkin',opts:4,time:20,hard:true}};
+const LV={o:{n:'Ortaokul',opts:3,time:60,famous:true},l:{n:'Lise',opts:4,time:45},y:{n:'Yetişkin',opts:4,time:30,hard:true}};
 function usable(c,k){const L=LV[S.lv];let a=c[k].filter(x=>!reveals(x));if(L.famous)a=a.filter(x=>c[k].indexOf(x)===0);return a}
 const TYPES={
  hI:{c:'h',w:5},Ih:{c:'h',w:3},yI:{c:'y',w:3},Iy:{c:'y',w:2},tI:{c:'t',w:3},It:{c:'t',w:2},mI:{c:'m',w:2,minLv:'l'},Im:{c:'m',w:1,minLv:'l'},sI:{c:'s',w:2,minLv:'l'},Is:{c:'s',w:1,minLv:'l'},
