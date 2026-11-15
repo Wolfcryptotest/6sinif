@@ -257,7 +257,7 @@ function buildKonular(){KONU=[];
       KONU.push({id:k.id,ders:d,dersAd:D.ad,ic:D.ikon||'📘',ad:k.ad,unite:u.ad,gen:()=>{if(gen&&Math.random()<.7){try{const q=gen();if(q)return q}catch(e){}}return stat.length?rnd(stat):(gen?gen():null)}})}))}}
   if(window.__loadedGrade===3&&typeof DERS!=='undefined'){for(const d in DERS){const D=DERS[d];(D.temalar||[]).forEach(t=>(t.konular||[]).forEach(k=>{if(typeof k.uret!=='function')return;KONU.push({id:'3'+d+':'+k.id,ders:d,dersAd:D.ad,ic:D.ikon||'📘',ad:k.ad,unite:t.ad,gen:()=>k.uret()})}))}}
 }
-const SUPPORTED=['secim','dy','sayi','sirala','eslestir','grupla'];
+const SUPPORTED=['secim','dy','sayi','sirala','eslestir','grupla','kesir','saat','market','simetri'];
 function konuQuestion(k){for(let i=0;i<25;i++){let q;try{q=k.gen()}catch(e){q=null}if(!q)continue;const tip=q.tip||(q.secenekler?'secim':null);if(!SUPPORTED.includes(tip))continue;
   if(tip==='secim'&&(!q.secenekler||q.secenekler.length<2))continue;return Object.assign({},q,{tip,konu:k})}return null}
 
@@ -296,7 +296,7 @@ const GAMES={
  sirala:{n:'Sırala',ic:'📜',g:[3,6],c:'linear-gradient(#38d9a9,#0ca678)',d:'Doğru sıraya diz'},
  renk:{n:'Renk Hafızası',ic:'🎨',g:[3],c:'linear-gradient(#ffd43b,#f08c00)',d:'Yanan renkleri sırayla hatırla'},
  rota:{n:'Rota Hafızası',ic:'🗺️',g:[6],c:'linear-gradient(#ffd43b,#f08c00)',d:'Yanan illeri sırayla bul'},
- tk:{n:'Türkiye Keşif',ic:'🇹🇷',g:[6],c:'linear-gradient(#20c997,#087f5b)',d:'81 il bilgi yarışması',frame:'turkiye-kesif.html'},
+ tk:{n:'Türkiye Keşif',ic:'🇹🇷',g:[3,6],c:'linear-gradient(#20c997,#087f5b)',d:'81 il + Dünya Turu',frame:'turkiye-kesif.html'},
  otopark:{n:'Otopark Kaçışı',ic:'🚗',g:[3,6],c:'linear-gradient(#748ffc,#4263eb)',d:'Arabaları doğru sırayla çıkar',frame:'otopark.html'}
 };
 const MEM={3:['esini','kelime','hesap','renk','sirala'],6:['esini','kelime','hesap','sirala','rota']};
@@ -392,6 +392,36 @@ function renderDersQ(q,next){const ga=$('garea'),k=q.konu,three=P().grade===3;
   else if(q.tip==='grupla'){let k2=0,err=false;const items=q.ogeler.slice();
     const draw=()=>{const it=items[k2];ga.innerHTML=head+`<div class="ans">${esc(it[0])}</div><div class="info">${k2+1} / ${items.length} · Hangi gruba ait?</div><div class="opts grid2">${q.gruplar.map((g,j)=>`<button class="opt" data-j="${j}" style="justify-content:center">${esc(g)}</button>`).join('')}</div>`;
       ga.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const ok=+b.dataset.j===it[1];if(!ok){err=true;b.classList.add('bad');SFX.bad();return}SFX.flip();k2++;if(k2>=items.length){ga.dataset.lock='1';done(!err,'')}else draw()})};draw()}
+  else if(q.tip==='kesir'){const n=q.parca,paint=new Set();const R=90,cx=100,cy=100;
+    const sl=i=>{const a0=i/n*2*Math.PI-Math.PI/2,a1=(i+1)/n*2*Math.PI-Math.PI/2;return `M${cx},${cy} L${cx+R*Math.cos(a0)},${cy+R*Math.sin(a0)} A${R},${R} 0 ${1/n>.5?1:0} 1 ${cx+R*Math.cos(a1)},${cy+R*Math.sin(a1)} Z`};
+    const draw=()=>{$('pz').innerHTML=Array.from({length:n},(_,i)=>`<path d="${sl(i)}" data-i="${i}" fill="${paint.has(i)?'#ff6b6b':'#ffe8a3'}" stroke="#b07a1a" stroke-width="3"/>`).join('');$('pzc').textContent=`${paint.size} / ${n} parça boyandı`};
+    ga.innerHTML=head+`<svg viewBox="0 0 200 200" style="width:62%;display:block;margin:12px auto 0" id="pz"></svg><div class="info" id="pzc"></div><button class="btn" id="chk">Kontrol et ✔</button>`;draw();
+    $('pz').onclick=e=>{if(ga.dataset.lock==='1')return;const p=e.target.closest('path');if(!p)return;const i=+p.dataset.i;paint.has(i)?paint.delete(i):paint.add(i);SFX.flip();draw()};
+    $('chk').onclick=()=>{if(ga.dataset.lock==='1')return;ga.dataset.lock='1';$('chk').remove();const ok=paint.size===q.boya;done(ok,ok?'':`${n} parçadan <b>${q.boya}</b> tanesi boyanmalıydı.`)}}
+  else if(q.tip==='saat'){let h=12,m=0;
+    const draw=()=>{const ha=((h%12)+m/60)*30,ma=m*6;$('clk').innerHTML=`<circle cx="100" cy="100" r="92" fill="#fff" stroke="#3a2c75" stroke-width="6"/>${Array.from({length:12},(_,i)=>{const a=(i+1)*30*Math.PI/180;return `<text x="${100+74*Math.sin(a)}" y="${100-74*Math.cos(a)+7}" text-anchor="middle" font-size="20" font-weight="800" fill="#2a1d5c">${i+1}</text>`}).join('')}
+      <line x1="100" y1="100" x2="${100+45*Math.sin(ha*Math.PI/180)}" y2="${100-45*Math.cos(ha*Math.PI/180)}" stroke="#e03131" stroke-width="8" stroke-linecap="round"/><line x1="100" y1="100" x2="${100+70*Math.sin(ma*Math.PI/180)}" y2="${100-70*Math.cos(ma*Math.PI/180)}" stroke="#1d1640" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#1d1640"/>`;
+      $('clkt').textContent=`${h}:${String(m).padStart(2,'0')}`};
+    ga.innerHTML=head+`<svg viewBox="0 0 200 200" style="width:56%;display:block;margin:10px auto 0" id="clk"></svg><div class="ans" id="clkt" style="font-size:22px;min-height:0"></div>
+     <div class="grid2" style="margin-top:8px"><button class="key" data-a="h-">◀ Akrep</button><button class="key" data-a="h+">Akrep ▶</button><button class="key" data-a="m-">◀ Yelkovan</button><button class="key" data-a="m+">Yelkovan ▶</button></div><button class="btn" id="chk">Kontrol et ✔</button>`;draw();
+    ga.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{if(ga.dataset.lock==='1')return;const a=b.dataset.a;if(a==='h+')h=h%12+1;if(a==='h-')h=(h+10)%12+1;if(a==='m+'){m=(m+5)%60}if(a==='m-'){m=(m+55)%60}SFX.click();draw()});
+    $('chk').onclick=()=>{if(ga.dataset.lock==='1')return;ga.dataset.lock='1';$('chk').remove();const ok=(h%12)===(q.saat%12)&&m===q.dakika;done(ok,ok?'':`Doğrusu: <b>${q.dogruMetin}</b>`)}}
+  else if(q.tip==='market'){let tot=0;const hist=[];const L=[[20000,'200 ₺'],[10000,'100 ₺'],[5000,'50 ₺'],[2000,'20 ₺'],[1000,'10 ₺'],[500,'5 ₺'],[100,'1 ₺']],K=[[50,'50 kr'],[25,'25 kr'],[10,'10 kr'],[5,'5 kr'],[1,'1 kr']];
+    const money=v=>{const l=Math.floor(v/100),k=v%100;return (l?l+' lira':'')+(l&&k?' ':'')+(k?k+' kuruş':'')||'0 lira'};
+    const tgt=q.tutar; // tutar her zaman kuruş cinsinden
+    ga.innerHTML=head+`<div class="ans" id="mt" style="font-size:22px">Ödenen: 0 lira</div><div class="keys" style="grid-template-columns:repeat(4,1fr)">${[...L.filter(x=>x[0]<=Math.max(tgt*2,2000)),...(q.kurus?K:[])].map(x=>`<button class="key" style="font-size:16px;padding:10px 4px;background:${x[0]>=500?'linear-gradient(#69db7c,#2b8a3e)':'linear-gradient(#ffd43b,#e67700)'}" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>
+     <div class="grid2" style="margin-top:8px"><button class="btn gray" id="mU" style="margin:0">↩️ Geri al</button><button class="btn" id="mP" style="margin:0">Öde ✔</button></div>`;
+    const upd=()=>$('mt').textContent='Ödenen: '+money(tot);
+    ga.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{if(ga.dataset.lock==='1')return;tot+=+b.dataset.v;hist.push(+b.dataset.v);SFX.click();upd()});
+    $('mU').onclick=()=>{if(ga.dataset.lock==='1'||!hist.length)return;tot-=hist.pop();upd()};
+    $('mP').onclick=()=>{if(ga.dataset.lock==='1')return;ga.dataset.lock='1';const ok=tot===tgt;done(ok,ok?'':`Tam olarak <b>${money(tgt)}</b> ödemeliydin; sen ${money(tot)} ödedin.`)}}
+  else if(q.tip==='simetri'){const R=q.satir,C=q.sutun,left=new Set(q.sol),want=new Set(q.sol.map(x=>{const [r,c]=x.split(',').map(Number);return r+','+(C-1-c)})),mine=new Set();
+    const cell=Math.min(44,Math.floor(300/C));
+    const draw=()=>{let h='';for(let r=0;r<R;r++)for(let c=0;c<C;c++){const k=r+','+c,isL=c<C/2;h+=`<rect x="${c*cell}" y="${r*cell}" width="${cell}" height="${cell}" data-k="${k}" fill="${isL?(left.has(k)?'#7b2cbf':'#f3eeff'):(mine.has(k)?'#ff8c42':'#fff')}" stroke="#c9bdf2"/>`}
+      h+=`<line x1="${C/2*cell}" y1="-4" x2="${C/2*cell}" y2="${R*cell+4}" stroke="#e03131" stroke-width="4" stroke-dasharray="8 5"/>`;$('sym').innerHTML=h};
+    ga.innerHTML=head+`<svg viewBox="-4 -6 ${C*cell+8} ${R*cell+12}" style="width:${Math.min(100,C*cell/3)}%;max-width:100%;display:block;margin:12px auto 0;background:#fff;border-radius:12px" id="sym"></svg><div class="info">Kırmızı çizgi ayna. Sağ taraftaki karelere dokunarak boya.</div><button class="btn" id="chk">Kontrol et ✔</button>`;draw();
+    $('sym').onclick=e=>{if(ga.dataset.lock==='1')return;const t=e.target.closest('rect');if(!t)return;const k=t.dataset.k,c=+k.split(',')[1];if(c<C/2)return;mine.has(k)?mine.delete(k):mine.add(k);SFX.flip();draw()};
+    $('chk').onclick=()=>{if(ga.dataset.lock==='1')return;ga.dataset.lock='1';$('chk').remove();const ok=mine.size===want.size&&[...want].every(k=>mine.has(k));if(!ok){want.forEach(k=>mine.add(k));draw();[...$('sym').querySelectorAll('rect')].forEach(r=>{if(want.has(r.dataset.k))r.setAttribute('fill','#5ee36b')})}done(ok,ok?'':'Doğru simetri yeşil gösterildi.')}}
   ga.dataset.lock='0';const sp=$('spk');if(sp)sp.onclick=()=>speak(q.soru+(q.ifade?'. '+q.ifade:''));
 }
 

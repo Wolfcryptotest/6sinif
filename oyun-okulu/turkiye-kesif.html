@@ -64,6 +64,7 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
 .qmap path.ok{fill:#2fbf5b}.qmap path.bad{fill:#ff4d6d}
 .tapmap path{cursor:pointer}
 .opts{width:100%;max-width:520px;display:grid;gap:10px;margin-top:14px}
+.bflag{font-size:110px;line-height:1.1;text-align:center;margin-top:6px}.sflag{font-size:44px;line-height:1;text-align:center;margin-top:4px}
 .shape{display:block;width:62%;max-height:22vh;margin:8px auto 0}.shape path{fill:#ff8c42;stroke:#7a2e00;stroke-linejoin:round}
 .hint{font-size:13px;color:#9ec3d6;text-align:center;margin-bottom:6px}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mgrid>div{display:flex;flex-direction:column;gap:8px}
@@ -189,6 +190,7 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
     <button class="mode m2" id="mCat"><b>Kategoriler</b><span>Tarih, yemek, tarım, maden…</span><i>📜</i></button>
     <button class="mode m3" id="mMarathon"><b>Maraton</b><span>3 can bitene kadar · rekor kır</span><i>🔥</i></button>
     <button class="mode m4" id="mAtlas"><b>İl Atlası</b><span>81 ili keşfet ve öğren</span><i>📖</i></button>
+    <button class="mode big" id="mWorld" style="background:linear-gradient(#4dabf7,#1864ab);box-shadow:0 5px 0 #0b3d73"><b>🌍 Dünya Turu</b><span>Başkentler, bayraklar, kıtalar, ünlü yerler</span><i>🗺️</i></button>
     <button class="mode m5" id="mDaily"><b>Günün Sorusu</b><span id="dailyTxt">Herkese aynı 10 soru</span><i>📅</i></button>
     <button class="mode m6" id="mDuel"><b>Düello</b><span>2 kişi aynı telefonda</span><i>⚔️</i></button>
   </div>
@@ -359,10 +361,127 @@ const GENEL_TF=[['Türkiye\'nin en uzun nehri hangisidir?','Kızılırmak',['Fı
  ['Türkiye\'yi Avrupa ve Asya olarak ayıran boğazlardan biri hangisidir?','İstanbul Boğazı',['Cebelitarık Boğazı','Hürmüz Boğazı','Babülmendep Boğazı']]];
 
 const ADJ={"1": {"31": 9, "33": 141, "38": 209, "46": 84, "51": 96, "80": 159}, "2": {"21": 15, "27": 52, "44": 244, "46": 88, "63": 37}, "3": {"15": 29, "20": 150, "26": 167, "32": 177, "42": 146, "43": 89, "64": 40}, "4": {"13": 37, "25": 98, "36": 83, "49": 89, "65": 184, "76": 206}, "5": {"19": 178, "55": 214, "60": 204, "66": 8}, "6": {"14": 242, "18": 170, "26": 286, "40": 54, "42": 214, "68": 63, "71": 176}, "7": {"15": 176, "32": 52, "33": 40, "42": 170, "48": 104, "70": 69}, "8": {"25": 199, "53": 76, "75": 83}, "9": {"20": 120, "35": 173, "45": 21, "48": 166}, "10": {"16": 180, "17": 213, "35": 69, "43": 98, "45": 186}, "11": {"14": 18, "16": 117, "26": 113, "43": 58, "54": 78}, "12": {"21": 127, "23": 163, "24": 17, "25": 88, "49": 106, "62": 86}, "13": {"4": 37, "49": 199, "56": 141, "65": 97, "72": 53}, "14": {"6": 242, "11": 18, "18": 13, "26": 11, "54": 93, "67": 41, "78": 69, "81": 149}, "15": {"3": 29, "7": 176, "20": 130, "32": 124, "48": 65}, "16": {"10": 180, "11": 117, "41": 72, "43": 120, "54": 2, "77": 50}, "17": {"10": 213, "22": 10, "59": 51}, "18": {"6": 170, "14": 13, "19": 100, "37": 168, "71": 28, "78": 60}, "19": {"5": 178, "18": 100, "37": 134, "55": 17, "57": 46, "66": 186, "71": 49}, "20": {"3": 150, "9": 120, "15": 130, "45": 31, "48": 148, "64": 140}, "21": {"2": 15, "12": 127, "23": 140, "44": 14, "47": 167, "49": 42, "63": 127, "72": 133}, "22": {"17": 10, "39": 120, "59": 103}, "23": {"12": 163, "21": 140, "24": 5, "44": 190, "62": 43}, "24": {"12": 17, "23": 5, "25": 130, "28": 24, "29": 90, "44": 45, "58": 206, "62": 277, "69": 78}, "25": {"4": 98, "8": 199, "12": 88, "24": 130, "36": 167, "49": 178, "53": 75, "69": 127, "75": 42}, "26": {"3": 167, "6": 286, "11": 113, "14": 11, "42": 20, "43": 75}, "27": {"2": 52, "31": 27, "46": 146, "63": 109, "79": 144, "80": 39}, "28": {"24": 24, "29": 144, "52": 75, "58": 125, "61": 36}, "29": {"24": 90, "28": 144, "61": 154, "69": 119}, "30": {"65": 134, "73": 57}, "31": {"1": 9, "27": 27, "80": 51}, "32": {"3": 177, "7": 52, "15": 124, "42": 122}, "33": {"1": 141, "7": 40, "42": 61, "51": 35, "70": 299}, "34": {"41": 76, "59": 82}, "35": {"9": 173, "10": 69, "45": 347}, "36": {"4": 83, "25": 167, "75": 138, "76": 53}, "37": {"18": 168, "19": 134, "57": 154, "74": 45, "78": 119}, "38": {"1": 209, "46": 65, "50": 112, "51": 113, "58": 238, "66": 132}, "39": {"22": 120, "59": 171}, "40": {"6": 54, "50": 129, "66": 87, "68": 49, "71": 92}, "41": {"16": 72, "34": 76, "54": 115, "77": 16}, "42": {"3": 146, "6": 214, "7": 170, "26": 20, "32": 122, "33": 61, "51": 126, "68": 189, "70": 357}, "43": {"3": 89, "10": 98, "11": 58, "16": 120, "26": 75, "45": 73, "64": 145}, "44": {"2": 244, "21": 14, "23": 190, "24": 45, "46": 145, "58": 193}, "45": {"9": 21, "10": 186, "20": 31, "35": 347, "43": 73, "64": 92}, "46": {"1": 84, "2": 88, "27": 146, "38": 65, "44": 145, "58": 76, "80": 137}, "47": {"21": 167, "63": 101, "72": 126, "73": 116}, "48": {"7": 104, "9": 166, "15": 65, "20": 148}, "49": {"4": 89, "12": 106, "13": 199, "21": 42, "25": 178, "72": 12}, "50": {"38": 112, "40": 129, "51": 71, "66": 75, "68": 78}, "51": {"1": 96, "33": 35, "38": 113, "42": 126, "50": 71, "68": 75}, "52": {"28": 75, "55": 63, "58": 82, "60": 150}, "53": {"8": 76, "25": 75, "61": 71, "69": 10}, "54": {"11": 78, "14": 93, "16": 2, "41": 115, "81": 68}, "55": {"5": 214, "19": 17, "52": 63, "57": 135, "60": 24}, "56": {"13": 141, "65": 36, "72": 138, "73": 150}, "57": {"19": 46, "37": 154, "55": 135}, "58": {"24": 206, "28": 125, "38": 238, "44": 193, "46": 76, "52": 82, "60": 246, "66": 117}, "59": {"17": 51, "22": 103, "34": 82, "39": 171}, "60": {"5": 204, "52": 150, "55": 24, "58": 246, "66": 92}, "61": {"28": 36, "29": 154, "53": 71, "69": 44}, "62": {"12": 86, "23": 43, "24": 277}, "63": {"2": 37, "21": 127, "27": 109, "47": 101}, "64": {"3": 40, "20": 140, "43": 145, "45": 92}, "65": {"4": 184, "13": 97, "30": 134, "56": 36, "73": 62}, "66": {"5": 8, "19": 186, "38": 132, "40": 87, "50": 75, "58": 117, "60": 92, "71": 25}, "67": {"14": 41, "74": 46, "78": 39, "81": 62}, "68": {"6": 63, "40": 49, "42": 189, "50": 78, "51": 75}, "69": {"24": 78, "25": 127, "29": 119, "53": 10, "61": 44}, "70": {"7": 69, "33": 299, "42": 357}, "71": {"6": 176, "18": 28, "19": 49, "40": 92, "66": 25}, "72": {"13": 53, "21": 133, "47": 126, "49": 12, "56": 138}, "73": {"30": 57, "47": 116, "56": 150, "65": 62}, "74": {"37": 45, "67": 46, "78": 63}, "75": {"8": 83, "25": 42, "36": 138}, "76": {"4": 206, "36": 53}, "77": {"16": 50, "41": 16}, "78": {"14": 69, "18": 60, "37": 119, "67": 39, "74": 63}, "79": {"27": 144}, "80": {"1": 159, "27": 39, "31": 51, "46": 137}, "81": {"14": 149, "54": 68, "67": 62}};
+/* Dünya Turu verisi: n=ad, f=bayrak, b=başkent, k=kıta, m=1 ünlü (ortaokul), l=ünlü yer(ler), tc=1 kıtalararası (kıta sorusu sorulmaz), x=ilginç bilgi */
+const KITA=['Avrupa','Asya','Afrika','Kuzey Amerika','Güney Amerika','Okyanusya'];
+const ULKE=[
+ {n:'Almanya',f:'🇩🇪',b:'Berlin',k:'Avrupa',m:1,l:['Brandenburg Kapısı','Neuschwanstein Şatosu'],x:'Avrupa\'nın en kalabalık ülkelerinden biridir; Türkiye kökenli çok sayıda insan yaşar.'},
+ {n:'Fransa',f:'🇫🇷',b:'Paris',k:'Avrupa',m:1,l:['Eyfel Kulesi','Louvre Müzesi'],x:'Dünyada en çok turist ağırlayan ülkelerden biridir.'},
+ {n:'İtalya',f:'🇮🇹',b:'Roma',k:'Avrupa',m:1,l:['Kolezyum','Pisa Kulesi'],x:'Haritada çizme şeklindedir; pizza ve makarna ile ünlüdür.'},
+ {n:'İspanya',f:'🇪🇸',b:'Madrid',k:'Avrupa',m:1,l:['Sagrada Familia','Elhamra Sarayı'],x:'Elhamra Sarayı Endülüs Emevileri döneminden kalmadır.'},
+ {n:'Portekiz',f:'🇵🇹',b:'Lizbon',k:'Avrupa',l:['Belém Kulesi'],x:'Coğrafi Keşifler\'in öncü ülkelerinden biridir.'},
+ {n:'Birleşik Krallık',f:'🇬🇧',b:'Londra',k:'Avrupa',m:1,l:['Big Ben','Stonehenge'],x:'İngiltere, İskoçya, Galler ve Kuzey İrlanda\'dan oluşur.'},
+ {n:'İrlanda',f:'🇮🇪',b:'Dublin',k:'Avrupa',x:'Yeşil doğası nedeniyle "Zümrüt Ada" diye anılır.'},
+ {n:'Hollanda',f:'🇳🇱',b:'Amsterdam',k:'Avrupa',m:1,l:['Kinderdijk Yel Değirmenleri'],x:'Topraklarının önemli bir kısmı deniz seviyesinin altındadır; lale ile ünlüdür.'},
+ {n:'Belçika',f:'🇧🇪',b:'Brüksel',k:'Avrupa',l:['Atomium'],x:'Avrupa Birliği\'nin birçok kurumu Brüksel\'dedir.'},
+ {n:'İsviçre',f:'🇨🇭',b:'Bern',k:'Avrupa',m:1,l:['Matterhorn Dağı'],x:'Saatleri ve çikolatasıyla ünlüdür; denize kıyısı yoktur.'},
+ {n:'Avusturya',f:'🇦🇹',b:'Viyana',k:'Avrupa',l:['Schönbrunn Sarayı'],x:'Osmanlı orduları Viyana\'yı iki kez kuşattı.'},
+ {n:'Yunanistan',f:'🇬🇷',b:'Atina',k:'Avrupa',m:1,l:['Akropolis'],x:'Türkiye\'nin batı komşusudur; antik olimpiyatların doğduğu yerdir.'},
+ {n:'Bulgaristan',f:'🇧🇬',b:'Sofya',k:'Avrupa',m:1,x:'Türkiye\'nin kuzeybatı komşusudur.'},
+ {n:'Romanya',f:'🇷🇴',b:'Bükreş',k:'Avrupa',l:['Bran Kalesi'],x:'Karadeniz\'e kıyısı olan ülkelerden biridir.'},
+ {n:'Macaristan',f:'🇭🇺',b:'Budapeşte',k:'Avrupa',l:['Macar Parlamento Binası'],x:'Budapeşte, Tuna Nehri\'nin iki yakasındaki Buda ve Peşte şehirlerinin birleşmesiyle oluştu.'},
+ {n:'Polonya',f:'🇵🇱',b:'Varşova',k:'Avrupa',x:'Ünlü bilim insanı Marie Curie Polonyalıdır.'},
+ {n:'Çekya',f:'🇨🇿',b:'Prag',k:'Avrupa',l:['Karlov Köprüsü'],x:'Prag "Yüz Kuleli Şehir" olarak anılır.'},
+ {n:'Slovakya',f:'🇸🇰',b:'Bratislava',k:'Avrupa'},
+ {n:'Sırbistan',f:'🇷🇸',b:'Belgrad',k:'Avrupa',x:'Belgrad, Tuna ve Sava nehirlerinin birleştiği yerdedir.'},
+ {n:'Hırvatistan',f:'🇭🇷',b:'Zagreb',k:'Avrupa',l:['Dubrovnik Surları'],x:'Adriyatik Denizi kıyısında binden fazla adası vardır.'},
+ {n:'Bosna-Hersek',f:'🇧🇦',b:'Saraybosna',k:'Avrupa',l:['Mostar Köprüsü'],x:'Mostar Köprüsü Mimar Hayreddin tarafından Osmanlı döneminde yapıldı.'},
+ {n:'Arnavutluk',f:'🇦🇱',b:'Tiran',k:'Avrupa'},
+ {n:'Kuzey Makedonya',f:'🇲🇰',b:'Üsküp',k:'Avrupa',x:'Üsküp\'te Osmanlı döneminden kalma Taş Köprü bulunur.'},
+ {n:'Kosova',f:'🇽🇰',b:'Priştine',k:'Avrupa'},
+ {n:'Karadağ',f:'🇲🇪',b:'Podgorica',k:'Avrupa'},
+ {n:'Slovenya',f:'🇸🇮',b:'Ljubljana',k:'Avrupa'},
+ {n:'Ukrayna',f:'🇺🇦',b:'Kiev',k:'Avrupa',m:1,x:'Avrupa\'nın yüzölçümü en büyük ülkelerinden biridir; Karadeniz\'e kıyısı vardır.'},
+ {n:'Moldova',f:'🇲🇩',b:'Kişinev',k:'Avrupa',x:'Gagavuz Türkleri bu ülkede yaşar.'},
+ {n:'Belarus',f:'🇧🇾',b:'Minsk',k:'Avrupa'},
+ {n:'Litvanya',f:'🇱🇹',b:'Vilnius',k:'Avrupa'},{n:'Letonya',f:'🇱🇻',b:'Riga',k:'Avrupa'},{n:'Estonya',f:'🇪🇪',b:'Tallinn',k:'Avrupa'},
+ {n:'Finlandiya',f:'🇫🇮',b:'Helsinki',k:'Avrupa',x:'"Bin Göller Ülkesi" olarak bilinir.'},
+ {n:'İsveç',f:'🇸🇪',b:'Stockholm',k:'Avrupa',x:'Nobel Ödülleri\'nin çoğu Stockholm\'de verilir.'},
+ {n:'Norveç',f:'🇳🇴',b:'Oslo',k:'Avrupa',l:['Geirangerfjord'],x:'Fiyortlarıyla ünlüdür; yazın gece yarısı güneşi görülür.'},
+ {n:'Danimarka',f:'🇩🇰',b:'Kopenhag',k:'Avrupa',l:['Küçük Deniz Kızı Heykeli'],x:'Lego oyuncakları bu ülkede doğdu.'},
+ {n:'İzlanda',f:'🇮🇸',b:'Reykjavik',k:'Avrupa',x:'Yanardağları ve gayzerleriyle ünlü bir ada ülkesidir.'},
+ {n:'Rusya',f:'🇷🇺',b:'Moskova',k:'Avrupa',m:1,tc:1,l:['Kızıl Meydan','Kremlin'],x:'Dünyanın yüzölçümü en büyük ülkesidir; hem Avrupa\'da hem Asya\'da toprakları vardır.'},
+ {n:'Türkiye',f:'🇹🇷',b:'Ankara',k:'Asya',m:1,tc:1,l:['Ayasofya','Kapadokya'],x:'Toprakları hem Asya hem Avrupa\'dadır; üç tarafı denizlerle çevrilidir.'},
+ {n:'Azerbaycan',f:'🇦🇿',b:'Bakü',k:'Asya',m:1,tc:1,turk:1,x:'"Tek millet, iki devlet" sözüyle anılan kardeş Türk devletidir; Nahçıvan üzerinden Türkiye\'ye komşudur.'},
+ {n:'Gürcistan',f:'🇬🇪',b:'Tiflis',k:'Asya',m:1,tc:1,x:'Türkiye\'nin kuzeydoğu komşusudur.'},
+ {n:'Ermenistan',f:'🇦🇲',b:'Erivan',k:'Asya',tc:1,x:'Türkiye\'nin doğu komşularından biridir.'},
+ {n:'İran',f:'🇮🇷',b:'Tahran',k:'Asya',m:1,l:['İsfahan İmam Meydanı','Persepolis'],x:'Türkiye\'nin doğu komşusudur.'},
+ {n:'Irak',f:'🇮🇶',b:'Bağdat',k:'Asya',m:1,x:'Fırat ve Dicle nehirleri Türkiye\'den doğup Irak\'tan geçer; bu bölgeye Mezopotamya denir.'},
+ {n:'Suriye',f:'🇸🇾',b:'Şam',k:'Asya',m:1,x:'Türkiye\'nin en uzun kara sınırı Suriye iledir.'},
+ {n:'Lübnan',f:'🇱🇧',b:'Beyrut',k:'Asya',x:'Bayrağında bir sedir ağacı bulunur.'},
+ {n:'Ürdün',f:'🇯🇴',b:'Amman',k:'Asya',l:['Petra Antik Kenti'],x:'Petra, kayalara oyulmuş antik bir şehirdir.'},
+ {n:'Suudi Arabistan',f:'🇸🇦',b:'Riyad',k:'Asya',m:1,x:'Mekke ve Medine şehirleri bu ülkededir.'},
+ {n:'Birleşik Arap Emirlikleri',f:'🇦🇪',b:'Abu Dabi',k:'Asya',l:['Burj Khalifa'],x:'Dünyanın en yüksek binası Burj Khalifa Dubai\'dedir.'},
+ {n:'Katar',f:'🇶🇦',b:'Doha',k:'Asya',x:'2022 Dünya Kupası bu ülkede yapıldı.'},
+ {n:'Kuveyt',f:'🇰🇼',b:'Kuveyt',k:'Asya'},{n:'Umman',f:'🇴🇲',b:'Maskat',k:'Asya'},{n:'Yemen',f:'🇾🇪',b:'Sana',k:'Asya'},
+ {n:'Kazakistan',f:'🇰🇿',b:'Astana',k:'Asya',tc:1,turk:1,x:'Dünyanın denize kıyısı olmayan en büyük ülkesidir; bir Türk devletidir.'},
+ {n:'Özbekistan',f:'🇺🇿',b:'Taşkent',k:'Asya',turk:1,l:['Registan Meydanı'],x:'Semerkant ve Buhara gibi tarihi Türk-İslam şehirleri buradadır.'},
+ {n:'Türkmenistan',f:'🇹🇲',b:'Aşkabat',k:'Asya',turk:1,x:'Bir Türk devletidir; doğalgaz kaynakları zengindir.'},
+ {n:'Kırgızistan',f:'🇰🇬',b:'Bişkek',k:'Asya',turk:1,x:'Bir Türk devletidir; Manas Destanı Kırgızlara aittir.'},
+ {n:'Tacikistan',f:'🇹🇯',b:'Duşanbe',k:'Asya'},
+ {n:'Afganistan',f:'🇦🇫',b:'Kabil',k:'Asya'},
+ {n:'Pakistan',f:'🇵🇰',b:'İslamabad',k:'Asya',m:1,x:'Kurtuluş Savaşı sırasında bu bölgenin Müslümanları Türkiye\'ye yardım gönderdi.'},
+ {n:'Hindistan',f:'🇮🇳',b:'Yeni Delhi',k:'Asya',m:1,l:['Tac Mahal'],x:'Dünyanın en kalabalık ülkesidir.'},
+ {n:'Nepal',f:'🇳🇵',b:'Katmandu',k:'Asya',x:'Bayrağı dikdörtgen olmayan tek ülke bayrağıdır.'},
+ {n:'Bangladeş',f:'🇧🇩',b:'Dakka',k:'Asya'},
+ {n:'Çin',f:'🇨🇳',b:'Pekin',k:'Asya',m:1,l:['Çin Seddi','Yasak Şehir'],x:'Dünyanın en kalabalık ülkelerinden biridir; İpek Yolu buradan başlardı.'},
+ {n:'Moğolistan',f:'🇲🇳',b:'Ulan Batur',k:'Asya',x:'Orhun Yazıtları bu ülkededir; Türklerin ilk yurtlarındandır.'},
+ {n:'Japonya',f:'🇯🇵',b:'Tokyo',k:'Asya',m:1,l:['Fuji Dağı'],x:'"Güneşin doğduğu ülke" diye anılır; binlerce adadan oluşur.'},
+ {n:'Güney Kore',f:'🇰🇷',b:'Seul',k:'Asya',m:1,x:'Kore Savaşı\'nda Türk askerleri bu ülke için savaştı.'},
+ {n:'Kuzey Kore',f:'🇰🇵',b:'Pyongyang',k:'Asya'},
+ {n:'Vietnam',f:'🇻🇳',b:'Hanoi',k:'Asya',l:['Ha Long Körfezi']},
+ {n:'Tayland',f:'🇹🇭',b:'Bangkok',k:'Asya',x:'Güneydoğu Asya\'da hiç sömürge olmamış ülkedir.'},
+ {n:'Kamboçya',f:'🇰🇭',b:'Phnom Penh',k:'Asya',l:['Angkor Wat'],x:'Bayrağında Angkor Wat tapınağı vardır.'},
+ {n:'Filipinler',f:'🇵🇭',b:'Manila',k:'Asya'},{n:'Singapur',f:'🇸🇬',b:'Singapur',k:'Asya'},
+ {n:'Azerbaycan',dup:1},
+ {n:'Mısır',f:'🇪🇬',b:'Kahire',k:'Afrika',m:1,tc:1,l:['Giza Piramitleri','Sfenks'],x:'Nil Nehri bu ülkeden geçerek Akdeniz\'e dökülür.'},
+ {n:'Libya',f:'🇱🇾',b:'Trablus',k:'Afrika'},{n:'Tunus',f:'🇹🇳',b:'Tunus',k:'Afrika'},
+ {n:'Cezayir',f:'🇩🇿',b:'Cezayir',k:'Afrika',x:'Afrika\'nın yüzölçümü en büyük ülkesidir.'},
+ {n:'Fas',f:'🇲🇦',b:'Rabat',k:'Afrika',x:'Cebelitarık Boğazı ile Avrupa\'ya çok yakındır.'},
+ {n:'Sudan',f:'🇸🇩',b:'Hartum',k:'Afrika'},{n:'Etiyopya',f:'🇪🇹',b:'Addis Ababa',k:'Afrika',x:'Kahvenin anavatanı olarak bilinir.'},
+ {n:'Kenya',f:'🇰🇪',b:'Nairobi',k:'Afrika',x:'Safarileri ve uzun mesafe koşucularıyla ünlüdür.'},
+ {n:'Somali',f:'🇸🇴',b:'Mogadişu',k:'Afrika'},{n:'Nijerya',f:'🇳🇬',b:'Abuja',k:'Afrika',x:'Afrika\'nın en kalabalık ülkesidir.'},
+ {n:'Gana',f:'🇬🇭',b:'Akra',k:'Afrika'},{n:'Senegal',f:'🇸🇳',b:'Dakar',k:'Afrika'},
+ {n:'Kongo Demokratik Cumhuriyeti',f:'🇨🇩',b:'Kinşasa',k:'Afrika'},{n:'Angola',f:'🇦🇴',b:'Luanda',k:'Afrika'},
+ {n:'Madagaskar',f:'🇲🇬',b:'Antananarivo',k:'Afrika',x:'Dünyanın en büyük adalarından biridir; lemurlarıyla ünlüdür.'},
+ {n:'Kamerun',f:'🇨🇲',b:'Yaunde',k:'Afrika'},{n:'Zimbabve',f:'🇿🇼',b:'Harare',k:'Afrika'},
+ {n:'Amerika Birleşik Devletleri',f:'🇺🇸',b:'Washington',k:'Kuzey Amerika',m:1,l:['Özgürlük Heykeli','Büyük Kanyon'],x:'50 eyaletten oluşur.'},
+ {n:'Kanada',f:'🇨🇦',b:'Ottawa',k:'Kuzey Amerika',m:1,l:['Niagara Şelalesi'],x:'Dünyanın yüzölçümü en büyük ikinci ülkesidir; bayrağında akçaağaç yaprağı vardır.'},
+ {n:'Meksika',f:'🇲🇽',b:'Meksiko',k:'Kuzey Amerika',m:1,l:['Chichén Itzá'],x:'Maya ve Aztek uygarlıkları bu topraklarda yaşadı.'},
+ {n:'Küba',f:'🇨🇺',b:'Havana',k:'Kuzey Amerika'},{n:'Jamaika',f:'🇯🇲',b:'Kingston',k:'Kuzey Amerika'},
+ {n:'Panama',f:'🇵🇦',b:'Panama',k:'Kuzey Amerika',l:['Panama Kanalı'],x:'Panama Kanalı Atlas ve Büyük okyanusları birleştirir.'},
+ {n:'Kosta Rika',f:'🇨🇷',b:'San José',k:'Kuzey Amerika'},{n:'Guatemala',f:'🇬🇹',b:'Guatemala',k:'Kuzey Amerika'},
+ {n:'Brezilya',f:'🇧🇷',b:'Brasilia',k:'Güney Amerika',m:1,l:['Kurtarıcı İsa Heykeli'],x:'Amazon yağmur ormanlarının büyük kısmı bu ülkededir; resmî dili Portekizcedir.'},
+ {n:'Arjantin',f:'🇦🇷',b:'Buenos Aires',k:'Güney Amerika',m:1,l:['Iguazu Şelaleleri'],x:'Tango dansı burada doğdu.'},
+ {n:'Şili',f:'🇨🇱',b:'Santiago',k:'Güney Amerika',l:['Paskalya Adası'],x:'Dünyanın en uzun ve ince ülkelerinden biridir.'},
+ {n:'Peru',f:'🇵🇪',b:'Lima',k:'Güney Amerika',l:['Machu Picchu'],x:'İnka uygarlığının merkeziydi.'},
+ {n:'Kolombiya',f:'🇨🇴',b:'Bogota',k:'Güney Amerika',x:'Kahvesiyle ünlüdür.'},
+ {n:'Venezuela',f:'🇻🇪',b:'Karakas',k:'Güney Amerika',l:['Angel Şelalesi'],x:'Dünyanın en yüksek şelalesi Angel Şelalesi buradadır.'},
+ {n:'Ekvador',f:'🇪🇨',b:'Quito',k:'Güney Amerika',l:['Galapagos Adaları'],x:'Adını içinden geçen Ekvator çizgisinden alır.'},
+ {n:'Uruguay',f:'🇺🇾',b:'Montevideo',k:'Güney Amerika',x:'İlk Futbol Dünya Kupası 1930\'da burada yapıldı.'},
+ {n:'Paraguay',f:'🇵🇾',b:'Asunción',k:'Güney Amerika'},
+ {n:'Avustralya',f:'🇦🇺',b:'Kanberra',k:'Okyanusya',m:1,l:['Sidney Opera Binası'],x:'Kanguru ve koala gibi hayvanlar yalnızca burada doğal olarak yaşar.'},
+ {n:'Yeni Zelanda',f:'🇳🇿',b:'Wellington',k:'Okyanusya',m:1,x:'Kivi kuşu bu ülkenin simgesidir.'},
+ {n:'Fiji',f:'🇫🇯',b:'Suva',k:'Okyanusya'},{n:'Papua Yeni Gine',f:'🇵🇬',b:'Port Moresby',k:'Okyanusya'}
+].filter(u=>!u.dup);
+const TR_KOMSU=['Yunanistan','Bulgaristan','Gürcistan','Ermenistan','Azerbaycan','İran','Irak','Suriye'];
+const DUNYA_TF=[
+ ['Yüzölçümü en büyük ülke hangisidir?','Rusya',['Kanada','Çin','Amerika Birleşik Devletleri','Brezilya']],
+ ['Dünyanın en büyük okyanusu hangisidir?','Büyük Okyanus (Pasifik)',['Atlas Okyanusu','Hint Okyanusu','Arktik Okyanusu']],
+ ['Yüzölçümü en büyük kıta hangisidir?','Asya',['Afrika','Avrupa','Kuzey Amerika']],
+ ['En küçük kıta hangisidir?','Okyanusya',['Avrupa','Güney Amerika','Afrika']],
+ ['Hangi kıtada sürekli yaşayan yerli halk yoktur?','Antarktika',['Okyanusya','Avrupa','Güney Amerika']],
+ ['Ekvator çizgisi hangi kıtadan geçmez?','Avrupa',['Afrika','Güney Amerika','Asya']],
+ ['Dünyanın en yüksek dağı Everest hangi sıradağlardadır?','Himalayalar',['Alpler','And Dağları','Kafkas Dağları']],
+ ['Dünyanın en büyük sıcak çölü hangisidir?','Sahra Çölü',['Gobi Çölü','Atacama Çölü','Kalahari Çölü']],
+ ['Avrupa ile Afrika\'yı ayıran boğaz hangisidir?','Cebelitarık Boğazı',['İstanbul Boğazı','Çanakkale Boğazı','Hürmüz Boğazı']],
+ ['Karadeniz\'i Marmara Denizi\'ne bağlayan boğaz hangisidir?','İstanbul Boğazı',['Çanakkale Boğazı','Cebelitarık Boğazı','Süveyş Kanalı']],
+ ['Akdeniz\'i Kızıldeniz\'e bağlayan kanal hangisidir?','Süveyş Kanalı',['Panama Kanalı','Kiel Kanalı','Korint Kanalı']]
+];
+
 const $=id=>document.getElementById(id);
 const REG=['MAR','EGE','AKD','ICA','KAR','DOG','GDA'];
 const RCOL={MAR:'#4dabf7',EGE:'#38d9a9',AKD:'#ffa94d',ICA:'#ffd43b',KAR:'#69db7c',DOG:'#b197fc',GDA:'#ff8787'};
-const CATS={h:{n:'Tarihi Yerler',ic:'🏛️',c:'#7b2cbf'},y:{n:'Yemek ve İçecek',ic:'🍽️',c:'#e8590c'},t:{n:'Tarım ve Hayvancılık',ic:'🌾',c:'#2b8a3e'},m:{n:'Yer Altı Zenginlikleri',ic:'⛏️',c:'#495057'},s:{n:'Sanayi ve El Sanatları',ic:'🏭',c:'#1971c2'},c:{n:'Doğa ve Coğrafya',ic:'🏔️',c:'#0b7285'},g:{n:'Harita ve Plaka',ic:'📍',c:'#d6336c'}};
+const CATS={h:{n:'Tarihi Yerler',ic:'🏛️',c:'#7b2cbf'},y:{n:'Yemek ve İçecek',ic:'🍽️',c:'#e8590c'},t:{n:'Tarım ve Hayvancılık',ic:'🌾',c:'#2b8a3e'},m:{n:'Yer Altı Zenginlikleri',ic:'⛏️',c:'#495057'},s:{n:'Sanayi ve El Sanatları',ic:'🏭',c:'#1971c2'},c:{n:'Doğa ve Coğrafya',ic:'🏔️',c:'#0b7285'},g:{n:'Harita ve Plaka',ic:'📍',c:'#d6336c'},w:{n:'Dünya Turu',ic:'🌍',c:'#1864ab'}};
 const BYP={};IL.forEach(c=>BYP[c.p]=c);
 
 /* ===== STATE ===== */
@@ -581,7 +700,35 @@ const NEW={
 function ek(w,suf){const v=[...lc(w)].reverse().find(ch=>'aeıioöuü'.includes(ch))||'a';const back='aıou'.includes(v),last=lc(w).slice(-1),hard='fstkçşhp'.includes(last),vow='aeıioöuü'.includes(last);
   if(suf==='den')return "'"+(hard?'t':'d')+(back?'a':'e')+'n';return "'"+(vow?'y':'')+(back?'a':'e')}
 
+
+/* ===== DÜNYA TURU ===== */
+const sameName=u=>lc(u.b).startsWith(lc(u.n).slice(0,4))||lc(u.n).startsWith(lc(u.b).slice(0,4));
+function wpick(n,excl,f){return shuffle(ULKE.filter(u=>!excl.includes(u.n)&&(!f||f(u)))).slice(0,n)}
+function makeWorldQ(no,L){const o=S.lv==='o',pool=o?ULKE.filter(u=>u.m):ULKE;
+  const T=[['cap',4],['capR',3],['flag',4],['kita',2],['yer',3],['komsu',1],['turk',1],['tf',1]];let tot=T.reduce((a,t)=>a+t[1],0),r=Math.random()*tot,t='cap';for(const [k,w] of T){r-=w;if(r<=0){t=k;break}}
+  const sim=u=>L.hard?(x=>x.k===u.k):null;
+  if(t==='cap'||t==='capR'){const u=rnd(pool.filter(u=>!sameName(u)));let ds=wpick(no-1,[u.n],x=>!sameName(x)&&(!sim(u)||sim(u)(x)));if(ds.length<no-1)ds=wpick(no-1,[u.n],x=>!sameName(x));
+    if(t==='cap')return {type:'w_cap',cat:'w',u,flag:u.f,text:`🏙️ <em>${u.n}</em> ülkesinin başkenti neresidir?`,opts:shuffle([{l:u.b,ok:1},...ds.map(d=>({l:d.b}))]),key:'wc'+u.n};
+    return {type:'w_capR',cat:'w',u,text:`🏙️ Başkenti <em>${u.b}</em> olan ülke hangisidir?`,opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wr'+u.n}}
+  if(t==='flag'){const u=rnd(pool);let ds=wpick(no-1,[u.n],sim(u));if(ds.length<no-1)ds=wpick(no-1,[u.n]);
+    return {type:'w_flag',cat:'w',u,bigflag:u.f,text:'🏳️ Bu bayrak hangi ülkenin bayrağıdır?',opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wf'+u.n}}
+  if(t==='kita'){const u=rnd(pool.filter(u=>!u.tc));const ks=shuffle(KITA.filter(k=>k!==u.k)).slice(0,no-1);
+    return {type:'w_kita',cat:'w',u,flag:u.f,text:`🌐 <em>${u.n}</em> hangi kıtadadır?`,opts:shuffle([{l:u.k,ok:1},...ks.map(k=>({l:k}))]),key:'wk'+u.n}}
+  if(t==='yer'){const us=pool.filter(u=>u.l&&u.l.length);const u=rnd(us),y=rnd(u.l);let ds=wpick(no-1,[u.n],sim(u));if(ds.length<no-1)ds=wpick(no-1,[u.n]);
+    return {type:'w_yer',cat:'w',u,text:`📸 <em>${y}</em> hangi ülkededir?`,opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wy'+y}}
+  if(t==='komsu'){const yes=Math.random()<.6;const K=ULKE.filter(u=>TR_KOMSU.includes(u.n)),N=ULKE.filter(u=>!TR_KOMSU.includes(u.n)&&u.n!=='Türkiye'&&u.k!=='Okyanusya');
+    if(yes){const u=rnd(K),ds=shuffle(N.filter(x=>['Avrupa','Asya','Afrika'].includes(x.k))).slice(0,no-1);return {type:'w_komsu',cat:'w',u,text:'🇹🇷 Hangisi Türkiye\'nin kara komşusudur?',opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wn'+u.n,note:'Türkiye\'nin kara komşuları: '+TR_KOMSU.join(', ')+' (Nahçıvan üzerinden).'}}
+    const u=rnd(N.filter(x=>['Avrupa','Asya'].includes(x.k))),ds=shuffle(K).slice(0,no-1);return {type:'w_komsu',cat:'w',u,text:'🇹🇷 Hangisi Türkiye\'nin kara komşusu <em>değildir</em>?',opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wnd'+u.n,note:'Türkiye\'nin kara komşuları: '+TR_KOMSU.join(', ')+' (Nahçıvan üzerinden).'}}
+  if(t==='turk'){const T2=ULKE.filter(u=>u.turk),u=rnd(T2),ds=wpick(no-1,[u.n],x=>!x.turk&&x.n!=='Türkiye'&&['Asya','Avrupa'].includes(x.k));
+    return {type:'w_turk',cat:'w',u,text:'🤝 Hangisi bağımsız bir <em>Türk devletidir</em>?',opts:shuffle([{l:u.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'wt'+u.n,note:'Türkiye dışındaki bağımsız Türk devletleri: Azerbaycan, Kazakistan, Kırgızistan, Özbekistan, Türkmenistan (ve KKTC).'}}
+  const [q,a,w]=rnd(DUNYA_TF);return {type:'w_tf',cat:'w',u:null,text:'🌍 '+q,opts:shuffle([{l:a,ok:1},...shuffle(w).slice(0,no-1).map(x=>({l:x}))]),key:'wg'+q,info:`Doğru cevap: <b>${a}</b>.`}}
+function ulkeFull(u){return `<div class="ilhead" style="margin-top:4px"><span style="font-size:54px;line-height:1">${u.f}</span><span class="nm">${u.n}</span></div>
+  <div class="frow"><span class="fi">🏙️</span><div><div class="ft">Başkent</div><div class="fv">${u.b}</div></div></div>
+  <div class="frow"><span class="fi">🌐</span><div><div class="ft">Kıta</div><div class="fv">${u.tc?u.k+' (toprakları birden fazla kıtaya uzanır)':u.k}</div></div></div>
+  ${u.l?`<div class="frow"><span class="fi">📸</span><div><div class="ft">Ünlü yerler</div><div class="fv">${u.l.join(' · ')}</div></div></div>`:''}
+  ${u.x?`<div class="bil">💡 <b>Biliyor muydun?</b> ${u.x}</div>`:''}`}
 function nextQ(G){
+  if(G.mode==='world'){for(let i=0;i<120;i++){const q=makeWorldQ(LV[S.lv].opts,LV[S.lv]);if(q&&!G.used.has(q.key)){G.used.add(q.key);return q}}G.used.clear();return makeWorldQ(LV[S.lv].opts,LV[S.lv])}
   const L=LV[S.lv];let types=Object.keys(TYPES).filter(t=>LVORD[S.lv]>=LVORD[TYPES[t].minLv||'o']&&!(G.region&&TYPES[t].genel));
   if(G.cat){types=types.filter(t=>G.cat==='ms'?('ms'.includes(TYPES[t].c)):TYPES[t].c===G.cat)}
   const pool=G.region?IL.filter(c=>c.r===G.region):IL;
@@ -604,7 +751,7 @@ function startGame(mode,extra={}){
   if(mode==='duel'){G.total=12;G.j={h50:0,time:0,pass:0}}
   show('quiz');nextQuestion();
 }
-function modeLabel(){if(G.mode==='daily')return 'Günün Sorusu';if(G.mode==='duel')return 'Düello';if(G.mode==='region')return BOLGE[G.region];if(G.mode==='cat')return G.cat==='ms'?'Maden & Sanayi':CATS[G.cat].n;if(G.mode==='marathon')return 'Maraton';return 'Hızlı Yarışma'}
+function modeLabel(){if(G.mode==='world')return 'Dünya Turu';if(G.mode==='daily')return 'Günün Sorusu';if(G.mode==='duel')return 'Düello';if(G.mode==='region')return BOLGE[G.region];if(G.mode==='cat')return G.cat==='ms'?'Maden & Sanayi':CATS[G.cat].n;if(G.mode==='marathon')return 'Maraton';return 'Hızlı Yarışma'}
 function nextQuestion(){
   $('sheet').classList.remove('on');$('quiz').scrollTop=0;
   if(G.n>=G.total||G.lives<=0)return finish();
@@ -621,6 +768,7 @@ function renderQ(){
   $('hearts').textContent=G.mode==='marathon'?'❤️'.repeat(G.lives)+'🖤'.repeat(3-G.lives):'';
   $('streakT').textContent=G.streak>=2?`🔥 ${G.streak} seri`:'';
   let h=(G.pl?`<div class="duelbar">${G.pl.map((p,i)=>`<span class="${i===G.turn?'on':''}">${p.ic} ${p.n} · ${p.score}</span>`).join('')}</div>`:'')+`<div class="cat" style="background:${cat.c}">${cat.ic} ${cat.n}</div><div class="q">${q.text}</div>`;
+  if(q.bigflag)h+=`<div class="bflag">${q.bigflag}</div>`;else if(q.flag)h+=`<div class="sflag">${q.flag}</div>`;
   if(q.shape){const b=bboxes()[q.shape],pd=Math.max(b.w,b.h)*.12;h+=`<svg class="shape" viewBox="${b.x-pd} ${b.y-pd} ${b.w+pd*2} ${b.h+pd*2}"><path d="${MAP[q.shape]}" stroke-width="${Math.max(b.w,b.h)/90}"/></svg>`}
   if(q.map)h+=`<svg class="qmap ${q.map==='tap'?'tapmap':''}" id="qmap" viewBox="15 140 1020 455"></svg>`;
   $('qcard').innerHTML=h;
@@ -690,11 +838,11 @@ function ilFull(c){
 }
 function ilInfo(c){return ilFull(c)}
 function showSheet(ok,gain,isTimeout){
-  const q=G.q,c=q.p?BYP[q.p]:null,right=q.opts.find(o=>o.ok),ans=q.ui?(q.ui==='match'?'Doğru eşleşmeler aşağıda':q.ans):(right?right.l:c.n);
+  const q=G.q,c=q.p?BYP[q.p]:null,right=q.opts.find(o=>o.ok),ans=q.ui?(q.ui==='match'?'Doğru eşleşmeler aşağıda':q.ans):(right?right.l:c?c.n:'');
   const last=G.n>=G.total||G.lives<=0;
   const ban=ok?`<div class="banner ok"><span class="ic">✅</span><div><div class="vt">Doğru!</div><div class="va">${ans}</div></div><span class="pts">+${gain} ⭐</span></div>`
     :`<div class="banner ${isTimeout?'to':'bad'}"><span class="ic">${isTimeout?'⏰':'❌'}</span><div><div class="vt">${isTimeout?'Süre doldu!':'Yanlış!'}</div><div class="va">${q.ui==='match'?ans:'Doğru cevap: '+ans}</div></div></div>`;
-  $('sheetBody').innerHTML=ban+(q.note?`<div class="bil" style="margin-bottom:10px">${q.type==='unesco'?'🏛️':'📌'} ${q.note}</div>`:'')+(q.ui?`<div class="bil">💡 ${q.info}</div>`:'')+(c?ilFull(c):(q.ui?'':`<div class="bil">💡 ${q.info||''}</div>`));$('sheetBody').scrollTop=0;
+  $('sheetBody').innerHTML=ban+(q.note?`<div class="bil" style="margin-bottom:10px">${q.type==='unesco'?'🏛️':'📌'} ${q.note}</div>`:'')+(q.ui?`<div class="bil">💡 ${q.info}</div>`:'')+(c?ilFull(c):q.u?ulkeFull(q.u):(q.ui?'':`<div class="bil">💡 ${q.info||''}</div>`));$('sheetBody').scrollTop=0;
   $('sheetFoot').innerHTML=`<button class="btn" id="nextB">${last?'Sonuçları gör 🏁':'Sıradaki soru ▶'}</button>`;
   setTimeout(()=>$('sheet').classList.add('on'),ok?350:650); // short moment to see the coloured answers first
   $('nextB').onclick=()=>{SFX.click();nextQuestion()};
@@ -713,6 +861,7 @@ const BADGES=[
  ...REG.map(r=>({id:'r_'+r,ic:{MAR:'🌉',EGE:'🫒',AKD:'🍊',ICA:'🌾',KAR:'🌲',DOG:'🏔️',GDA:'🏺'}[r],n:BOLGE[r]+' Rozeti',d:'Bölge Turunda 10 sorudan en az 8 doğru'})),
  ...['h','y','t','ms','c','g'].map(k=>({id:'c_'+k,ic:k==='ms'?'⛏️':CATS[k].ic,n:(k==='ms'?'Maden & Sanayi':CATS[k].n)+' Uzmanı',d:'Bu kategoride en az 8 doğru'})),
  {id:'perf_o',ic:'🥉',n:'Ortaokul Şampiyonu',d:'Hızlı Yarışmada 10/10 (Ortaokul)'},{id:'perf_l',ic:'🥈',n:'Lise Şampiyonu',d:'Hızlı Yarışmada 10/10 (Lise)'},{id:'perf_y',ic:'🥇',n:'Yetişkin Şampiyonu',d:'Hızlı Yarışmada 10/10 (Yetişkin)'},
+ {id:'world',ic:'🌍',n:'Dünya Gezgini',d:'Dünya Turunda en az 8 doğru'},
  {id:'mar25',ic:'🔥',n:'Maraton Koşucusu',d:'Maratonda 25 doğru'},{id:'disc81',ic:'🇹🇷',n:'81 İl Kâşifi',d:'81 ilin hepsini keşfet'}
 ];
 function finish(){
@@ -725,6 +874,7 @@ function finish(){
   if(G.mode==='cat'&&G.correct>=8)give('c_'+G.cat);
   if(G.mode==='quick'&&G.correct===10)give('perf_'+S.lv);
   if(G.mode==='marathon'&&G.correct>=25)give('mar25');
+  if(G.mode==='world'&&G.correct>=8)give('world');
   if(Object.keys(S.disc).length>=81)give('disc81');
   let dailyMsg='';if(G.mode==='daily'){const k=todayKey();S.daily[k]=S.daily[k]||{};if(S.daily[k][S.lv]===undefined){S.daily[k][S.lv]=G.score;dailyMsg=`<div class="newb">📅 Bugünün puanı kaydedildi: ${G.score}. Yarın yeni sorular!</div>`}else dailyMsg=`<div class="newb">📅 Bugünkü ilk puanın: ${S.daily[k][S.lv]} (tekrar oynamalar sayılmaz)</div>`;const ds=dailyStreak();if(ds>1)dailyMsg+=`<div class="newb">🔥 ${ds} gündür Günün Sorusu'nu çözüyorsun!</div>`}
   save();
@@ -772,6 +922,7 @@ $('mCat').onclick=()=>{SFX.click();const cs=[['h','#7b2cbf'],['y','#e8590c'],['t
   document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(k==='ms'&&S.lv==='o'){S.lv='l';save();renderHome();toast('Seviye Lise yapıldı')}closeModal();startGame('cat',{cat:k})});$('mX').onclick=closeModal};
 $('mAtlas').onclick=()=>{SFX.click();openAtlas()};
 $('mDaily').onclick=()=>startGame('daily');
+$('mWorld').onclick=()=>startGame('world');
 $('mDuel').onclick=()=>{SFX.click();const nm=S.duelNames||['Oyuncu 1','Oyuncu 2'];modal(`<h2>⚔️ Düello</h2><p style="color:#9ec3d6;font-size:14px">Telefon sırayla elden ele geçer. Her oyuncuya 6 soru.</p>
   <input id="dn1" class="dn" value="${nm[0]}" maxlength="12"><input id="dn2" class="dn" value="${nm[1]}" maxlength="12"><button class="btn" id="dGo">Başla ⚔️</button><button class="btn gray" id="mX">Vazgeç</button>`);
   $('mX').onclick=closeModal;$('dGo').onclick=()=>{const n=[$('dn1').value.trim()||'Oyuncu 1',$('dn2').value.trim()||'Oyuncu 2'];S.duelNames=n;save();closeModal();startGame('duel',{names:n})}};
