@@ -34,7 +34,9 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
 .mode span{font-size:12px;opacity:.9;display:block;margin-top:2px;line-height:1.2}
 .mode i{position:absolute;right:6px;bottom:0;font-size:38px;font-style:normal;opacity:.35}
 .mode.big{grid-column:span 2;min-height:74px;background:linear-gradient(#5ee36b,#1fa64a);box-shadow:0 5px 0 #0d6b2c}
-.m1{background:linear-gradient(#5aa9ff,#2f6fed)}.m2{background:linear-gradient(#c77dff,#7b2cbf)}.m3{background:linear-gradient(#ff8fa3,#d6336c)}.m4{background:linear-gradient(#ffb347,#e8590c)}
+.m1{background:linear-gradient(#5aa9ff,#2f6fed)}.m2{background:linear-gradient(#c77dff,#7b2cbf)}.m3{background:linear-gradient(#ff8fa3,#d6336c)}.m4{background:linear-gradient(#ffb347,#e8590c)}.m5{background:linear-gradient(#20c997,#087f5b)}.m6{background:linear-gradient(#ff6b6b,#c92a2a)}
+.dn{width:100%;font-family:inherit;font-size:19px;font-weight:700;text-align:center;border:0;border-radius:12px;padding:10px;margin-top:8px;user-select:text;-webkit-user-select:text}
+.duelbar{display:flex;gap:8px;justify-content:center;margin:6px 0 0}.duelbar span{background:#0006;border-radius:12px;padding:3px 10px;font-weight:800;font-size:14px}.duelbar span.on{outline:2px solid #ffd166}
 .xpbox{margin-top:12px;background:#0006;border-radius:16px;padding:10px 12px;border:2px solid #ffffff12}
 .xpbox .row{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
 .bar{height:12px;border-radius:8px;background:#0008;overflow:hidden;border:2px solid #ffffff14;margin-top:4px}
@@ -62,6 +64,13 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
 .qmap path.ok{fill:#2fbf5b}.qmap path.bad{fill:#ff4d6d}
 .tapmap path{cursor:pointer}
 .opts{width:100%;max-width:520px;display:grid;gap:10px;margin-top:14px}
+.shape{display:block;width:62%;max-height:22vh;margin:8px auto 0}.shape path{fill:#ff8c42;stroke:#7a2e00;stroke-linejoin:round}
+.hint{font-size:13px;color:#9ec3d6;text-align:center;margin-bottom:6px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mgrid>div{display:flex;flex-direction:column;gap:8px}
+.mb{border-radius:14px;padding:10px 8px;font-size:15px;font-weight:800;background:linear-gradient(#2f5a70,#1d3a4b);box-shadow:0 4px 0 #0f2230;line-height:1.15;min-height:52px}
+.mb.r{background:linear-gradient(#5a4b8f,#3a2c75);box-shadow:0 4px 0 #1f1745}
+.mb.sel{outline:3px solid #ffd166}.mb.done{background:linear-gradient(#5ee36b,#1fa64a)!important;box-shadow:0 4px 0 #0d6b2c!important;opacity:.85}
+.mb.bad{animation:shake .35s;background:linear-gradient(#ff6b6b,#d62839)}
 .opt{border-radius:18px;padding:13px 14px;font-size:18px;font-weight:800;background:linear-gradient(#2f5a70,#1d3a4b);box-shadow:0 5px 0 #0f2230;text-align:left;display:flex;align-items:center;gap:10px;line-height:1.15}
 .opt .k{width:30px;height:30px;border-radius:10px;background:#0006;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
 .opt.ok{background:linear-gradient(#5ee36b,#1fa64a);box-shadow:0 5px 0 #0d6b2c;animation:pop .35s}
@@ -180,6 +189,8 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
     <button class="mode m2" id="mCat"><b>Kategoriler</b><span>Tarih, yemek, tarım, maden…</span><i>📜</i></button>
     <button class="mode m3" id="mMarathon"><b>Maraton</b><span>3 can bitene kadar · rekor kır</span><i>🔥</i></button>
     <button class="mode m4" id="mAtlas"><b>İl Atlası</b><span>81 ili keşfet ve öğren</span><i>📖</i></button>
+    <button class="mode m5" id="mDaily"><b>Günün Sorusu</b><span id="dailyTxt">Herkese aynı 10 soru</span><i>📅</i></button>
+    <button class="mode m6" id="mDuel"><b>Düello</b><span>2 kişi aynı telefonda</span><i>⚔️</i></button>
   </div>
   <div class="xpbox">
     <div class="row"><span id="lvlName">🧭 Gezgin</span><span id="xpNext"></span></div>
@@ -355,7 +366,7 @@ const CATS={h:{n:'Tarihi Yerler',ic:'🏛️',c:'#7b2cbf'},y:{n:'Yemek ve İçec
 const BYP={};IL.forEach(c=>BYP[c.p]=c);
 
 /* ===== STATE ===== */
-const DEF={lv:'o',xp:0,best:{},badges:{},disc:{},sound:true,music:false,seenIntro:false};
+const DEF={daily:{},lv:'o',xp:0,best:{},badges:{},disc:{},sound:true,music:false,seenIntro:false};
 let S=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem('trkesif'));if(s)S=Object.assign(S,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('trkesif',JSON.stringify(S))}catch(e){}};
@@ -428,6 +439,7 @@ function usable(c,k){const L=LV[S.lv];let a=c[k].filter(x=>!reveals(x));if(L.fam
 const TYPES={
  hI:{c:'h',w:5},Ih:{c:'h',w:3},yI:{c:'y',w:3},Iy:{c:'y',w:2},tI:{c:'t',w:3},It:{c:'t',w:2},mI:{c:'m',w:2,minLv:'l'},Im:{c:'m',w:1,minLv:'l'},sI:{c:'s',w:2,minLv:'l'},Is:{c:'s',w:1,minLv:'l'},
  komsu:{c:'c',w:3},komsuDegil:{c:'c',w:2,minLv:'l'},kiyi:{c:'c',w:2},kiyiVY:{c:'c',w:2},doga:{c:'c',w:3},unesco:{c:'c',w:2},nehir:{c:'c',w:1,minLv:'l',genel:1},rekor:{c:'c',w:1,genel:1},genelTF:{c:'c',w:1,genel:1},
+ sekil:{c:'g',w:3},farkli:{c:'g',w:2},yon:{c:'c',w:2},yolculuk:{c:'c',w:2,minLv:'l'},sirala:{c:'c',w:2},eslestir:{c:'y',w:2},tarih:{c:'h',w:3},
  plate:{c:'g',w:2},plateR:{c:'g',w:1,minLv:'l'},region:{c:'g',w:2},mapPick:{c:'g',w:3},mapTap:{c:'g',w:2,minLv:'l'}
 };
 const LVORD={o:0,l:1,y:2};
@@ -435,6 +447,7 @@ function pickProvs(n,excl,filter){return shuffle(IL.filter(c=>!excl.includes(c.p
 /* builds a question object: {type,cat,text(html),opts:[{label,correct}],p (focus province), map?} */
 function makeQ(type,pool){
   const L=LV[S.lv],no=L.opts,t=TYPES[type];
+  if(NEW[type])return NEW[type](pool,no,L);
   const cands=pool.filter(c=>{if('hytms'.includes(t.c)&&type.length===2){return usable(c,t.c).length>0}return true});
   if(!cands.length)return null;
   const c=rnd(cands),k=t.c;
@@ -502,6 +515,72 @@ function makeGeo(type,pool,no){
     return {type,cat:'c',p:null,text:'🇹🇷 '+q,opts:shuffle([{l:a,ok:1},...shuffle(w).slice(0,no-1).map(x=>({l:x}))]),key:'gt'+q,info:`Doğru cevap: ${a}.`}}
   return null;
 }
+/* ===== YENİ SORU TİPLERİ ===== */
+const CEN=()=>{const B=bboxes(),o={};for(const c of IL){const b=B[c.p];o[c.p]={x:b.x+b.w/2,y:b.y+b.h/2}}return o};
+let _CEN=null;const cen=p=>(_CEN=_CEN||CEN())[p];
+const TARIH=[
+ ['1071 Malazgirt Meydan Muharebesi hangi ilimizde yapılmıştır?',49,'Malazgirt, bugün Muş iline bağlı bir ilçedir. Bu zaferle Anadolu\'nun kapıları Türklere açıldı.'],
+ ['1473 Otlukbeli Savaşı hangi ilimizde yapılmıştır?',24,'Otlukbeli Savaşı Fatih Sultan Mehmet ile Akkoyunlu hükümdarı Uzun Hasan arasında, Erzincan yakınlarında yapıldı.'],
+ ['Türkiye Büyük Millet Meclisi 23 Nisan 1920\'de hangi ilimizde açıldı?',6,'TBMM 23 Nisan 1920\'de Ankara\'da açıldı. Bu gün Ulusal Egemenlik ve Çocuk Bayramı olarak kutlanır.'],
+ ['Kurtuluş Savaşı\'ndaki direnişi nedeniyle "Kahraman" unvanı verilen ilimiz hangisidir?',46,'Maraş\'a 1973\'te "Kahraman" unvanı verildi ve adı Kahramanmaraş oldu.'],
+ ['Kurtuluş Savaşı\'ndaki direnişi nedeniyle "Gazi" unvanı verilen ilimiz hangisidir?',27,'Antep\'e 1921\'de "Gazi" unvanı verildi ve adı Gaziantep oldu.'],
+ ['Kurtuluş Savaşı\'ndaki direnişi nedeniyle "Şanlı" unvanı verilen ilimiz hangisidir?',63,'Urfa\'ya 1984\'te "Şanlı" unvanı verildi ve adı Şanlıurfa oldu.'],
+ ['Hititlerin başkenti Hattuşa hangi ilimizdedir?',19,'Hattuşa, Çorum\'un Boğazkale ilçesindedir ve UNESCO Dünya Mirası listesindedir.'],
+ ['Friglerin başkenti Gordion hangi ilimizdedir?',6,'Gordion antik kenti Ankara\'nın Polatlı ilçesindedir.'],
+ ['Urartuların başkenti Tuşpa hangi ilimizdedir?',65,'Tuşpa, bugünkü Van Kalesi\'nin bulunduğu yerdir.'],
+ ['Lidyalıların başkenti Sardes hangi ilimizdedir?',45,'Sardes antik kenti Manisa\'nın Salihli ilçesindedir. Parayı ilk kullanan uygarlık Lidyalılardır.'],
+ ['Kommagene Krallığı\'nın dev heykelleriyle ünlü Nemrut Dağı hangi ilimizdedir?',2,'Nemrut Dağı Adıyaman\'dadır; gün doğumu ve batımıyla ünlüdür.'],
+ ['Anadolu Selçuklu Devleti\'nin uzun süre başkenti olan ilimiz hangisidir?',42,'Konya, Anadolu Selçuklu Devleti\'nin başkentiydi.'],
+ ['Osmanlı Devleti\'nin ilk büyük başkenti olan ilimiz hangisidir?',16,'Bursa 1326\'da fethedildi ve Osmanlı\'nın ilk büyük başkenti oldu.'],
+ ['İstanbul\'un fethinden önce Osmanlı\'nın başkenti olan ilimiz hangisidir?',22,'Edirne, İstanbul\'dan önce Osmanlı\'nın başkentiydi.'],
+ ['Kurtuluş Savaşı\'nı bitiren Mudanya Ateşkesi hangi ilimizde imzalandı?',16,'Mudanya, Bursa\'nın bir ilçesidir. Ateşkes 11 Ekim 1922\'de imzalandı.'],
+ ['Atatürk\'ün Büyük Taarruz\'u yönettiği Kocatepe hangi ilimizdedir?',3,'Kocatepe Afyonkarahisar\'dadır. Büyük Taarruz 26 Ağustos 1922\'de buradan başladı.'],
+ ['Dumlupınar Şehitliği ve Zafer Anıtı hangi ilimizdedir?',43,'Dumlupınar, Kütahya\'nın bir ilçesidir. 30 Ağustos Zafer Bayramı bu zaferin yıldönümüdür.'],
+ ['Kurtuluş Savaşı\'nda düşmana ilk kurşunun atıldığı il hangisidir?',35,'Gazeteci Hasan Tahsin, 15 Mayıs 1919\'da İzmir\'de düşmana ilk kurşunu attı.'],
+ ['Havza Genelgesi hangi ilimizde yayımlandı?',55,'Havza, Samsun\'un bir ilçesidir. Genelge 28 Mayıs 1919\'da yayımlandı.'],
+ ['Alaşehir Kongresi hangi ilimizde toplandı?',45,'Alaşehir, Manisa\'nın bir ilçesidir.'],
+ ['Pozantı Kongresi hangi ilimizde toplandı?',1,'Pozantı, Adana\'nın bir ilçesidir.'],
+ ['Conkbayırı ve Anafartalar, hangi ilimizdeki savaşlarla ünlüdür?',17,'Conkbayırı ve Anafartalar Çanakkale\'dedir. Mustafa Kemal burada büyük başarılar kazandı.'],
+ ['1914-1915 Sarıkamış Harekâtı hangi ilimizde yaşandı?',36,'Sarıkamış, Kars\'ın bir ilçesidir. Binlerce asker soğuk nedeniyle şehit düştü.'],
+ ['Nasreddin Hoca\'nın türbesinin bulunduğu Akşehir hangi ilimizdedir?',42,'Akşehir Konya\'nın bir ilçesidir; her yıl Nasreddin Hoca şenlikleri yapılır.'],
+ ['Hacı Bektaş-ı Veli Külliyesi hangi ilimizdedir?',50,'Hacıbektaş, Nevşehir\'in bir ilçesidir.']
+];
+const DIRN={k:'Kuzeyinde',g:'Güneyinde',d:'Doğusunda',b:'Batısında'};
+function allShortest(a,b){const da=DIST[a],db=DIST[b],D=da[b];if(D===undefined)return null;const lv={};for(const c of IL){const p=c.p;if(p===a||p===b)continue;if(da[p]!==undefined&&db[p]!==undefined&&da[p]+db[p]===D)(lv[da[p]]=lv[da[p]]||[]).push(p)}return {D,lv}}
+const NEW={
+ sekil(pool,no,L){const T=computeTiny(),cs=pool.filter(c=>!T[c.p]);if(!cs.length)return null;const c=rnd(cs);
+   const ds=pickProvs(no-1,[c.p],L.hard?d=>d.r===c.r:null);if(ds.length<no-1)return null;
+   return {type:'sekil',cat:'g',p:c.p,shape:c.p,text:'🧩 Bu şekil hangi ilimizin haritasıdır?',opts:optsP(c,ds),key:'sk'+c.p}},
+ yon(pool,no,L){for(let t=0;t<30;t++){const a=rnd(pool),b=rnd(IL);if(a.p===b.p)continue;const A=cen(a.p),B=cen(b.p),dx=A.x-B.x,dy=A.y-B.y,dist=Math.hypot(dx,dy);
+     if(dist<70||dist>(L.hard?330:520))continue;let d=null;if(Math.abs(dx)>2.6*Math.abs(dy))d=dx>0?'d':'b';else if(Math.abs(dy)>2.6*Math.abs(dx))d=dy>0?'g':'k';if(!d)continue;
+     const others=shuffle(Object.keys(DIRN).filter(x=>x!==d)).slice(0,no-1);
+     return {type:'yon',cat:'c',p:a.p,text:`🧭 <em>${a.n}</em>, <em>${b.n}</em> ilinin hangi yönündedir?`,opts:shuffle([{l:DIRN[d],ok:1},...others.map(x=>({l:DIRN[x]}))]),key:'yn'+a.p+'-'+b.p,
+       note:`${a.n}, ${b.n} ilinin ${DIRN[d].toLowerCase()} yer alır.`}}return null},
+ yolculuk(pool,no,L){for(let t=0;t<40;t++){const a=rnd(pool),b=rnd(IL);if(a.p===b.p)continue;const r=allShortest(a.p,b.p);if(!r||r.D<3||r.D>5)continue;
+     const must=Object.values(r.lv).filter(x=>x.length===1).map(x=>x[0]);if(!must.length)continue;const m=BYP[rnd(must)];
+     const onPath=new Set([a.p,b.p,...Object.values(r.lv).flat()]);
+     const ds=pickProvs(no-1,[...onPath],d=>[...onPath].every(q=>far(q,d.p)||DIST[q][d.p]>=2));if(ds.length<no-1)continue;
+     return {type:'yolculuk',cat:'c',p:m.p,text:`🚌 <em>${a.n}</em>${ek(a.n,'den')} <em>${b.n}</em>${ek(b.n,'a')} komşu illeri takip ederek, <em>en az ile uğrayarak</em> gidiyorsun. Hangi ilden mutlaka geçersin?`,
+       opts:optsP(m,ds),key:'yl'+a.p+'-'+b.p,note:`En kısa rotada ${r.D} kez il sınırı geçilir ve hangi yol seçilirse seçilsin ${m.n} ilinden geçmek gerekir.`}}return null},
+ eslestir(pool,no,L){const k=Math.random()<.5?'y':'h',n=no===3?3:4;for(let t=0;t<40;t++){const ps=shuffle(pool).filter(c=>usable(c,k).length).slice(0,n);if(ps.length<n)return null;
+     if(new Set(ps.map(c=>c.r)).size<Math.min(n,3))continue;const items=ps.map(c=>usable(c,k)[0]);
+     let bad=false;ps.forEach((c,i)=>items.forEach((it,j)=>{if(i!==j&&conflicts(it,c.p))bad=true}));if(bad)continue;
+     return {type:'eslestir',cat:k,p:null,ui:'match',pairs:ps.map((c,i)=>[c.n,items[i],c.p]),text:k==='y'?'🔗 Her ili ünlü lezzetiyle eşleştir':'🔗 Her ili tarihi / doğal güzelliğiyle eşleştir',opts:[],key:'es'+ps.map(c=>c.p).join(),
+       ans:'Eşleştirme',info:ps.map((c,i)=>`<b>${c.n}</b> → ${items[i]}`).join('<br>')}}return null},
+ sirala(pool,no,L){const ax=Math.random()<.6?'x':'y',n=no===3?3:4;for(let t=0;t<60;t++){const ps=shuffle(pool).slice(0,n);if(ps.length<n)return null;
+     const s=ps.slice().sort((u,v)=>cen(u.p)[ax]-cen(v.p)[ax]);let okGap=true;for(let i=1;i<s.length;i++)if(cen(s[i].p)[ax]-cen(s[i-1].p)[ax]<(ax==='x'?55:35))okGap=false;if(!okGap)continue;
+     return {type:'sirala',cat:'c',p:null,ui:'order',order:s.map(c=>c.n),items:shuffle(s.map(c=>c.n)),text:ax==='x'?'↔️ İlleri <em>batıdan doğuya</em> doğru sırala':'↕️ İlleri <em>kuzeyden güneye</em> doğru sırala',opts:[],key:'sr'+s.map(c=>c.p).join(),
+       ans:s.map(c=>c.n).join(' → '),info:`${ax==='x'?'Batıdan doğuya':'Kuzeyden güneye'}: <b>${s.map(c=>c.n).join(' → ')}</b>`}}return null},
+ farkli(pool,no,L){for(let t=0;t<30;t++){const r=rnd(REG),same=shuffle(IL.filter(c=>c.r===r)).slice(0,no-1);const odd=rnd(pool.filter(c=>c.r!==r));if(!odd||same.length<no-1)continue;
+     return {type:'farkli',cat:'g',p:odd.p,text:'🔍 Hangisi diğerlerinden <em>farklı bir bölgededir</em>?',opts:shuffle([{l:odd.n,ok:1},...same.map(c=>({l:c.n}))]),key:'fk'+odd.p+r,
+       note:`${same.map(c=>c.n).join(', ')} ${BOLGE[r]} Bölgesi'ndedir; ${odd.n} ise ${BOLGE[odd.r]} Bölgesi'ndedir.`}}return null},
+ tarih(pool,no,L){const ps=new Set(pool.map(c=>c.p));const ev=TARIH.filter(e=>ps.has(e[1]));if(!ev.length)return null;const [q,p,inf]=rnd(ev),c=BYP[p];
+   const ds=pickProvs(no-1,[p],d=>far(p,d.p));if(ds.length<no-1)return null;
+   return {type:'tarih',cat:'h',p,text:'⚔️ '+q,opts:optsP(c,ds),key:'tr'+q,note:inf}}
+};
+function ek(w,suf){const v=[...lc(w)].reverse().find(ch=>'aeıioöuü'.includes(ch))||'a';const back='aıou'.includes(v),last=lc(w).slice(-1),hard='fstkçşhp'.includes(last),vow='aeıioöuü'.includes(last);
+  if(suf==='den')return "'"+(hard?'t':'d')+(back?'a':'e')+'n';return "'"+(vow?'y':'')+(back?'a':'e')}
+
 function nextQ(G){
   const L=LV[S.lv];let types=Object.keys(TYPES).filter(t=>LVORD[S.lv]>=LVORD[TYPES[t].minLv||'o']&&!(G.region&&TYPES[t].genel));
   if(G.cat){types=types.filter(t=>G.cat==='ms'?('ms'.includes(TYPES[t].c)):TYPES[t].c===G.cat)}
@@ -515,17 +594,24 @@ function nextQ(G){
 
 /* ===== GAME FLOW ===== */
 let G=null,timerI=null;
+const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function prng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function startGame(mode,extra={}){
   ac();SFX.click();
-  G={mode,region:extra.region||null,cat:extra.cat||null,total:mode==='marathon'?Infinity:10,n:0,score:0,correct:0,streak:0,maxStreak:0,lives:3,used:new Set(),wrong:[],j:{h50:1,time:1,pass:1},answered:false};
+  G={pl:extra.names?extra.names.map((n,i)=>({n,ic:i?'🔵':'🔴',score:0,correct:0,st:0})):null,mode,region:extra.region||null,cat:extra.cat||null,total:mode==='marathon'?Infinity:10,n:0,score:0,correct:0,streak:0,maxStreak:0,lives:3,used:new Set(),wrong:[],j:{h50:1,time:1,pass:1},answered:false};
+  if(mode==='daily'){G.j.pass=0;const orig=Math.random;Math.random=prng(hashStr('tk'+todayKey()+S.lv));try{G.queue=[];for(let i=0;i<10;i++)G.queue.push(nextQ(G))}finally{Math.random=orig}}
+  if(mode==='duel'){G.total=12;G.j={h50:0,time:0,pass:0}}
   show('quiz');nextQuestion();
 }
-function modeLabel(){if(G.mode==='region')return BOLGE[G.region];if(G.mode==='cat')return G.cat==='ms'?'Maden & Sanayi':CATS[G.cat].n;if(G.mode==='marathon')return 'Maraton';return 'Hızlı Yarışma'}
+function modeLabel(){if(G.mode==='daily')return 'Günün Sorusu';if(G.mode==='duel')return 'Düello';if(G.mode==='region')return BOLGE[G.region];if(G.mode==='cat')return G.cat==='ms'?'Maden & Sanayi':CATS[G.cat].n;if(G.mode==='marathon')return 'Maraton';return 'Hızlı Yarışma'}
 function nextQuestion(){
   $('sheet').classList.remove('on');$('quiz').scrollTop=0;
   if(G.n>=G.total||G.lives<=0)return finish();
-  G.n++;G.q=nextQ(G);G.answered=false;G.t=LV[S.lv].time;G.tmax=G.t;
-  renderQ();startTimer();
+  G.n++;G.q=G.queue?G.queue[G.n-1]:nextQ(G);G.answered=false;if(G.pl){G.turn=(G.n-1)%2;G.streak=G.pl[G.turn].st}G.t=LV[S.lv].time*(G.q.ui?2.2:1);G.tmax=G.t;
+  renderQ();
+  if(G.pl){const p=G.pl[G.turn];modal(`<div style="font-size:60px">${p.ic}</div><h2>Sıra sende, ${p.n}!</h2><p style="color:#9ec3d6">Soru ${Math.ceil(G.n/2)} / ${G.total/2} · Telefonu ${p.n} alsın</p><button class="btn" id="mGo">Hazırım ▶</button>`);$('mGo').onclick=()=>{closeModal();startTimer()}}
+  else startTimer();
 }
 function renderQ(){
   const q=G.q,cat=CATS[q.cat];
@@ -534,7 +620,8 @@ function renderQ(){
   $('scoreP').textContent='⭐ '+G.score;
   $('hearts').textContent=G.mode==='marathon'?'❤️'.repeat(G.lives)+'🖤'.repeat(3-G.lives):'';
   $('streakT').textContent=G.streak>=2?`🔥 ${G.streak} seri`:'';
-  let h=`<div class="cat" style="background:${cat.c}">${cat.ic} ${cat.n}</div><div class="q">${q.text}</div>`;
+  let h=(G.pl?`<div class="duelbar">${G.pl.map((p,i)=>`<span class="${i===G.turn?'on':''}">${p.ic} ${p.n} · ${p.score}</span>`).join('')}</div>`:'')+`<div class="cat" style="background:${cat.c}">${cat.ic} ${cat.n}</div><div class="q">${q.text}</div>`;
+  if(q.shape){const b=bboxes()[q.shape],pd=Math.max(b.w,b.h)*.12;h+=`<svg class="shape" viewBox="${b.x-pd} ${b.y-pd} ${b.w+pd*2} ${b.h+pd*2}"><path d="${MAP[q.shape]}" stroke-width="${Math.max(b.w,b.h)/90}"/></svg>`}
   if(q.map)h+=`<svg class="qmap ${q.map==='tap'?'tapmap':''}" id="qmap" viewBox="15 140 1020 455"></svg>`;
   $('qcard').innerHTML=h;
   if(q.map){mapSVG($('qmap'),{cls:c=>q.map==='pick'&&c.p===q.p?'hl':''});
@@ -542,8 +629,22 @@ function renderQ(){
   const keys='ABCD';
   $('opts').innerHTML=q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${keys[i]}</span>${o.l}</button>`).join('');
   $('opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+  if(q.ui==='match')renderMatch(q);if(q.ui==='order')renderOrder(q);
   $('j50').disabled=!G.j.h50||!q.opts.length||q.opts.length<4;$('jTime').disabled=!G.j.time;$('jPass').disabled=!G.j.pass;
 }
+
+function renderMatch(q){const L=q.pairs.map((p,i)=>({t:p[0],i})),R=shuffle(q.pairs.map((p,i)=>({t:p[1],i})));let sel=null,left=q.pairs.length;q.err=0;
+  $('opts').innerHTML=`<div class="hint">Önce soldan bir il, sonra sağdan eşini seç</div><div class="mgrid"><div>${L.map(o=>`<button class="mb" data-s="L" data-i="${o.i}">${o.t}</button>`).join('')}</div><div>${R.map(o=>`<button class="mb r" data-s="R" data-i="${o.i}">${o.t}</button>`).join('')}</div></div>`;
+  $('opts').querySelectorAll('.mb').forEach(b=>b.onclick=()=>{if(G.answered||b.classList.contains('done'))return;
+    if(b.dataset.s==='L'){$('opts').querySelectorAll('[data-s=L]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=b;SFX.click();return}
+    if(!sel)return toast('Önce soldan bir il seç');
+    if(sel.dataset.i===b.dataset.i){sel.classList.remove('sel');sel.classList.add('done');b.classList.add('done');sel=null;SFX.ok(1);if(--left===0)resolve(q.err===0,'')}
+    else{q.err++;b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');SFX.bad();buzz(30)}})}
+function renderOrder(q){let pos=0;q.err=0;
+  $('opts').innerHTML=`<div class="hint">Sırayla dokun: ${q.text.includes('batı')?'en batıdaki önce':'en kuzeydeki önce'}</div>${q.items.map((t,i)=>`<button class="opt ob" data-t="${t}"><span class="k">?</span>${t}</button>`).join('')}`;
+  $('opts').querySelectorAll('.ob').forEach(b=>b.onclick=()=>{if(G.answered||b.classList.contains('ok'))return;
+    if(b.dataset.t===q.order[pos]){b.classList.add('ok');b.querySelector('.k').textContent=++pos;SFX.click();if(pos===q.order.length)resolve(q.err===0,'')}
+    else{q.err++;b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');SFX.bad();buzz(30);setTimeout(()=>b.classList.remove('bad'),400)}})}
 function startTimer(){clearInterval(timerI);updTimer();timerI=setInterval(()=>{if(G.answered)return;G.t-=.25;if(G.t<=5&&Math.abs(G.t-Math.round(G.t))<.01&&G.t>0)SFX.tick();updTimer();if(G.t<=0)timeout()},250)}
 function updTimer(){$('tFill').style.width=Math.max(0,G.t/G.tmax*100)+'%';$('timer').classList.toggle('low',G.t<=5)}
 function timeout(){if(G.answered)return;resolve(false,null,true)}
@@ -560,7 +661,8 @@ function resolve(ok,given,isTimeout){
     if(G.streak>=3){const e=$('combo');e.textContent=['','','','SÜPER!','HARİKA!','MUHTEŞEM!','EFSANE!'][Math.min(G.streak,6)]+' 🔥'+G.streak;e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}
     const r=$('qcard').getBoundingClientRect();sparkle(r.left+r.width/2,r.top+30,16);
   }else{G.streak=0;SFX.bad();buzz([40,30,40]);if(G.mode==='marathon')G.lives--;
-    const right=q.opts.find(o=>o.ok);G.wrong.push({q:q.text.replace(/<[^>]+>/g,''),a:right?right.l:BYP[q.p].n,p:q.p})}
+    const right=q.opts.find(o=>o.ok);G.wrong.push({q:q.text.replace(/<[^>]+>/g,''),a:q.ui?q.ans:(right?right.l:BYP[q.p].n),p:q.p})}
+  if(G.pl){const p=G.pl[G.turn];p.score+=gain;if(ok)p.correct++;p.st=G.streak}
   $('scoreP').textContent='⭐ '+G.score;
   if(G.mode==='marathon')$('hearts').textContent='❤️'.repeat(Math.max(0,G.lives))+'🖤'.repeat(3-Math.max(0,G.lives));
   save();showSheet(ok,gain,isTimeout);
@@ -588,11 +690,11 @@ function ilFull(c){
 }
 function ilInfo(c){return ilFull(c)}
 function showSheet(ok,gain,isTimeout){
-  const q=G.q,c=q.p?BYP[q.p]:null,right=q.opts.find(o=>o.ok),ans=right?right.l:c.n;
+  const q=G.q,c=q.p?BYP[q.p]:null,right=q.opts.find(o=>o.ok),ans=q.ui?(q.ui==='match'?'Doğru eşleşmeler aşağıda':q.ans):(right?right.l:c.n);
   const last=G.n>=G.total||G.lives<=0;
   const ban=ok?`<div class="banner ok"><span class="ic">✅</span><div><div class="vt">Doğru!</div><div class="va">${ans}</div></div><span class="pts">+${gain} ⭐</span></div>`
-    :`<div class="banner ${isTimeout?'to':'bad'}"><span class="ic">${isTimeout?'⏰':'❌'}</span><div><div class="vt">${isTimeout?'Süre doldu!':'Yanlış!'}</div><div class="va">Doğru cevap: ${ans}</div></div></div>`;
-  $('sheetBody').innerHTML=ban+(q.note?`<div class="bil" style="margin-bottom:10px">🏛️ ${q.note}</div>`:'')+(c?ilFull(c):`<div class="bil">💡 ${q.info||''}</div>`);$('sheetBody').scrollTop=0;
+    :`<div class="banner ${isTimeout?'to':'bad'}"><span class="ic">${isTimeout?'⏰':'❌'}</span><div><div class="vt">${isTimeout?'Süre doldu!':'Yanlış!'}</div><div class="va">${q.ui==='match'?ans:'Doğru cevap: '+ans}</div></div></div>`;
+  $('sheetBody').innerHTML=ban+(q.note?`<div class="bil" style="margin-bottom:10px">${q.type==='unesco'?'🏛️':'📌'} ${q.note}</div>`:'')+(q.ui?`<div class="bil">💡 ${q.info}</div>`:'')+(c?ilFull(c):(q.ui?'':`<div class="bil">💡 ${q.info||''}</div>`));$('sheetBody').scrollTop=0;
   $('sheetFoot').innerHTML=`<button class="btn" id="nextB">${last?'Sonuçları gör 🏁':'Sıradaki soru ▶'}</button>`;
   setTimeout(()=>$('sheet').classList.add('on'),ok?350:650); // short moment to see the coloured answers first
   $('nextB').onclick=()=>{SFX.click();nextQuestion()};
@@ -600,7 +702,7 @@ function showSheet(ok,gain,isTimeout){
 // jokers
 $('j50').onclick=()=>{if(G.answered||!G.j.h50)return;G.j.h50=0;SFX.joker();const bs=$('opts').children;const wrong=shuffle(G.q.opts.map((o,i)=>i).filter(i=>!G.q.opts[i].ok)).slice(0,2);wrong.forEach(i=>bs[i].classList.add('gone'));$('j50').disabled=true};
 $('jTime').onclick=()=>{if(G.answered||!G.j.time)return;G.j.time=0;SFX.joker();G.t+=10;G.tmax=Math.max(G.tmax,G.t);updTimer();$('jTime').disabled=true};
-$('jPass').onclick=()=>{if(G.answered||!G.j.pass)return;G.j.pass=0;SFX.joker();G.q=nextQ(G);G.t=LV[S.lv].time;G.tmax=G.t;renderQ();startTimer()};
+$('jPass').onclick=()=>{if(G.answered||!G.j.pass)return;G.j.pass=0;SFX.joker();G.q=nextQ(G);G.t=LV[S.lv].time*(G.q.ui?2.2:1);G.tmax=G.t;renderQ();startTimer()};
 $('qBack').onclick=()=>{clearInterval(timerI);$('sheet').classList.remove('on');modal(`<h2>Yarışmadan çıkılsın mı?</h2><p style="color:#9ec3d6">Bu oyundaki puanın kaydedilmez.</p><button class="btn gray" id="mStay">Devam et</button><button class="btn" style="background:linear-gradient(#ff6b6b,#d62839);box-shadow:0 5px 0 #7a0f1c" id="mQuit">Çık</button>`);
   $('mStay').onclick=()=>{closeModal();if(!G.answered)startTimer();else $('sheet').classList.add('on')};$('mQuit').onclick=()=>{closeModal();goHome()}};
 
@@ -615,6 +717,7 @@ const BADGES=[
 ];
 function finish(){
   clearInterval(timerI);$('sheet').classList.remove('on');
+  if(G.mode==='duel')return finishDuel();
   const xpGain=Math.round(G.score/10);S.xp+=xpGain;
   const key=G.mode+(G.region||'')+(G.cat||'')+S.lv;const prevBest=S.best[key]||0;const rec=G.score>prevBest;if(rec)S.best[key]=G.score;
   const nb=[];const give=id=>{if(!S.badges[id]){S.badges[id]=1;nb.push(BADGES.find(b=>b.id===id))}};
@@ -623,13 +726,14 @@ function finish(){
   if(G.mode==='quick'&&G.correct===10)give('perf_'+S.lv);
   if(G.mode==='marathon'&&G.correct>=25)give('mar25');
   if(Object.keys(S.disc).length>=81)give('disc81');
+  let dailyMsg='';if(G.mode==='daily'){const k=todayKey();S.daily[k]=S.daily[k]||{};if(S.daily[k][S.lv]===undefined){S.daily[k][S.lv]=G.score;dailyMsg=`<div class="newb">📅 Bugünün puanı kaydedildi: ${G.score}. Yarın yeni sorular!</div>`}else dailyMsg=`<div class="newb">📅 Bugünkü ilk puanın: ${S.daily[k][S.lv]} (tekrar oynamalar sayılmaz)</div>`;const ds=dailyStreak();if(ds>1)dailyMsg+=`<div class="newb">🔥 ${ds} gündür Günün Sorusu'nu çözüyorsun!</div>`}
   save();
   const st=G.mode==='marathon'?(G.correct>=25?3:G.correct>=12?2:G.correct>=5?1:0):(G.correct>=10?3:G.correct>=8?2:G.correct>=5?1:0);
   const msg=st===3?'Muhteşem!':st===2?'Çok iyi!':st===1?'Güzel deneme!':'Tekrar dene!';
   $('resBox').innerHTML=`<div class="res"><div class="pill" style="display:inline-flex">${modeLabel()} · ${LV[S.lv].n}</div><h2>${msg}</h2>
    <div class="stars"><b>⭐</b><b>⭐</b><b>⭐</b></div><div class="big">${G.score}</div><div style="color:#9ec3d6">puan ${rec&&prevBest?'· 🏆 Yeni rekor!':''}</div>
    <div class="statrow"><div class="stat"><b>${G.correct}${G.mode==='marathon'?'':'/'+G.total}</b>doğru</div><div class="stat"><b>🔥${G.maxStreak}</b>en uzun seri</div><div class="stat"><b>+${xpGain}</b>deneyim</div></div>
-   ${nb.map(b=>`<div class="newb">🏅 Yeni rozet: ${b.ic} ${b.n}</div>`).join('')}
+   ${dailyMsg}${nb.map(b=>`<div class="newb">🏅 Yeni rozet: ${b.ic} ${b.n}</div>`).join('')}
    ${G.wrong.length?`<div class="review"><h3>📝 Tekrar etmen gerekenler</h3>${G.wrong.map(w=>`<div>${w.q}<br>→ <b>${w.a}</b> ${w.p?`<span style="color:#9ec3d6">(${BYP[w.p].n})</span>`:''}</div>`).join('')}</div>`:''}
    <button class="btn" id="rAgain">🔁 Tekrar oyna</button><button class="btn gray" id="rHome">🏠 Ana menü</button></div>`;
   show('result');SFX.win();if(st>=2)confetti(st===3?160:90);
@@ -638,6 +742,13 @@ function finish(){
   $('rAgain').onclick=()=>startGame(G.mode,{region:G.region,cat:G.cat});$('rHome').onclick=()=>{SFX.click();goHome()};
 }
 
+function dailyStreak(){let n=0;const d=new Date();for(;;){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(S.daily[k]&&Object.keys(S.daily[k]).length){n++;d.setDate(d.getDate()-1)}else break}return n}
+function finishDuel(){const [a,b]=G.pl;const w=a.score===b.score?null:(a.score>b.score?a:b);SFX.win();confetti(160);
+  $('resBox').innerHTML=`<div class="res"><div class="pill" style="display:inline-flex">⚔️ Düello · ${LV[S.lv].n}</div><div style="font-size:70px;margin-top:8px">${w?'🏆':'🤝'}</div><h2>${w?w.ic+' '+w.n+' kazandı!':'Berabere!'}</h2>
+   <div class="statrow">${G.pl.map(p=>`<div class="stat"><b>${p.ic} ${p.score}</b>${p.n} · ${p.correct}/${G.total/2} doğru</div>`).join('')}</div>
+   ${G.wrong.length?`<div class="review"><h3>📝 Birlikte tekrar edin</h3>${G.wrong.map(w=>`<div>${w.q}<br>→ <b>${w.a}</b></div>`).join('')}</div>`:''}
+   <button class="btn" id="rAgain">🔁 Rövanş</button><button class="btn gray" id="rHome">🏠 Ana menü</button></div>`;
+  show('result');$('rAgain').onclick=()=>startGame('duel',{names:G.pl.map(p=>p.n)});$('rHome').onclick=()=>{SFX.click();goHome()}}
 /* ===== HOME ===== */
 function renderHome(){
   mapSVG($('heroMap'),{fill:c=>S.disc[c.p]?RCOL[c.r]:RCOL[c.r]+'55'});
@@ -645,6 +756,7 @@ function renderHome(){
   const T=titleOf(S.xp);$('titlePill').textContent=T.t;$('lvlName').textContent=T.t;$('xpTxt').textContent=S.xp;
   $('xpNext').textContent=T.next?`${S.xp} / ${T.next[0]}`:'En yüksek unvan!';$('xpFill').style.width=(T.next?(S.xp-T.from)/(T.next[0]-T.from)*100:100)+'%';
   const d=Object.keys(S.disc).length;$('discTxt').textContent=d+'/81';$('discFill').style.width=(d/81*100)+'%';
+  const dk=(S.daily[todayKey()]||{})[S.lv];$('dailyTxt').textContent=dk!==undefined?`✅ Bugün: ${dk} puan`:'Bugünün 10 sorusu hazır!';
   const bc=BADGES.filter(b=>S.badges[b.id]).length;$('bdgTxt').textContent=bc+'/'+BADGES.length;
   $('badges').innerHTML=BADGES.map(b=>`<button class="bdg ${S.badges[b.id]?'on':''}" data-b="${b.id}">${b.ic}</button>`).join('');
   $('badges').querySelectorAll('.bdg').forEach(e=>e.onclick=()=>{const b=BADGES.find(x=>x.id===e.dataset.b);toast(`${b.ic} ${b.n}: ${S.badges[b.id]?'Kazanıldı ✓':b.d}`)});
@@ -659,6 +771,10 @@ $('mCat').onclick=()=>{SFX.click();const cs=[['h','#7b2cbf'],['y','#e8590c'],['t
    ${S.lv==='o'?'<p style="font-size:12px;color:#9ec3d6;margin-top:8px">Maden & Sanayi soruları Lise ve Yetişkin seviyesinde.</p>':''}<button class="btn gray" id="mX">Kapat</button>`);
   document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(k==='ms'&&S.lv==='o'){S.lv='l';save();renderHome();toast('Seviye Lise yapıldı')}closeModal();startGame('cat',{cat:k})});$('mX').onclick=closeModal};
 $('mAtlas').onclick=()=>{SFX.click();openAtlas()};
+$('mDaily').onclick=()=>startGame('daily');
+$('mDuel').onclick=()=>{SFX.click();const nm=S.duelNames||['Oyuncu 1','Oyuncu 2'];modal(`<h2>⚔️ Düello</h2><p style="color:#9ec3d6;font-size:14px">Telefon sırayla elden ele geçer. Her oyuncuya 6 soru.</p>
+  <input id="dn1" class="dn" value="${nm[0]}" maxlength="12"><input id="dn2" class="dn" value="${nm[1]}" maxlength="12"><button class="btn" id="dGo">Başla ⚔️</button><button class="btn gray" id="mX">Vazgeç</button>`);
+  $('mX').onclick=closeModal;$('dGo').onclick=()=>{const n=[$('dn1').value.trim()||'Oyuncu 1',$('dn2').value.trim()||'Oyuncu 2'];S.duelNames=n;save();closeModal();startGame('duel',{names:n})}};
 $('setBtn').onclick=()=>{SFX.click();modal(`<h2>⚙️ Ayarlar</h2><div class="set"><span>🔊 Ses</span><button class="sw ${S.sound?'on':''}" id="swS"></button></div>
   <div class="set"><span>❓ Nasıl oynanır?</span><button class="iconbtn" id="howB" style="width:40px;height:36px">▶</button></div>
   <button class="btn" style="background:linear-gradient(#ff6b6b,#d62839);box-shadow:0 5px 0 #7a0f1c" id="rst">İlerlemeyi sıfırla</button><button class="btn gray" id="mX">Kapat</button>`);
