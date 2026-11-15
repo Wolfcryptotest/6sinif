@@ -91,9 +91,17 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
 .banner.to{background:linear-gradient(90deg,#e8590c,#ffa94d)}
 .banner .ic{font-size:34px}
 .banner .pts{margin-left:auto;font-size:20px;color:#fff6c2;white-space:nowrap}
-.bigmap{width:100%;max-height:24vh;border-radius:16px;display:block;background:#0e2230;box-shadow:inset 0 0 0 2px #ffffff14}
-.bigmap path{fill:#3b6378;stroke:#132a38;stroke-width:1.5}
-.bigmap path.hl{fill:#ffd166}
+.bigmap{width:100%;max-height:32vh;border-radius:16px;display:block;box-shadow:inset 0 0 0 2px #ffffff14}
+.bigmap .sea{fill:#4f7590}
+.bigmap path{fill:#d9cfb8;stroke:#7d7363;stroke-width:1.2;stroke-linejoin:round}
+.bigmap path.nb{fill:#efe6cf;stroke:#5b5246;stroke-width:1.4}
+.bigmap path.hl{fill:#ff8c42;stroke:#7a2e00;stroke-width:3}
+.bigmap .pl{font-family:inherit;font-weight:700;fill:#5b5246;text-anchor:middle;dominant-baseline:middle;paint-order:stroke;stroke:#f6f0e0;stroke-width:3px;stroke-linejoin:round}
+.bigmap .pl.nbl{fill:#2f2a24;font-weight:800}
+.bigmap .pl.hll{fill:#fff;stroke:#7a2e00;stroke-width:5px;font-weight:800}
+.bigmap .insbg{fill:#4f7590;stroke:#fff;stroke-width:1.5;opacity:.95}
+.bigmap .ip{fill:#d9cfb8;stroke:none}.bigmap .ihl{fill:#ff8c42;stroke:#7a2e00;stroke-width:4}
+.bigmap .iview{fill:none;stroke:#fff;stroke-width:10}
 .ilhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 6px}
 .ilhead .nm{font-size:26px;font-weight:800;line-height:1}
 .tag{background:#0006;border-radius:10px;padding:2px 9px;font-size:13px;font-weight:700;color:#cfe3ee}
@@ -557,9 +565,21 @@ function resolve(ok,given,isTimeout){
   if(G.mode==='marathon')$('hearts').textContent='❤️'.repeat(Math.max(0,G.lives))+'🖤'.repeat(3-Math.max(0,G.lives));
   save();showSheet(ok,gain,isTimeout);
 }
-function zoomMap(p,cls){const b=bboxes()[p],W=Math.max(b.w*2.4,340),H=W*0.5,cx=b.x+b.w/2,cy=b.y+b.h/2;
-  let h=`<svg class="${cls}" viewBox="${cx-W/2} ${cy-H/2} ${W} ${H}">`;for(const c of IL)h+=`<path d="${MAP[c.p]}" class="${c.p===p?'hl':''}"/>`;
-  return h+`<circle cx="${cx}" cy="${cy}" r="${Math.max(b.w,b.h)*0.72+10}" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="8 6" opacity=".85"/></svg>`}
+function zoomMap(p,cls){const B=bboxes(),b=B[p],W=Math.max(b.w*3.2,330),H=W*0.56,cx=b.x+b.w/2,cy=b.y+b.h/2,x0=cx-W/2,y0=cy-H/2,fs=W/30,nb=new Set(LINK[p]||[]);
+  let h=`<svg class="${cls}" viewBox="${x0} ${y0} ${W} ${H}"><rect x="${x0}" y="${y0}" width="${W}" height="${H}" class="sea"/>`;
+  for(const c of IL){if(c.p===p)continue;h+=`<path d="${MAP[c.p]}" class="${nb.has(c.p)?'nb':''}"/>`}
+  h+=`<path d="${MAP[p]}" class="hl"/>`;
+  const iw=W*.27,ih=iw*455/1020,ix=x0+W-iw-fs*.4,iy=y0+fs*.4;
+  const placed=[[ix+iw/2,iy+ih/2,iw,ih]],fits=(x,y,w,hh)=>!placed.some(r=>Math.abs(r[0]-x)<(r[2]+w)/2&&Math.abs(r[1]-y)<(r[3]+hh)/2),put=(x,y,w,hh)=>placed.push([x,y,w,hh]);
+  const hn=IL.find(c=>c.p===p).n,hfs=fs*1.35,hw=hn.length*hfs*.56;let hy=cy;if(hw>b.w*1.1){hy=b.y-hfs*.65;if(hy<y0+hfs)hy=b.y+b.h+hfs*.65}
+  let lab=`<text x="${cx}" y="${hy}" class="pl hll" font-size="${hfs}">${hn}</text>`;put(cx,hy,hw,hfs);put(cx,cy,b.w*.8,b.h*.8);
+  const cand=IL.filter(c=>c.p!==p).map(c=>({c,q:B[c.p],n:nb.has(c.p)})).sort((u,v)=>(v.n-u.n)||(v.q.w*v.q.h-u.q.w*u.q.h));
+  for(const {c,q,n} of cand){const lx=q.x+q.w/2,ly=q.y+q.h/2,f=fs*(n?1:.85),w=c.n.length*f*.56;if(lx-w/2<x0+2||lx+w/2>x0+W-2||ly<y0+f||ly>y0+H-f*.5)continue;
+    if(!n&&q.w<W/9)continue;let yy=null,xx=lx;const offs=n?[[0,0],[0,.7],[0,-.7],[-.35,0],[.35,0],[-.35,.8],[.35,.8],[0,1.4],[0,-1.4]]:[[0,0]];for(const [dx,dy] of offs){const tx=lx+dx*w,ty=ly+dy*f;if(tx-w/2<x0+2||tx+w/2>x0+W-2)continue;if(fits(tx,ty,w,f*1.05)){yy=ty;xx=tx;break}}if(yy===null)continue;put(xx,yy,w,f*1.05);lab+=`<text x="${xx}" y="${yy}" class="pl${n?' nbl':''}" font-size="${f}">${c.n}</text>`}
+  let ins=`<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="${fs*.3}" class="insbg"/><svg x="${ix}" y="${iy}" width="${iw}" height="${ih}" viewBox="15 140 1020 455">`;
+  for(const c of IL)ins+=`<path d="${MAP[c.p]}" class="${c.p===p?'ihl':'ip'}"/>`;
+  ins+=`<rect x="${x0}" y="${y0}" width="${W}" height="${H}" class="iview"/></svg>`;
+  return h+lab+ins+'</svg>'}
 const FLAB={h:'Tarihi ve doğal güzellikler',y:'Lezzetler',t:'Tarım ve hayvancılık',m:'Yer altı zenginlikleri',s:'Sanayi ve el sanatları'};
 function ilFull(c){
   return `${zoomMap(c.p,'bigmap')}<div class="ilhead"><span class="nm">${c.n}</span><span class="tag">🚗 ${String(c.p).padStart(2,'0')}</span><span class="tag" style="background:${RCOL[c.r]}33">${BOLGE[c.r]} Bölgesi</span></div>
