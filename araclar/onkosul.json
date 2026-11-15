@@ -65,5 +65,53 @@
     "mat10k2": ["7:m4k1"],
     "mat11k1": ["7:m5k3", "7:m6k1"],
     "mat11k2": ["7:m5k2"]
+  },
+  "9": {
+    "mat1k1": ["8:mat2k2", "8:mat3k2"],
+    "mat1k2": ["8:mat8k1", "8:mat3k2"],
+    "mat1k3": ["7:m1k3", "8:mat3k2"],
+    "mat1k4": ["8:mat6k2", "8:mat6k1"],
+    "mat2k1": ["8:mat7k2"],
+    "mat2k2": ["8:mat7k2", "8:mat7k1"],
+    "mat3k1": ["8:mat9k1", "8:mat9k2"],
+    "mat3k2": ["8:mat10k1", "7:m2k2"],
+    "mat4k1": ["7:m8k1", "8:mat4k1"],
+    "mat4k2": ["8:mat5k1", "7:m9k1"]
+  },
+  "10": {
+    "mat1k1": ["8:mat1k2", "8:mat1k1"],
+    "mat2k1": ["8:mat9k2", "9:mat3k2"],
+    "mat2k2": ["9:mat3k1", "8:mat9k2"],
+    "mat3k1": ["9:mat4k1"],
+    "mat4k1": ["9:mat2k1", "9:mat1k4"],
+    "mat5k1": ["8:mat5k1"],
+    "mat5k2": ["9:mat4k2"]
+  },
+  "11": {
+    "mat11i1": ["10:mat3k1", "9:mat2k2"],
+    "mat11g1": ["9:mat3k1", "7:m6k2"],
+    "mat11g2": ["9:mat3k1"],
+    "mat1k1": ["10:mat2k1"],
+    "mat1k2": ["10:mat2k2", "10:mat2k1"],
+    "mat1k3": ["10:mat2k1", "9:mat2k1"],
+    "mat2k1": ["9:mat2k2", "8:mat9k2"],
+    "mat3k1": ["10:mat4k1", "9:mat1k4"],
+    "mat4k1": ["7:m6k1", "9:mat3k1"],
+    "mat4k2": ["10:mat5k2", "10:mat5k1"],
+    "mat11u1": ["9:mat1k1", "9:mat2k1"],
+    "mat11u2": ["9:mat1k1"],
+    "mat11f1": ["9:mat2k1", "10:mat4k1"]
+  },
+  "12": {
+    "mat1k1": ["11:mat11u1", "11:mat11u2"],
+    "mat2k1": ["9:mat2k2", "9:mat1k1"],
+    "mattr1": ["11:mat1k1", "11:mat1k3"],
+    "mattr2": ["11:mat1k3", "11:mat1k1"],
+    "matdn1": ["8:mat10k2", "11:mat2k1"],
+    "matlm1": ["11:mat11f1", "10:mat4k1"],
+    "mat3k1": ["11:mat2k1", "11:mat11f1"],
+    "mat3k2": ["11:mat3k1", "11:mat11f1"],
+    "mat4k1": ["11:mat3k1", "7:m6k2"],
+    "matcm1": ["11:mat2k1", "11:mat4k1"]
   }
 }
