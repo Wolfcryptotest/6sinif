@@ -40,7 +40,7 @@ Bir metinde yazarın okura vermek istediği mesaja ne denir? | Ana fikir | Konu 
 "Elif her gün düzenli kitap okudu. Bir yıl sonra okuma hızı ve kelime bilgisi çok arttı." Ana fikir nedir? | Düzenli okumak bizi geliştirir | Elif'in kitabı vardır ; Bir yıl uzundur | Düzenli okumanın faydası anlatılıyor.
 Metnin konusu genellikle nasıl ifade edilir? | Birkaç kelimeyle | Uzun bir paragrafla ; Bir soruyla | Örnek: "Ağaç dikmenin önemi".
 "Ormanlar canlıların yaşam alanıdır. Ağaçlar havayı temizler. Ormanları korumalıyız." Metnin konusu nedir? | Ormanların önemi | Hayvanların beslenmesi ; Deniz kirliliği | Metin ormanlar hakkındadır.
-Yukarıdaki türden bir orman metninin ana fikri hangisi olur? | Ormanları korumalıyız | Ağaçlar yeşildir ; Ormanda yürüdüm | Ana fikir yazarın verdiği mesajdır.
+Ormanların önemini anlatan bir metnin ana fikri hangisi olabilir? | Ormanları korumalıyız | Ağaçlar yeşildir ; Ormanda yürüdüm | Ana fikir yazarın verdiği mesajdır.
 Başlık ile konu arasındaki ilişki nasıldır? | Başlık konuyu ya da ana fikri yansıtır | Başlığın konuyla ilgisi olmaz ; Başlık her zaman bir isimdir | Başlık metnin içeriğine uygun olmalıdır.
 "Mert arkadaşına yalan söyledi. Arkadaşı bunu öğrenince ona güvenmez oldu." Ana fikir nedir? | Yalan güveni yok eder | Mert'in arkadaşı vardır ; Arkadaşlar oyun oynar | Olaydan çıkarılan ders ana fikirdir.
 "Su hayatımız için çok önemlidir. Dişlerimizi fırçalarken musluğu kapatmalıyız." Ana fikir nedir? | Suyu tasarruflu kullanmalıyız | Diş fırçası mavidir ; Su soğuktur | Metin su tasarrufunu öğütlüyor.

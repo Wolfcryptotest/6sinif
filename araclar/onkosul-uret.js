@@ -25,6 +25,8 @@ for (const [g, m] of Object.entries(harita)) {
     await yukle(g);
     const r = await p.evaluate((ids) => {
       const out = {};
+      // Görünmeyen bir metne/görsele dayanan sorular temel kontrolünde gösterilemez
+      const BAGLAM = /yukarıdaki|görseldeki|resimdeki|tablodaki|grafikteki|şekildeki/i;
       // 1–4. sınıflar: DERS[dk].temalar[].konular[] ve k.uret() (oyun görevleri). Yalnızca görselsiz çoktan seçmeli
       // görevler alınır; görselsiz sayı cevaplı görevler, basamak hatalarına dayanan çeldiricilerle çoktan seçmeliye çevrilir.
       if (typeof ICERIK === "undefined" && typeof DERS !== "undefined") {
@@ -36,7 +38,7 @@ for (const [g, m] of Object.entries(harita)) {
           const gor = new Map();
           for (let t = 0; t < 400 && gor.size < 12; t++) {
             let q; try { q = k.uret(); } catch (e) { continue; }
-            if (!q || !q.soru || q.gorsel || q.ses) continue;
+            if (!q || !q.soru || q.gorsel || q.ses || BAGLAM.test(q.soru)) continue;
             let o, a = 0;
             if (q.tip === "secim" && Array.isArray(q.secenekler) && q.secenekler.length >= 3) { o = q.secenekler.map(String); a = typeof q.dogru === "number" ? q.dogru : o.indexOf(String(q.dogru)); }
             else if (q.tip === "sayi" && Number.isInteger(q.cevap) && q.cevap >= 0) {
@@ -53,14 +55,17 @@ for (const [g, m] of Object.entries(harita)) {
       }
       for (const id of ids) {
         const f = konuBul(id); if (!f) { out[id] = null; continue; }
-        const k = f.konu, gor = new Map();
+        const k = f.konu, gor = new Map(), oto = new Map();
+        // Konu metninden otomatik üretilen boşluk doldurma soruları (soru-ekle.js) yalnızca yedek olarak kullanılır
         const ekle = (q) => {
-          if (!q || Array.isArray(q) || !q.soru || !Array.isArray(q.secenekler) || q.secenekler.length < 3 || q.ses) return;
+          if (q && q.otomatik) { if (q.soru && Array.isArray(q.secenekler) && q.secenekler.length >= 3 && !oto.has(q.soru.trim())) oto.set(q.soru.trim(), q); return; }
+          if (!q || Array.isArray(q) || !q.soru || BAGLAM.test(q.soru) || !Array.isArray(q.secenekler) || q.secenekler.length < 3 || q.ses) return;
           const o = q.secenekler.map(String), a = typeof q.dogru === "number" ? q.dogru : o.indexOf(String(q.dogru));
           if (new Set(o).size !== o.length || a < 0 || a >= o.length || gor.has(q.soru.trim())) return;
           gor.set(q.soru.trim(), [q.soru, o, a, q.cozum || ""]);
         };
-        for (let t = 0; t < 4 && gor.size < 12; t++) { try { (soruHazirla(k, 12) || []).forEach(ekle); } catch (e) {} }
+        for (let t = 0; t < 6 && gor.size < 12; t++) { try { (soruHazirla(k, 12) || []).forEach(ekle); } catch (e) {} }
+        if (gor.size < 6) for (const q of oto.values()) { delete q.otomatik; ekle(q); }
         out[id] = { ad: k.ad, ders: (ICERIK[f.ders] && ICERIK[f.ders].ad) || f.ders, sorular: [...gor.values()].slice(0, 12) };
       }
       return out;

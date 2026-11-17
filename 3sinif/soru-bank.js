@@ -65,7 +65,7 @@ Hangisi gerçek bir varlıktır? | Penguen | Deniz kızı ; Tek boynuzlu at | Pe
 t15: `Bir metnin bize vermek istediği mesaja ne denir? | Ana fikir | Başlık ; Kahraman | Ana fikir metnin öğüdüdür.
 Metne konan ve onu en iyi anlatan ada ne denir? | Başlık | Ana fikir ; Paragraf | Başlık metnin içeriğine uygun olmalıdır.
 "Arı her gün çiçek çiçek dolaştı. Sonunda kovanı balla doldu." Ana fikir nedir? | Çalışan kazanır | Arılar uçar ; Çiçekler güzeldir | Çalışmanın sonucu güzel olur.
-Yukarıdaki arı metnine hangi başlık uygundur? | Çalışkan Arı | Mavi Deniz ; Tembel Kedi | Başlık metnin konusunu yansıtır.
+Arıların çalışkanlığını anlatan bir metne hangi başlık uygundur? | Çalışkan Arı | Mavi Deniz ; Tembel Kedi | Başlık metnin konusunu yansıtır.
 "Can oyuncaklarını kardeşiyle paylaştı. İkisi birlikte çok eğlendi." Ana fikir nedir? | Paylaşmak mutluluk verir | Oyuncaklar pahalıdır ; Can'ın kardeşi küçüktür | Paylaşınca mutluluk artar.
 "Defne her gece dişlerini fırçaladı. Diş doktoru dişlerinin çok sağlıklı olduğunu söyledi." Ana fikir nedir? | Diş fırçalamak dişleri korur | Doktorlar beyaz giyer ; Gece karanlıktır | Düzenli bakımın faydası anlatılıyor.
 "Ali yalan söyledi, kimse ona inanmaz oldu." metnine en uygun başlık hangisidir? | Yalanın Sonu | Güzel Bir Gün ; Bahçedeki Çiçek | Başlık olayı yansıtır.
