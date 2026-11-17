@@ -552,4 +552,20 @@
   // ---------- Başlat ----------
   window.APP_TEST = { K: () => K, tumKonular, gun, seri };
   git(anaSayfa);
+  // Bağlantıyla gelen konu (?konu=<id>&temel=5:<konuId>&ad=...): 5. sınıfın ön koşul kontrolünden "temel tamamlama" için gelinir
+  try {
+    const q = new URLSearchParams(location.search), kid = q.get("konu");
+    const f = kid && tumKonular().find((x) => x.k.id === kid);
+    if (f) {
+      const temel = (q.get("temel") || "").match(/^(\d+):([\w-]+)$/), ad = q.get("ad") || "";
+      history.replaceState(null, "", location.pathname);
+      git(() => {
+        konuSayfa(f.d, f.k);
+        if (!temel) return;
+        const yer = (temel[1] === "6" ? "../index.html" : "../" + temel[1] + "sinif/index.html") + "?konu=" + encodeURIComponent(temel[2]);
+        ekran.prepend($(`<div class="temel-serit" style="background:color-mix(in srgb,#7c3aed 10%,#fff);border:2px solid #c4b5fd;border-radius:20px;padding:12px 14px;margin-bottom:12px;font-size:17px;line-height:1.45">🧱 <b>Temel tamamlama</b> · ${temel[1]}. sınıftaki <b>${esc(ad || "konun")}</b> için buradasın. Önce Bilgin anlatsın, sonra oyna. Hazır olunca geri dön.
+          <a class="buyukbtn ikincil" style="display:block;text-decoration:none;text-align:center;margin-top:10px" href="${esc(yer)}">↩️ ${temel[1]}. sınıfa geri dön</a></div>`));
+      }, f.k.ad);
+    }
+  } catch (e) {}
 })();

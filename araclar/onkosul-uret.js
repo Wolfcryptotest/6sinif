@@ -25,6 +25,32 @@ for (const [g, m] of Object.entries(harita)) {
     await yukle(g);
     const r = await p.evaluate((ids) => {
       const out = {};
+      // 1–4. sınıflar: DERS[dk].temalar[].konular[] ve k.uret() (oyun görevleri). Yalnızca görselsiz çoktan seçmeli
+      // görevler alınır; görselsiz sayı cevaplı görevler, basamak hatalarına dayanan çeldiricilerle çoktan seçmeliye çevrilir.
+      if (typeof ICERIK === "undefined" && typeof DERS !== "undefined") {
+        const N = (n) => (Math.abs(n) >= 1000 ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : String(n));
+        for (const id of ids) {
+          let k = null, dad = "";
+          for (const [dk, d] of Object.entries(DERS)) for (const t of d.temalar || []) for (const x of t.konular) if (x.id === id) { k = x; dad = d.ad || dk; }
+          if (!k || typeof k.uret !== "function") { out[id] = null; continue; }
+          const gor = new Map();
+          for (let t = 0; t < 400 && gor.size < 12; t++) {
+            let q; try { q = k.uret(); } catch (e) { continue; }
+            if (!q || !q.soru || q.gorsel || q.ses) continue;
+            let o, a = 0;
+            if (q.tip === "secim" && Array.isArray(q.secenekler) && q.secenekler.length >= 3) { o = q.secenekler.map(String); a = typeof q.dogru === "number" ? q.dogru : o.indexOf(String(q.dogru)); }
+            else if (q.tip === "sayi" && Number.isInteger(q.cevap) && q.cevap >= 0) {
+              const n = q.cevap, d = n >= 1000 ? 100 : n >= 100 ? 10 : 1, b = q.birim ? " " + q.birim : "";
+              const ad = [...new Set([n + d, n - d, n + 10 * d, n + 2 * d, n - 10 * d].filter((x) => x >= 0 && x !== n))].slice(0, 3);
+              o = [n, ...ad].map((x) => N(x) + b);
+            } else continue;
+            if (new Set(o).size !== o.length || a < 0 || a >= o.length || gor.has(q.soru.trim())) continue;
+            gor.set(q.soru.trim(), [q.soru, o, a, q.cozum || ""]);
+          }
+          out[id] = { ad: k.ad, ders: dad, sorular: [...gor.values()].slice(0, 12) };
+        }
+        return out;
+      }
       for (const id of ids) {
         const f = konuBul(id); if (!f) { out[id] = null; continue; }
         const k = f.konu, gor = new Map();

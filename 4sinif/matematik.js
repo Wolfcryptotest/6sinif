@@ -134,7 +134,7 @@
     [2, () => { const t = pick([["İki şehir arası uzaklık", "km"], ["Bir silginin boyu", "cm"], ["Sınıfın uzunluğu", "m"], ["Bir karıncanın boyu", "mm"]]); return secim(`${t[0]} hangi birimle ölçülür?`, t[1], ["km", "m", "cm", "mm"].filter((x) => x !== t[1]), ""); }]
   ]);
   const cevreAlan = tiplerden([
-    [3, () => { const a = r(3, 15), b = r(3, 15); if (a === b) return null; return sayi(`Kısa kenarı ${a} cm, uzun kenarı ${b} cm olan dikdörtgenin çevresi kaç cm?`, 2 * (a + b), `2 × (${a} + ${b})`, { birim: "cm" }); }],
+    [3, () => { const x = r(3, 15), y = r(3, 15); if (x === y) return null; const a = Math.min(x, y), b = Math.max(x, y); return sayi(`Kısa kenarı ${a} cm, uzun kenarı ${b} cm olan dikdörtgenin çevresi kaç cm?`, 2 * (a + b), `2 × (${a} + ${b})`, { birim: "cm" }); }],
     [3, () => { const a = r(2, 12); return sayi(`Bir kenarı ${a} cm olan karenin çevresi kaç cm?`, 4 * a, `4 × ${a}`, { birim: "cm" }); }],
     [3, () => { const a = r(2, 6), b = r(2, 6); return sayi("Şekil kaç birimkareden oluşur? (Alanı kaç birimkaredir?)", a * b, `${a} × ${b} = ${a * b}`, { gorsel: `<div style="font-size:30px;line-height:1">${("🟩".repeat(a) + "<br>").repeat(b)}</div>` }); }],
     [2, () => { const c = r(4, 12) * 4; return sayi(`Çevresi ${c} cm olan karenin bir kenarı kaç cm?`, c / 4, `${c} ÷ 4`, { birim: "cm" }); }]
