@@ -220,7 +220,7 @@
     if (!plan.length) return { html: "Bugün için her şey yolunda! 🎉 İstediğin bir konudan soru çözebilirsin." };
     return {
       html: `📋 <b>Bugünkü çalışma planın</b> (yaklaşık ${plan.length * 10} dakika):<br>${plan.map((p, i) => `${i + 1}. <b>${esc(p.x.k.ad)}</b> <small>(${esc(dersA(p.x.dk))} · ${p.neden})</small>`).join("<br>")}<br><small>Her konuda önce kısa anlatımı oku, sonra 5 soru çöz. Bitirince bir sonrakine geç. Ara vermeyi unutma! 🦉</small>`,
-      btn: plan.map((p) => btn(p.x, p.neden === "yeni konu" ? "📖" : "✏️")).map((b, i) => (plan[i].neden === "yeni konu" ? [b[0], "konu:" + plan[i].x.k.id] : b))
+      btn: (window.OZEL_DERS ? [["🎓 Bugünkü dersim (10 dk)", "ozelders"]] : []).concat(plan.map((p) => btn(p.x, p.neden === "yeni konu" ? "📖" : "✏️")).map((b, i) => (plan[i].neden === "yeni konu" ? [b[0], "konu:" + plan[i].x.k.id] : b)))
     };
   }
   function sonYanlis() {
@@ -303,6 +303,7 @@
       kutu.querySelectorAll("[data-e]").forEach((b) => (b.onclick = () => {
         const e = b.dataset.e;
         if (e.startsWith("say:")) return gonder(e.slice(4));
+        if (e === "ozelders") return window.OZEL_DERS && window.OZEL_DERS.ac();
         if (e === "program") return window.PROGRAM_AC ? window.PROGRAM_AC() : alert("Ders programı bu sınıfta yok.");
         const [tur, id] = e.split(":"), k = konuBulK(id); if (!k) return;
         if (tur === "konu") git(() => konuSayfa(k), k.ad);
