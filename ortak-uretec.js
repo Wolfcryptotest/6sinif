@@ -7,11 +7,18 @@ window.UR = (function () {
   const buyuk = (s) => s.charAt(0).toLocaleUpperCase("tr") + s.slice(1);
 
   // doğru şık + yanlış şık havuzundan 3 benzersiz yanlış seçer
+  // Yanılgı etiketli yanlış şık (A4): Y(değer, "d:...") dikkat hatası, Y(değer, "k:...") kavram yanılgısı
+  const Y = (v, e) => ({ v, e });
   function soru(metin, dogru, havuz, cozum) {
-    const s = [String(dogru)];
-    for (const x of karistir(havuz)) { const t = String(x); if (s.length < 4 && t && !s.includes(t)) s.push(t); }
+    const s = [String(dogru)], yan = {};
+    for (const x of karistir(havuz)) {
+      const et = x && typeof x === "object" ? x.e : null, t = String(et ? x.v : x);
+      if (s.length < 4 && t && !s.includes(t)) { s.push(t); if (et) yan[t] = et; }
+    }
     if (s.length < 4) return null; // yeterli şık yok
-    return { soru: metin, secenekler: s, dogru: 0, cozum, uretildi: true };
+    const q = { soru: metin, secenekler: s, dogru: 0, cozum, uretildi: true };
+    if (Object.keys(yan).length) q.yanilgi = yan;
+    return q;
   }
 
   // Birden çok soru tipinden rastgele biri; null dönerse başkasını dener
@@ -51,5 +58,5 @@ window.UR = (function () {
     ]);
   }
 
-  return { r, pick, karistir, buyuk, soru, tiplerden, eslestir, siniflandir, ifadeler };
+  return { r, pick, karistir, buyuk, soru, Y, tiplerden, eslestir, siniflandir, ifadeler };
 })();

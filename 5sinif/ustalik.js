@@ -67,8 +67,35 @@
   };
   const sayim = (konular) => { const c = [0, 0, 0, 0]; konular.forEach((k) => c[seviye(k.id)]++); return c; };
   const cubuk = (c) => { const t = c.reduce((a, b) => a + b, 0) || 1; return `<span style="display:flex;height:6px;border-radius:4px;overflow:hidden;margin-top:6px;background:${SEVIYE[0].renk}">${[3, 2, 1].map((s) => `<i style="width:${(c[s] / t) * 100}%;background:${SEVIYE[s].renk}"></i>`).join("")}</span>`; };
+  // ---------- Hata türü teşhisi (A4) ----------
+  // Üreteçler yanlış şıklara etiket koyar: s.yanilgi = { "şık metni": "d:..." (dikkat hatası) | "k:..." (kavram yanılgısı) }.
+  // Teşhis edilebilen soruda etiketsiz yanlış şık "bilmiyor" sayılır. Veri: kayit.hataTuru = { konuId: { d, k, b, e: { etiket: sayı } } }.
+  const HT = (kayit.hataTuru = kayit.hataTuru || {});
+  const hataTeshis = (s, secilen) => {
+    if (!s || !s.yanilgi || secilen == null || String(secilen) === String(s.secenekler[s.dogru])) return null;
+    const t = s.yanilgi[secilen];
+    if (!t) return { tur: "b" };
+    const m = /^([dk]):(.+)$/.exec(t);
+    return m ? { tur: m[1], etiket: m[2] } : { tur: "k", etiket: t };
+  };
+  const hataKaydet = (s, secilen) => {
+    const t = hataTeshis(s, secilen); if (!t || !s.konuId) return t;
+    const h = HT[s.konuId] || (HT[s.konuId] = { d: 0, k: 0, b: 0, e: {} });
+    h[t.tur]++; if (t.etiket) { h.e[t.etiket] = (h.e[t.etiket] || 0) + 1; }
+    const et = Object.entries(h.e); if (et.length > 12) { et.sort((x, y) => x[1] - y[1]); delete h.e[et[0][0]]; }
+    kaydet(); return t;
+  };
+  // ek: teşhisin ardından söylenecek cümle (verilmezse çözümü okumaya yönlendirir)
+  const hataHtml = (t, ek) => !t || t.tur === "b" || !t.etiket ? "" : t.tur === "d"
+    ? `<div class="hata-teshis dikkat">🦉 <b>Bilge'nin teşhisi: dikkat hatası.</b> ${esc(buyukH(t.etiket))}. ${ek || "Konuyu biliyor olabilirsin; işlemi adım adım kontrol et ve sorunun ne istediğini yeniden oku."}</div>`
+    : `<div class="hata-teshis kavram">🦉 <b>Bilge'nin teşhisi: kavram yanılgısı.</b> ${esc(buyukH(t.etiket))}. ${ek || "Bu çok sık yapılan bir yanılgı; aşağıdaki çözümü dikkatle oku."}</div>`;
+  const buyukH = (x) => String(x).charAt(0).toLocaleUpperCase("tr") + String(x).slice(1);
+  const stH = document.createElement("style");
+  stH.textContent = ".hata-teshis{border-radius:12px;padding:9px 12px;margin:8px 0;font-size:15.5px;line-height:1.45}.hata-teshis.dikkat{background:color-mix(in srgb,#0ea5e9 13%,var(--kart));border:1px solid color-mix(in srgb,#0ea5e9 45%,var(--sinir))}.hata-teshis.kavram{background:color-mix(in srgb,#a855f7 13%,var(--kart));border:1px solid color-mix(in srgb,#a855f7 45%,var(--sinir))}";
+  document.head.appendChild(stH);
+
   window.USTALIK = {
-    cip, konuYazi,
+    cip, konuYazi, hataTeshis, hataKaydet, hataHtml,
     uniteCubuk: (u) => cubuk(sayim(u.konular)),
     uniteOzet: (u) => { const c = sayim(u.konular); return `${u.konular.length} konu${c[3] ? ` · 🏆 ${c[3]}` : ""}`; },
     dersOzet: (dk) => { const l = (ICERIK[dk].uniteler || []).flatMap((u) => u.konular), c = sayim(l); return c[3] || c[2] ? ` · 🏆 ${c[3]}/${l.length} usta` : ""; },

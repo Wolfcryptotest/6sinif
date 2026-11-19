@@ -67,6 +67,7 @@
         const ok = +b.dataset.k === q.dogru;
         ekran.querySelectorAll("[data-k]").forEach((x) => { x.disabled = true; if (+x.dataset.k === q.dogru) x.classList.add("dogru"); });
         if (!ok) b.classList.add("yanlis");
+        const teshis = !ok && window.USTALIK && USTALIK.hataKaydet ? USTALIK.hataKaydet(q, q.secenekler[+b.dataset.k]) : null;
         if (ok) {
           dogru++; v.k++;
           if (v.k >= ARALIK.length) { delete A[a]; kayit.ogrenilen++; sonuc.ogrenilen++; kayit.yanlislar = (kayit.yanlislar || []).filter((y) => anahtarOf(y) !== a); }
@@ -74,7 +75,7 @@
         } else { v.k = 0; v.g = gk(gunEkle(bugunT(), 1)); }
         if (kayit.istatistik && q.konuId) { const s = (kayit.istatistik[q.konuId] = kayit.istatistik[q.konuId] || { s: 0, d: 0 }); s.s++; if (ok) s.d++; }
         kaydet();
-        el("atC").innerHTML = `<div class="not" style="margin-top:10px">${ok ? (A[a] ? `✅ Doğru! Bu soru ${ARALIK[v.k]} gün sonra yine gelecek.` : "🎉 Öğrenildi! Bu soru artık tekrar kutusundan çıktı.") : "❌ Yanlış. Yarın yeniden sorulacak."}${q.cozum ? `<br>💡 ${e(q.cozum)}` : ""}</div>
+        el("atC").innerHTML = `<div class="not" style="margin-top:10px">${ok ? (A[a] ? `✅ Doğru! Bu soru ${ARALIK[v.k]} gün sonra yine gelecek.` : "🎉 Öğrenildi! Bu soru artık tekrar kutusundan çıktı.") : "❌ Yanlış. Yarın yeniden sorulacak."}${q.cozum ? `<br>💡 ${e(q.cozum)}` : ""}</div>${teshis && USTALIK.hataHtml ? USTALIK.hataHtml(teshis, teshis.tur === "d" ? "Konuyu biliyorsun; işlemi adım adım kontrol et." : "Yukarıdaki çözümü bir kez daha oku; yarın yeniden soracağım.") : ""}
           <div class="satir"><button class="btn" id="atI">${i + 1 < liste.length ? "Sonraki soru →" : "Bitir"}</button></div>`;
         el("atI").onclick = () => { i++; goster(); window.scrollTo(0, 0); };
       }));
@@ -125,6 +126,16 @@
     if (H.odGec) dikkat.push(`${H.odGec} ödevin teslim tarihi geçti.`); else if (H.odToplam && H.odBiten === H.odToplam) iyi.push("Bu haftanın bütün ödevlerini tamamladı.");
     if (zayif.length) dikkat.push(`Desteklenmesi gereken konular: ${zayif.slice(0, 3).map(([id]) => konuAd[id]).join(", ")}.`);
     if (guclu.length) iyi.push(`Güçlü olduğu konular: ${guclu.slice(0, 3).map(([id]) => konuAd[id]).join(", ")}.`);
+    // Hata türleri (A4): teşhis edilebilen sorulardaki yanlışlar dikkat hatası / kavram yanılgısı / bilmiyor diye ayrılır
+    const HT = { d: 0, k: 0, b: 0 }, yan = [];
+    for (const [id, h] of Object.entries(kayit.hataTuru || {})) {
+      if (!konuAd[id]) continue; HT.d += h.d || 0; HT.k += h.k || 0; HT.b += h.b || 0;
+      for (const [et, n] of Object.entries(h.e || {})) yan.push([et, n, id]);
+    }
+    yan.sort((a, b) => b[1] - a[1]);
+    const htTop = HT.d + HT.k + HT.b;
+    if (htTop >= 5 && HT.d / htTop >= 0.4) dikkat.push(`Yanlışlarının %${Math.round((HT.d / htTop) * 100)}'i dikkat hatası: konuyu biliyor ama işlemde ya da soruyu okurken hata yapıyor. Soruyu yavaş okuyup sonucu kontrol etmesi faydalı olur.`);
+    else if (htTop >= 5 && (HT.k + HT.b) / htTop >= 0.7) dikkat.push(`Yanlışlarının çoğu bilgi eksiğinden (kavram yanılgısı ya da bilmeme): ${yan.length ? `en sık yanılgı "${yan[0][0]}" (${konuAd[yan[0][2]]}). ` : ""}Konu anlatımına ve Bilge'nin özel dersine dönmek iyi gelir.`);
     const bekleyen = window.ARALIKLI_BUGUN ? ARALIKLI_BUGUN() : 0;
     if (bekleyen > 10) dikkat.push(`Aralıklı tekrar kutusunda ${bekleyen} soru bekliyor.`);
     const aralik = `${new Date(H.gunler[0] + "T00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long" })} – ${new Date(H.gunler[6] + "T00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}`;
@@ -146,6 +157,14 @@
       <h3>📚 Ders ders başarı <small class="not">(bugüne kadar)</small></h3>
       ${dersSatir.length ? `<table class="tablo"><tr><th>Ders</th><th>Soru</th><th>Başarı</th><th>Bu hafta süre</th></tr>${dersSatir.map(([d, x]) => { const y = Math.round((x.d / x.s) * 100); return `<tr><td>${dersIkon(d)} ${e(dersAd(d))}</td><td>${x.s}</td><td><b style="color:${y >= 80 ? "#16a34a" : y >= 60 ? "#d97706" : "#dc2626"}">%${y}</b></td><td>${H.dersSure[d] || 0} dk</td></tr>`; }).join("")}</table>` : '<p class="not">Henüz soru çözülmedi.</p>'}
       ${zayif.length ? `<h3>🎯 Desteklenmesi gereken konular</h3><ul>${zayif.map(([id, x]) => `<li>${dersIkon(konuDers[id])} ${e(konuAd[id])} — %${Math.round((x.d / x.s) * 100)} (${x.s} soru)</li>`).join("")}</ul>` : ""}
+      ${htTop ? `<h3>🔍 Hata türleri <small class="not">(bugüne kadar)</small></h3>
+      <div class="karolar">
+        <div class="karo"><span>🎯 Dikkat hatası</span><b>${HT.d}</b><small class="not">bildiği hâlde işlem/okuma hatası</small></div>
+        <div class="karo"><span>🧩 Kavram yanılgısı</span><b>${HT.k}</b><small class="not">yanlış öğrenilmiş bilgi</small></div>
+        <div class="karo"><span>📘 Bilmiyor</span><b>${HT.b}</b><small class="not">konuyu henüz bilmiyor</small></div>
+      </div>
+      ${yan.length ? `<p style="margin:8px 0 2px"><b>En sık yapılan yanılgılar:</b></p><ul>${yan.slice(0, 4).map(([et, n, id]) => `<li>${e(et.charAt(0).toLocaleUpperCase("tr") + et.slice(1))} <small class="not">(${dersIkon(konuDers[id])} ${e(konuAd[id])} · ${n} kez)</small></li>`).join("")}</ul>` : ""}
+      <p class="not">Bilge, yanlış şıkkın hangi hatadan geldiğini bildiği sorularda bu ayrımı yapar.</p>` : ""}
       <h3>📖 Okuma</h3>
       <p>${okHiz ? `Bu hafta ${H.okuma.length} hikâye okudu · ortalama okuma hızı <b>${okHiz}</b> kelime/dk.` : "Bu hafta hikâye okuma kaydı yok."}${oaSon ? `<br>Okuma Atölyesi son okuma: <b>${oaSon.hiz}</b> kelime/dk${oaSon.anlama != null ? `, anlama <b>%${oaSon.anlama}</b>` : ""}.` : ""}</p>
       ${H.den.length || H.yaz.length ? `<h3>📝 Deneme ve yazılı provaları</h3><ul>${H.den.map((d) => `<li>${e(d.ad)} — <b>${d.net.toFixed(2)} net</b></li>`).join("")}${H.yaz.map((y) => `<li>${e(dersAd(y.ders))} yazılı provası — <b>${y.puan}</b> puan</li>`).join("")}</ul>` : ""}

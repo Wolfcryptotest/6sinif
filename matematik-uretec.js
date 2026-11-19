@@ -37,17 +37,21 @@ window.URETEC = window.URETEC || {};
   }
 
   // Soru nesnesi kurar: doğru şık + benzersiz yanlış şıklar (gerekirse yedekle tamamlar)
+  // Yanılgı etiketli yanlış şık (A4): "d:..." dikkat hatası, "k:..." kavram yanılgısı. Etiket, öğrenci o şıkkı seçerse Bilge'nin teşhisidir.
+  const Y = (v, e) => ({ v, e });
   function soru(metin, dogru, yanlislar, cozum, yedek) {
-    const s = [String(dogru)];
+    const s = [String(dogru)], yan = {};
     const ekle = (x) => {
-      const t = String(x);
-      if (s.length < 4 && t && !s.includes(t) && !/NaN|undefined|Infinity/.test(t) && !/^-/.test(t) && !/^0°$/.test(t)) s.push(t);
+      const et = x && typeof x === "object" ? x.e : null, t = String(et ? x.v : x);
+      if (s.length < 4 && t && !s.includes(t) && !/NaN|undefined|Infinity/.test(t) && !/^-/.test(t) && !/^0°$/.test(t)) { s.push(t); if (et) yan[t] = et; }
     };
     karistir(yanlislar).forEach(ekle);
     const y = yedek || yakinUret(dogru);
     let g = 0;
     while (s.length < 4 && g++ < 500) ekle(y());
-    return { soru: metin, secenekler: s, dogru: 0, cozum, uretildi: true };
+    const q = { soru: metin, secenekler: s, dogru: 0, cozum, uretildi: true };
+    if (Object.keys(yan).length) q.yanilgi = yan;
+    return q;
   }
 
   // ---------- 1. TEMA: Sayılar ve Nicelikler (1) ----------
@@ -56,7 +60,7 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       const n = pick([12, 16, 18, 20, 24, 28, 30, 32, 36, 40, 42, 44, 45, 48, 50, 52, 54, 56, 60, 63, 64, 66, 70, 72, 75, 78, 80, 84, 88, 90, 96, 98, 100]);
       const b = bolenler(n), c = b.length;
-      return soru(`${n} sayısının kaç tane çarpanı vardır?`, c, [c - 1, c + 1, c + 2, c - 2], `${n} sayısının çarpanları: ${b.join(", ")}. Toplam ${c} tane.`);
+      return soru(`${n} sayısının kaç tane çarpanı vardır?`, c, [Y(c - 1, "d:1 ya da sayının kendisi çarpan olarak sayılmadı"), c + 1, c + 2, c - 2], `${n} sayısının çarpanları: ${b.join(", ")}. Toplam ${c} tane.`);
     }
     if (tip === 2) {
       const n = pick([24, 30, 36, 40, 42, 48, 54, 56, 60, 63, 64, 70, 72, 75, 80, 84, 90, 96, 100]);
@@ -125,11 +129,11 @@ window.URETEC = window.URETEC || {};
       const dogru = farkli.join(", ");
       const yan = [];
       const bil = bolenler(n).filter((x) => x > 3 && x < n && enKucukBolen(x) !== x);
-      if (bil.length) yan.push([...farkli.slice(1), pick(bil)].sort((a, b) => a - b).join(", "));
+      if (bil.length) yan.push(Y([...farkli.slice(1), pick(bil)].sort((a, b) => a - b).join(", "), "k:bileşik bir sayı asal çarpan sanıldı"));
       if (farkli.length > 1) yan.push(farkli.slice(0, -1).join(", "));
       const ekstra = [2, 3, 5, 7, 11].find((p) => !farkli.includes(p));
       yan.push([...farkli, ekstra].sort((a, b) => a - b).join(", "));
-      yan.push(f.join(", "));
+      yan.push(Y(f.join(", "), "k:tekrar eden asal çarpan ayrı ayrı yazıldı (asal çarpanlar bir kez yazılır)"));
       return soru(`${n} sayısının asal çarpanları hangileridir?`, dogru, yan, `${n} = ${f.join(" × ")}. Farklı asal çarpanlar: ${dogru}.`,
         () => karistir([2, 3, 5, 7, 11, 13]).slice(0, farkli.length).sort((a, b) => a - b).join(", "));
     }
@@ -141,12 +145,12 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       let g, x, y; do { g = r(2, 12); x = r(2, 7); y = r(2, 9); } while (x === y || gcd(x, y) !== 1 || g * Math.max(x, y) > 99);
       const a = g * x, b = g * y, ortak = bolenler(g);
-      return soru(`${a} ve ${b} sayılarının en büyük ortak böleni kaçtır?`, g, [ortak[ortak.length - 2], g * 2, Math.min(a, b), g + 1],
+      return soru(`${a} ve ${b} sayılarının en büyük ortak böleni kaçtır?`, g, [ortak[ortak.length - 2], g * 2, Y(Math.min(a, b), "k:küçük sayı en büyük ortak bölen sanıldı"), g + 1],
         `Ortak bölenleri: ${ortak.join(", ")}. En büyüğü ${g}.`);
     }
     if (tip === 2) {
       let a, b, l; do { a = r(2, 15); b = r(2, 15); l = lcm(a, b); } while (a === b || l > 120 || l === Math.max(a, b));
-      return soru(`${a} ve ${b} sayılarının en küçük ortak katı kaçtır?`, l, [a * b, l * 2, a + b, l % 2 ? l + a : l / 2],
+      return soru(`${a} ve ${b} sayılarının en küçük ortak katı kaçtır?`, l, [Y(a * b, "k:sayılar çarpıldı (EKOK her zaman çarpım değildir)"), l * 2, Y(a + b, "k:sayılar toplandı"), l % 2 ? l + a : l / 2],
         `${l}, hem ${a} hem ${b} ile kalansız bölünen en küçük sayıdır: ${l} ÷ ${a} = ${l / a}, ${l} ÷ ${b} = ${l / b}.`);
     }
     if (tip === 3) {
@@ -154,16 +158,16 @@ window.URETEC = window.URETEC || {};
       const a = g * x, b = g * y, ne = pick(["kurdele", "ip", "tahta", "kumaş"]);
       if (r(0, 1)) {
         return soru(`${a} cm ve ${b} cm uzunluğundaki iki ${ne}, hiç artmayacak şekilde eşit ve en uzun parçalara kesilecek. Bir parça kaç cm olur?`, g,
-          [x * y, g * 2, Math.abs(b - a), Math.min(a, b)], `${a} ve ${b} sayılarının en büyük ortak böleni ${g}. Bir parça ${g} cm olur.`);
+          [x * y, g * 2, Y(Math.abs(b - a), "k:uzunlukların farkı alındı (EBOB bulunmalıydı)"), Y(Math.min(a, b), "k:kısa olan parça uzunluğu sanıldı")], `${a} ve ${b} sayılarının en büyük ortak böleni ${g}. Bir parça ${g} cm olur.`);
       }
       return soru(`${a} cm ve ${b} cm uzunluğundaki iki ${ne}, hiç artmayacak şekilde eşit ve en uzun parçalara kesiliyor. Toplam kaç parça elde edilir?`, x + y,
-        [x * y, g, x + y + 1, x + y - 1], `En uzun parça ${a} ve ${b} sayılarının en büyük ortak böleni: ${g} cm. ${a} ÷ ${g} = ${x}, ${b} ÷ ${g} = ${y}. Toplam ${x + y} parça.`);
+        [x * y, Y(g, "d:parça uzunluğu bulundu ama parça sayısı sorulmuştu"), x + y + 1, x + y - 1], `En uzun parça ${a} ve ${b} sayılarının en büyük ortak böleni: ${g} cm. ${a} ÷ ${g} = ${x}, ${b} ÷ ${g} = ${y}. Toplam ${x + y} parça.`);
     }
     if (tip === 4) {
       let x, y; do { x = r(2, 12); y = r(2, 12); } while (x === y || lcm(x, y) > 90 || lcm(x, y) === Math.max(x, y));
       const [A, B] = karistir(ISIM).slice(0, 2), yer = pick(["kütüphaneye", "yüzmeye", "parka", "kursa"]), l = lcm(x, y);
       return soru(`${A} ${x} günde bir, ${B} ${y} günde bir ${yer} gidiyor. Bugün ikisi birlikte gittiyse en az kaç gün sonra yine birlikte giderler?`, l,
-        [x * y, x + y, l * 2, Math.max(x, y)], `${x} ve ${y} sayılarının en küçük ortak katı ${l}. ${l} gün sonra yine birlikte giderler.`);
+        [Y(x * y, "k:gün sayıları çarpıldı (EKOK bulunmalıydı)"), Y(x + y, "k:gün sayıları toplandı"), l * 2, Math.max(x, y)], `${x} ve ${y} sayılarının en küçük ortak katı ${l}. ${l} gün sonra yine birlikte giderler.`);
     }
     let a, b; do { a = r(12, 60); b = r(12, 60); } while (a === b || gcd(a, b) < 2);
     const ort = bolenler(gcd(a, b));
@@ -181,12 +185,12 @@ window.URETEC = window.URETEC || {};
       let K; do { K = r(Math.ceil(N * 0.2), Math.floor(N * 0.9)); } while (K * 2 === N);
       const [ad, eylem] = pick([["basket atma", ["atış yapıp", "basket atıyor"]], ["hedefi vurma", ["ok atıp", "hedefi vuruyor"]], ["penaltıyı gole çevirme", ["penaltı atıp", "gol atıyor"]]]);
       return soru(`${pick(ISIM)} ${N} ${eylem[0]} ${K} tanesinde ${eylem[1]}. Buna göre ${ad} olasılığının tahmini nedir?`, `${K}/${N}`,
-        [`${N - K}/${N}`, `${K}/${N - K}`, `${N}/${K}`, `1/${K}`], `Olasılık tahmini = olayın gerçekleşme sayısı ÷ deneme sayısı = ${K}/${N}.`);
+        [Y(`${N - K}/${N}`, "d:olayın gerçekleşmediği durumlar sayıldı"), Y(`${K}/${N - K}`, "k:paydaya toplam deneme sayısı yerine kalan deneme yazıldı"), Y(`${N}/${K}`, "k:pay ile payda yer değiştirdi"), `1/${K}`], `Olasılık tahmini = olayın gerçekleşme sayısı ÷ deneme sayısı = ${K}/${N}.`);
     }
     if (tip === 2) {
       const n = pick([50, 100, 200]); let t; do { t = r(Math.round(n * 0.4), Math.round(n * 0.6)); } while (t * 2 === n);
       return soru(`Bir madeni para ${n} kez atıldı ve ${t} kez tura geldi. Yazı gelme olasılığının tahmini nedir?`, `${n - t}/${n}`,
-        [`${t}/${n}`, `${t}/${n - t}`, `${n - t}/${t}`], `Yazı ${n} − ${t} = ${n - t} kez geldi. Tahmin: ${n - t}/${n}.`);
+        [Y(`${t}/${n}`, "d:yazı yerine tura sayıldı"), Y(`${t}/${n - t}`, "k:paydaya toplam atış sayısı yazılmadı"), `${n - t}/${t}`], `Yazı ${n} − ${t} = ${n - t} kez geldi. Tahmin: ${n - t}/${n}.`);
     }
     if (tip === 3) {
       const hedef = pick(TUR); let a, b;
@@ -219,7 +223,7 @@ window.URETEC = window.URETEC || {};
     const sayi = `${tam},${d.join("")}`, tip = r(1, 3);
     if (tip === 1) {
       const p = r(0, 2), deg = ["0," + d[p], "0,0" + d[p], "0,00" + d[p]];
-      return soru(`${sayi} sayısında ${d[p]} rakamının basamak değeri kaçtır?`, deg[p], [...deg.filter((_, i) => i !== p), String(d[p])],
+      return soru(`${sayi} sayısında ${d[p]} rakamının basamak değeri kaçtır?`, deg[p], [...deg.filter((_, i) => i !== p).map((x) => Y(x, "k:basamaklar karıştırıldı (onda, yüzde, binde birler)")), Y(String(d[p]), "k:basamak değeri yerine rakamın kendisi yazıldı")],
         `${d[p]} rakamı ${BASAMAK[p]} basamağında. Basamak değeri ${deg[p]}.`);
     }
     if (tip === 2) {
@@ -239,7 +243,7 @@ window.URETEC = window.URETEC || {};
     const birim = 10 ** (3 - k), R = yuv(k), kesik = Math.floor(v / birim);
     const sag = Math.floor(v / (birim / 10)) % 10;
     const ad = ["en yakın tam sayıya", "onda birler basamağına", "yüzde birler basamağına"][k];
-    const yan = [ond(kesik === R ? R + 1 : kesik, k, false), ond(R + 1, k, false), ...[0, 1, 2].filter((x) => x !== k).map((x) => ond(yuv(x), x, false))];
+    const yan = [Y(ond(kesik === R ? R + 1 : kesik, k, false), kesik === R ? "k:sağdaki rakam 5'ten küçükken bir artırıldı" : "k:sağdaki rakam 5 ya da daha büyükken artırılmadı"), ond(R + 1, k, false), ...[0, 1, 2].filter((x) => x !== k).map((x) => Y(ond(yuv(x), x, false), "d:istenen basamak yerine başka bir basamağa yuvarlandı"))];
     return soru(`${ond(v, 3, false)} sayısı ${ad} yuvarlanırsa hangisi elde edilir?`, ond(R, k, false), yan,
       `Yuvarlanacak basamağın sağındaki rakam ${sag}. ${sag >= 5 ? "5 veya daha büyük olduğu için bir artırırız" : "5'ten küçük olduğu için aynı bırakırız"}. Sonuç: ${ond(R, k, false)}.`);
   };
@@ -249,24 +253,24 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       const a = r(2, 9), b = r(a + 1, 12), ne = pick(["ekmek", "pizza", "karpuz", "pasta"]);
       return soru(`${a} ${ne} ${b} kişiye eşit olarak paylaştırılırsa kişi başına ne kadar ${ne} düşer?`, `${a}/${b}`,
-        [`${b}/${a}`, `${b - a}/${b}`, `1/${b}`, `${a}/${a + b}`], `${a} ÷ ${b} = ${a}/${b}. Pay bölünen, payda bölendir.`);
+        [Y(`${b}/${a}`, "k:pay ile payda yer değiştirdi (bölünen paya yazılır)"), `${b - a}/${b}`, `1/${b}`, `${a}/${a + b}`], `${a} ÷ ${b} = ${a}/${b}. Pay bölünen, payda bölendir.`);
     }
     if (tip === 2) {
       const d = pick([2, 4, 5, 20, 25, 50]); let n; do { n = r(1, d - 1); } while (gcd(n, d) !== 1);
       const v = (n * 100) / d;
-      return soru(`${n}/${d} kesrinin ondalık gösterimi hangisidir?`, ond(v, 2), [`0,${n}${d}`, `${d},${n}`, ond(v + 10, 2), ond(v + 5, 2)],
+      return soru(`${n}/${d} kesrinin ondalık gösterimi hangisidir?`, ond(v, 2), [Y(`0,${n}${d}`, "k:pay ile payda virgülden sonra yan yana yazıldı"), Y(`${d},${n}`, "k:pay ile payda virgülle yan yana yazıldı"), ond(v + 10, 2), ond(v + 5, 2)],
         `Paydayı 100 yapalım: ${n}/${d} = ${v}/100 = ${ond(v, 2)}.`, () => ond(r(1, 99), 2));
     }
     if (tip === 3) {
       let a, b; do { a = r(7, 40); b = r(2, 9); } while (a % b === 0 || a < b);
       const q = Math.floor(a / b), k = a % b;
       return soru(`${a} ÷ ${b} işleminin sonucu hangi tam sayılı kesre eşittir?`, `${q} tam ${k}/${b}`,
-        [`${k} tam ${q}/${b}`, `${q + 1} tam ${k}/${b}`, `${q} tam ${k}/${a}`, `${q - 1} tam ${k}/${b}`], `${a} ÷ ${b} = ${q}, kalan ${k}. Sonuç: ${q} tam ${k}/${b}.`,
+        [Y(`${k} tam ${q}/${b}`, "k:bölüm ile kalan yer değiştirdi"), `${q + 1} tam ${k}/${b}`, Y(`${q} tam ${k}/${a}`, "k:paydaya bölen yerine bölünen yazıldı"), `${q - 1} tam ${k}/${b}`], `${a} ÷ ${b} = ${q}, kalan ${k}. Sonuç: ${q} tam ${k}/${b}.`,
         () => `${q} tam ${r(1, 9)}/${r(2, 9)}`);
     }
     if (tip === 4) {
       let ab; do { ab = r(11, 99); } while (ab % 10 === 0);
-      return soru(`0,${ab} sayısının kesir gösterimi hangisidir?`, `${ab}/100`, [`${ab}/10`, `${ab}/1000`, `${Math.floor(ab / 10)}/${ab % 10}`],
+      return soru(`0,${ab} sayısının kesir gösterimi hangisidir?`, `${ab}/100`, [Y(`${ab}/10`, "k:virgülden sonraki basamak sayısına bakılmadı"), Y(`${ab}/1000`, "k:virgülden sonraki basamak sayısına bakılmadı"), `${Math.floor(ab / 10)}/${ab % 10}`],
         `0,${ab} = ${ab} yüzde = ${ab}/100.`, () => `${r(1, 99)}/100`);
     }
     const n = pick([2, 4, 5, 8, 10]); let L; do { L = r(n + 1, 45); } while (L % n === 0);
@@ -280,7 +284,7 @@ window.URETEC = window.URETEC || {};
     if (r(1, 4) === 1) {
       const m = r(8, 30) * 50, g = r(2, 7), top = m * 2 * g;
       return soru(`${pick(ISIM)} okula gidip gelirken her gün tek yön ${m} m yürüyor. Gidiş-dönüş ${g} günde toplam kaç km yürür?`, ond(top, 3),
-        [ond(m * g, 3), ond(top * 10, 3), grup(top)], `Bir günde: ${m} × 2 = ${m * 2} m. ${g} günde: ${grup(top)} m = ${ond(top, 3)} km.`);
+        [Y(ond(m * g, 3), "d:gidiş-dönüş için 2 ile çarpılmadı"), ond(top * 10, 3), Y(grup(top), "d:birim çevrilmedi (metre bulundu, km sorulmuştu)")], `Bir günde: ${m} × 2 = ${m * 2} m. ${g} günde: ${grup(top)} m = ${ond(top, 3)} km.`);
     }
     const [b, k, f] = pick(UZ);
     if (r(0, 1)) { // büyük birimden küçüğe
@@ -289,7 +293,7 @@ window.URETEC = window.URETEC || {};
         `1 ${b} = ${f} ${k}. ${ond(s, 1)} × ${f} = ${ond(res, 1)} ${k}.`);
     }
     const w = f === 10 ? r(12, 999) : r(120, 9999), res = (w * 1000) / f; // sonuç 3 ondalık basamaklı
-    return soru(`${grup(w)} ${k} kaç ${b} eder?`, ond(res, 3), [ond(res * 10, 3), ond(res * 100, 3), grup(w * f)],
+    return soru(`${grup(w)} ${k} kaç ${b} eder?`, ond(res, 3), [ond(res * 10, 3), ond(res * 100, 3), Y(grup(w * f), "k:küçük birimden büyüğe geçerken çarpıldı (bölünmeliydi)")],
       `1 ${b} = ${f} ${k}. ${grup(w)} ÷ ${f} = ${ond(res, 3)} ${b}.`);
   };
 
@@ -313,7 +317,7 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       let n, v, m, son; do { n = r(4, 6); v = Array.from({ length: n - 1 }, () => r(3, 30)); m = r(8, 22); son = m * n - v.reduce((a, b) => a + b, 0); } while (son < 1 || son > 40);
       const d = karistir([...v, son]), top = m * n;
-      return soru(`${bg}: ${d.join(", ")}. Bu verilerin aritmetik ortalaması kaçtır?`, m, [top, m + 1, m - 1, m + 2],
+      return soru(`${bg}: ${d.join(", ")}. Bu verilerin aritmetik ortalaması kaçtır?`, m, [Y(top, "d:toplam bulundu ama veri sayısına bölünmedi"), m + 1, m - 1, m + 2],
         `Toplam: ${d.join(" + ")} = ${top}. Veri sayısı ${n}. ${top} ÷ ${n} = ${m}.`);
     }
     if (tip === 2) {
@@ -324,16 +328,16 @@ window.URETEC = window.URETEC || {};
     if (tip === 3) {
       const s = new Set(); while (s.size < 5) s.add(r(2, 40));
       const d = karistir([...s]), sir = [...s].sort((a, b) => a - b);
-      return soru(`${bg}: ${d.join(", ")}. Bu verilerin ortancası kaçtır?`, sir[2], [d[2], sir[0], sir[4], sir[1]],
+      return soru(`${bg}: ${d.join(", ")}. Bu verilerin ortancası kaçtır?`, sir[2], [Y(d[2], "k:veriler sıralanmadan ortadaki sayı alındı"), sir[0], sir[4], sir[1]],
         `Küçükten büyüğe sırala: ${sir.join(", ")}. Ortadaki değer ${sir[2]}.`);
     }
     if (tip === 4) {
       const s = new Set(), n = r(5, 6); while (s.size < n) s.add(r(5, 50));
       const d = karistir([...s]), mx = Math.max(...d), mn = Math.min(...d);
-      return soru(`${bg}: ${d.join(", ")}. Bu verilerin açıklığı kaçtır?`, mx - mn, [mx, mn, mx + mn], `En büyük ${mx}, en küçük ${mn}. Açıklık: ${mx} − ${mn} = ${mx - mn}.`);
+      return soru(`${bg}: ${d.join(", ")}. Bu verilerin açıklığı kaçtır?`, mx - mn, [Y(mx, "k:açıklık en büyük değer sanıldı"), mn, Y(mx + mn, "k:en büyük ile en küçük değer toplandı (çıkarılmalıydı)")], `En büyük ${mx}, en küçük ${mn}. Açıklık: ${mx} − ${mn} = ${mx - mn}.`);
     }
     const n = r(3, 8), m = r(40, 95);
-    return soru(`${n} öğrencinin sınav puanlarının ortalaması ${m} ise puanların toplamı kaçtır?`, n * m, [n + m, m * (n - 1), m * (n + 1)],
+    return soru(`${n} öğrencinin sınav puanlarının ortalaması ${m} ise puanların toplamı kaçtır?`, n * m, [Y(n + m, "k:ortalama ile kişi sayısı toplandı (çarpılmalıydı)"), m * (n - 1), m * (n + 1)],
       `Toplam = ortalama × veri sayısı = ${m} × ${n} = ${n * m}.`);
   };
 
@@ -349,19 +353,19 @@ window.URETEC = window.URETEC || {};
       ["Kesenin aynı tarafında, paralellerin arasında kalan iki açıdan biri", b, `Bu iki açının toplamı 180°: 180° − ${a}° = ${b}°.`],
       ["Kesen üzerinde yan yana duran iki açıdan biri", b, `Yan yana duran bu açıların toplamı 180°: 180° − ${a}° = ${b}°.`]]);
     return soru(`İki paralel doğruyu bir kesen kesiyor. ${t[0]} ${a}° ise diğeri kaç derecedir?`, derece(t[1]),
-      [derece(t[1] === a ? b : a), derece(360 - a), derece(Math.abs(90 - a)), derece(2 * a)], t[2], yakinDerece(t[1]));
+      [Y(derece(t[1] === a ? b : a), t[1] === a ? "k:eş olan açılar bütünler sanıldı" : "k:bütünler olan açılar eş sanıldı"), Y(derece(360 - a), "k:180° yerine 360° kullanıldı"), derece(Math.abs(90 - a)), derece(2 * a)], t[2], yakinDerece(t[1]));
   };
 
   U.t5k2 = () => {
     const tip = r(1, 4);
     if (tip === 1) {
       let a, b, c; do { a = r(20, 110); b = r(20, 110); c = 180 - a - b; } while (c < 15 || a === b);
-      return soru(`Bir üçgenin iki iç açısı ${a}° ve ${b}° ise üçüncü açısı kaç derecedir?`, derece(c), [derece(a + b), derece(180 - a), derece(c + 10), derece(360 - a - b)],
+      return soru(`Bir üçgenin iki iç açısı ${a}° ve ${b}° ise üçüncü açısı kaç derecedir?`, derece(c), [Y(derece(a + b), "d:iki açı toplandı ama 180°'den çıkarılmadı"), derece(180 - a), derece(c + 10), Y(derece(360 - a - b), "k:üçgenin iç açıları toplamı 360° sanıldı")],
         `180° − (${a}° + ${b}°) = 180° − ${a + b}° = ${c}°.`, yakinDerece(c));
     }
     if (tip === 2) {
       const a = r(15, 75);
-      return soru(`Bir dik üçgende dik açı dışındaki açılardan biri ${a}° ise diğeri kaç derecedir?`, derece(90 - a), [derece(180 - a), derece(a), derece(90 + a)],
+      return soru(`Bir dik üçgende dik açı dışındaki açılardan biri ${a}° ise diğeri kaç derecedir?`, derece(90 - a), [Y(derece(180 - a), "d:dik açı (90°) hesaba katılmadı"), derece(a), derece(90 + a)],
         `180° − (90° + ${a}°) = ${90 - a}°.`, yakinDerece(90 - a));
     }
     if (tip === 3) {
@@ -388,13 +392,13 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       let a, b, c, d; do { a = r(50, 150); b = r(50, 150); c = r(50, 150); d = 360 - a - b - c; } while (d < 30 || d > 170);
       return soru(`Bir dörtgenin üç iç açısı ${a}°, ${b}° ve ${c}° ise dördüncü açısı kaç derecedir?`, derece(d),
-        [derece(a + b + c - 180), derece(d + 10), derece(180 - d)], `360° − (${a}° + ${b}° + ${c}°) = 360° − ${a + b + c}° = ${d}°.`, yakinDerece(d));
+        [Y(derece(a + b + c - 180), "k:dörtgenin iç açıları toplamı 180° sanıldı"), derece(d + 10), derece(180 - d)], `360° − (${a}° + ${b}° + ${c}°) = 360° − ${a + b + c}° = ${d}°.`, yakinDerece(d));
     }
     if (tip === 2) {
       let a; do { a = r(35, 145); } while (a === 90);
       const karsi = r(0, 1), dogru = karsi ? a : 180 - a;
       return soru(`Bir paralelkenarın bir açısı ${a}° ise ${karsi ? "bu açının karşısındaki açı" : "bu açıyla yan yana olan açı"} kaç derecedir?`, derece(dogru),
-        [derece(karsi ? 180 - a : a), derece(360 - a), derece(Math.abs(90 - a))],
+        [Y(derece(karsi ? 180 - a : a), karsi ? "k:karşılıklı açılar bütünler sanıldı (eşittir)" : "k:yan yana açılar eş sanıldı (toplamları 180°)"), derece(360 - a), derece(Math.abs(90 - a))],
         karsi ? "Paralelkenarda karşılıklı açılar eşittir." : `Paralelkenarda yan yana iki açının toplamı 180°: 180° − ${a}° = ${180 - a}°.`, yakinDerece(dogru));
     }
     const [tanim, ad] = pick(DORTGEN);
@@ -408,13 +412,13 @@ window.URETEC = window.URETEC || {};
     const tip = r(1, 5), h = pick(HARF);
     if (tip === 1) {
       let k, s, v, val; do { k = r(2, 9); s = r(1, 15) * pick([1, -1]); v = r(1, 10); val = k * v + s; } while (val <= 0);
-      return soru(`${h} = ${v} için ${ifade(k, h, s)} ifadesinin değeri kaçtır?`, val, [k + v + s, k * (v + s), k * v - s, val + k],
+      return soru(`${h} = ${v} için ${ifade(k, h, s)} ifadesinin değeri kaçtır?`, val, [Y(k + v + s, "k:katsayı ile sayı çarpılmadı, toplandı"), Y(k * (v + s), "k:işlem önceliğine uyulmadı"), Y(k * v - s, "d:işaret karıştırıldı"), val + k],
         `${k} × ${v} ${s > 0 ? "+" : "−"} ${Math.abs(s)} = ${k * v} ${s > 0 ? "+" : "−"} ${Math.abs(s)} = ${val}.`);
     }
     if (tip === 2) {
       const p = r(2, 9), q = r(2, 9), c = r(1, 15);
       return soru(`${p}${h} + ${q}${h} + ${c} ifadesinin sade hali hangisidir?`, `${p + q}${h} + ${c}`,
-        [`${p + q + c}${h}`, `${p * q}${h} + ${c}`, `${p + q}${h}`, `${p + q}${h} + ${c + 1}`],
+        [Y(`${p + q + c}${h}`, "k:sabit terim harfli terimlerle toplandı"), Y(`${p * q}${h} + ${c}`, "k:katsayılar toplanacağı yerde çarpıldı"), Y(`${p + q}${h}`, "d:sabit terim yazılmadı"), `${p + q}${h} + ${c + 1}`],
         `Aynı harfi taşıyan terimler toplanır: ${p}${h} + ${q}${h} = ${p + q}${h}. ${c} ayrı kalır: ${p + q}${h} + ${c}.`, () => `${p + q + r(1, 3)}${h} + ${c}`);
     }
     if (tip === 3) {
@@ -429,10 +433,10 @@ window.URETEC = window.URETEC || {};
       let a, b; do { a = r(10, 50); b = r(5, 40); } while (a === b);
       const net = a - b, dogru = net > 0 ? `${h} + ${net}` : `${h} − ${-net}`;
       return soru(`${pick(ISIM)} adlı öğrencinin ${h} lirası var. Annesi ona ${a} lira verdi, sonra ${b} liralık bir kitap aldı. Kalan parası hangisidir?`, dogru,
-        [`${h} + ${a + b}`, `${h} − ${a + b}`, net > 0 ? `${h} − ${net}` : `${h} + ${-net}`], `${h} + ${a} − ${b} = ${dogru}.`, () => `${h} + ${r(1, 60)}`);
+        [Y(`${h} + ${a + b}`, "d:harcanan para da eklendi"), Y(`${h} − ${a + b}`, "d:alınan para da çıkarıldı"), Y(net > 0 ? `${h} − ${net}` : `${h} + ${-net}`, "d:işaret karıştırıldı")], `${h} + ${a} − ${b} = ${dogru}.`, () => `${h} + ${r(1, 60)}`);
     }
     const n = r(3, 12), es = pick(["kalem", "defter", "silgi", "kitap"]);
-    return soru(`Bir ${es} ${h} TL ise ${n} ${es} kaç TL eder?`, `${n}${h}`, [`${h} + ${n}`, `${h} ÷ ${n}`, `${n} − ${h}`],
+    return soru(`Bir ${es} ${h} TL ise ${n} ${es} kaç TL eder?`, `${n}${h}`, [Y(`${h} + ${n}`, "k:çarpma yerine toplama yapıldı"), Y(`${h} ÷ ${n}`, "k:çarpma yerine bölme yapıldı"), `${n} − ${h}`],
       `${n} tane ${h}: ${n} × ${h} = ${n}${h}.`, () => `${h} + ${r(1, 20)}`);
   };
 
@@ -445,7 +449,7 @@ window.URETEC = window.URETEC || {};
     }
     if (tip === 2) {
       const a = r(2, 7), b = r(0, 9), n = r(5, 20), ans = a * n + b;
-      return soru(`Kuralı ${kural(a, b)} olan örüntünün ${n}. terimi kaçtır?`, ans, [a * n, a + n + b, a * (n + b), ans + a],
+      return soru(`Kuralı ${kural(a, b)} olan örüntünün ${n}. terimi kaçtır?`, ans, [Y(a * n, "d:kuraldaki sabit sayı eklenmedi"), Y(a + n + b, "k:katsayı n ile çarpılmadı, toplandı"), Y(a * (n + b), "k:işlem önceliğine uyulmadı"), ans + a],
         `n yerine ${n} yazılır: ${a} × ${n}${b ? ` + ${b}` : ""} = ${ans}.`);
     }
     if (tip === 3) {
@@ -458,12 +462,12 @@ window.URETEC = window.URETEC || {};
     if (tip === 4) {
       const s = r(3, 8), d = r(2, 5), k = r(5, 12), ans = s + (k - 1) * d;
       return soru(`Bir şekil örüntüsünde 1. adımda ${s} kibrit var ve her adımda ${d} kibrit ekleniyor. ${k}. adımda kaç kibrit olur?`, ans,
-        [s + k * d, k * d, ans + d, ans - 1], `1. adımdan ${k}. adıma ${k - 1} kez ${d} eklenir: ${s} + ${k - 1} × ${d} = ${ans}.`);
+        [Y(s + k * d, "k:1. adımdaki kibritlerin üzerine k kez eklendi (k − 1 kez eklenmeliydi)"), Y(k * d, "d:başlangıçtaki kibritler hesaba katılmadı"), ans + d, ans - 1], `1. adımdan ${k}. adıma ${k - 1} kez ${d} eklenir: ${s} + ${k - 1} × ${d} = ${ans}.`);
     }
     let a, b, ek, v; do { a = r(2, 6); b = r(1, 9); ek = r(0, 1); v = r(2, 12); } while (!ek && a * v <= b); // sonuç negatif olmasın
     const ans = ek ? a * v + b : a * v - b;
     return soru(`"Sayıyı al, ${a} ile çarp, ${b} ${ek ? "ekle" : "çıkar"}" algoritmasına ${v} girilirse sonuç kaç olur?`, ans,
-      [v * a, ek ? a * v - b : a * v + b, v + a + b, a * (v + b)], `${v} × ${a} = ${a * v}. ${a * v} ${ek ? "+" : "−"} ${b} = ${ans}.`);
+      [Y(v * a, "d:algoritmanın son adımı yapılmadı"), Y(ek ? a * v - b : a * v + b, "d:ekleme ile çıkarma karıştırıldı"), v + a + b, Y(a * (v + b), "k:adımların sırasına uyulmadı")], `${v} × ${a} = ${a * v}. ${a * v} ${ek ? "+" : "−"} ${b} = ${ans}.`);
   };
 
   // ---------- 7. TEMA: Geometrik Nicelikler ----------
@@ -477,11 +481,11 @@ window.URETEC = window.URETEC || {};
     const [B, K, f] = pick(ALAN);
     if (tip === 1) {
       const s = pick([r(2, 9) * 10, r(11, 99)]), res = s * f; // 1 ondalık basamak
-      return soru(`${ond(s, 1)} ${B} kaç ${K} eder?`, ond(res, 1), [ond(res / 10, 1), ond(res * 10, 1), ond(res / 100, 1)],
+      return soru(`${ond(s, 1)} ${B} kaç ${K} eder?`, ond(res, 1), [f === 100 ? Y(ond(res / 10, 1), "k:alan birimi uzunluk birimi gibi 10'ar kat çevrildi (100'er olmalı)") : ond(res / 10, 1), ond(res * 10, 1), ond(res / 100, 1)],
         `1 ${B} = ${grup(f)} ${K}. ${ond(s, 1)} × ${grup(f)} = ${ond(res, 1)} ${K}.`);
     }
     const res = r(5, 950), w = (res * f) / 100; // sonuç 2 ondalık basamak
-    return soru(`${grup(w)} ${K} kaç ${B} eder?`, ond(res, 2), [ond(res * 10, 2), ond(res * 100, 2), grup(w * f)],
+    return soru(`${grup(w)} ${K} kaç ${B} eder?`, ond(res, 2), [ond(res * 10, 2), ond(res * 100, 2), Y(grup(w * f), "k:küçük birimden büyüğe geçerken çarpıldı (bölünmeliydi)")],
       `1 ${B} = ${grup(f)} ${K}. ${grup(w)} ÷ ${grup(f)} = ${ond(res, 2)} ${B}.`);
   };
 
@@ -489,17 +493,17 @@ window.URETEC = window.URETEC || {};
     const tip = r(1, 5);
     if (tip === 1) {
       const b = r(4, 20), h = r(3, 15);
-      return soru(`Tabanı ${b} cm, yüksekliği ${h} cm olan paralelkenarın alanı kaç cm²'dir?`, b * h, [b + h, 2 * (b + h), (b * h) % 2 ? b * h + b : (b * h) / 2],
+      return soru(`Tabanı ${b} cm, yüksekliği ${h} cm olan paralelkenarın alanı kaç cm²'dir?`, b * h, [Y(b + h, "k:taban ile yükseklik toplandı (çarpılmalıydı)"), Y(2 * (b + h), "k:alan yerine çevre hesaplandı"), (b * h) % 2 ? b * h + b : Y((b * h) / 2, "k:paralelkenar alanı üçgen gibi 2'ye bölündü")],
         `Paralelkenarın alanı = taban × yükseklik = ${b} × ${h} = ${b * h} cm².`);
     }
     if (tip === 2) {
       let b, h; do { b = r(4, 20); h = r(3, 16); } while ((b * h) % 2);
-      return soru(`Tabanı ${b} cm, yüksekliği ${h} cm olan üçgenin alanı kaç cm²'dir?`, (b * h) / 2, [b * h, b + h, (b * h) / 2 + b],
+      return soru(`Tabanı ${b} cm, yüksekliği ${h} cm olan üçgenin alanı kaç cm²'dir?`, (b * h) / 2, [Y(b * h, "d:üçgen alanında 2'ye bölmek unutuldu"), Y(b + h, "k:taban ile yükseklik toplandı"), (b * h) / 2 + b],
         `Üçgenin alanı = (taban × yükseklik) ÷ 2 = ${b} × ${h} ÷ 2 = ${(b * h) / 2} cm².`);
     }
     if (tip === 3) {
       const b = r(4, 15), h = r(3, 12), A = b * h;
-      return soru(`Alanı ${A} cm², tabanı ${b} cm olan paralelkenarın yüksekliği kaç cm'dir?`, h, [A - b, h * 2, h + 2], `Yükseklik = alan ÷ taban = ${A} ÷ ${b} = ${h} cm.`);
+      return soru(`Alanı ${A} cm², tabanı ${b} cm olan paralelkenarın yüksekliği kaç cm'dir?`, h, [Y(A - b, "k:alandan taban çıkarıldı (bölünmeliydi)"), h * 2, h + 2], `Yükseklik = alan ÷ taban = ${A} ÷ ${b} = ${h} cm.`);
     }
     if (tip === 4) {
       let b, h; do { b = r(4, 16); h = r(3, 12); } while ((b * h) % 2);
@@ -509,18 +513,18 @@ window.URETEC = window.URETEC || {};
     }
     const b = r(5, 25), h = r(4, 20), k = r(2, 5), ne = pick(["fide", "lale soğanı", "marul fidesi"]), top = b * h * k;
     return soru(`Tabanı ${b} m, yüksekliği ${h} m olan paralelkenar şeklindeki bir bahçenin her metrekaresine ${k} ${ne} dikilecek. Toplam kaç ${ne} gerekir?`, top,
-      [b * h, (b + h) * k, top % 2 ? b * h * (k + 1) : top / 2], `Alan: ${b} × ${h} = ${b * h} m². Toplam: ${b * h} × ${k} = ${top}.`);
+      [Y(b * h, "d:alan bulundu ama metrekare başına düşen sayıyla çarpılmadı"), (b + h) * k, top % 2 ? b * h * (k + 1) : top / 2], `Alan: ${b} × ${h} = ${b * h} m². Toplam: ${b * h} × ${k} = ${top}.`);
   };
 
   U.t7k3 = () => {
     const tip = r(1, 5), pi = "(π = 3 alınız)";
-    if (tip === 1) { const R = r(2, 25); return soru(`Yarıçapı ${R} cm olan çemberin çapı kaç cm'dir?`, 2 * R, [R, 4 * R, R + 2, 3 * R], `Çap = 2 × yarıçap = 2 × ${R} = ${2 * R} cm.`); }
-    if (tip === 2) { const c = r(3, 30); return soru(`Çapı ${c} cm olan çemberin çevresi kaç cm'dir? ${pi}`, 3 * c, [6 * c, c + 3, 2 * c, 3 * c + 3], `Çevre = π × çap = 3 × ${c} = ${3 * c} cm.`); }
-    if (tip === 3) { const R = r(2, 20); return soru(`Yarıçapı ${R} cm olan çemberin çevresi kaç cm'dir? ${pi}`, 6 * R, [3 * R, 3 * R * R, 2 * R + 3, 6 * R + 6], `Çevre = 2 × π × r = 2 × 3 × ${R} = ${6 * R} cm.`); }
-    if (tip === 4) { const R = r(2, 20), C = 6 * R; return soru(`Çevresi ${C} cm olan çemberin yarıçapı kaç cm'dir? ${pi}`, R, [2 * R, C / 2, R + 3], `2 × 3 × r = ${C} → 6 × r = ${C} → r = ${R} cm.`); }
+    if (tip === 1) { const R = r(2, 25); return soru(`Yarıçapı ${R} cm olan çemberin çapı kaç cm'dir?`, 2 * R, [Y(R, "k:yarıçap ile çap karıştırıldı"), 4 * R, R + 2, 3 * R], `Çap = 2 × yarıçap = 2 × ${R} = ${2 * R} cm.`); }
+    if (tip === 2) { const c = r(3, 30); return soru(`Çapı ${c} cm olan çemberin çevresi kaç cm'dir? ${pi}`, 3 * c, [Y(6 * c, "k:çap, yarıçap gibi kullanıldı (fazladan 2 ile çarpıldı)"), Y(c + 3, "k:π ile çarpmak yerine toplandı"), 2 * c, 3 * c + 3], `Çevre = π × çap = 3 × ${c} = ${3 * c} cm.`); }
+    if (tip === 3) { const R = r(2, 20); return soru(`Yarıçapı ${R} cm olan çemberin çevresi kaç cm'dir? ${pi}`, 6 * R, [Y(3 * R, "k:yarıçap, çap gibi kullanıldı (2 ile çarpılmadı)"), Y(3 * R * R, "k:çevre yerine alan formülü kullanıldı"), 2 * R + 3, 6 * R + 6], `Çevre = 2 × π × r = 2 × 3 × ${R} = ${6 * R} cm.`); }
+    if (tip === 4) { const R = r(2, 20), C = 6 * R; return soru(`Çevresi ${C} cm olan çemberin yarıçapı kaç cm'dir? ${pi}`, R, [Y(2 * R, "d:çap bulundu ama yarıçap sorulmuştu"), C / 2, R + 3], `2 × 3 × r = ${C} → 6 × r = ${C} → r = ${R} cm.`); }
     const c = r(4, 16) * 5, n = r(2, 20), yol = 3 * c * n;
     return soru(`Çapı ${c} cm olan bir bisiklet tekerleği ${n} tam tur dönerse bisiklet kaç cm yol alır? ${pi}`, grup(yol),
-      [grup(c * n), grup(6 * c * n), grup(3 * c)], `Bir tur = çevre = 3 × ${c} = ${3 * c} cm. ${n} tur: ${3 * c} × ${n} = ${grup(yol)} cm.`,
+      [Y(grup(c * n), "k:π ile çarpılmadı (bir tur, çevre kadar yoldur)"), Y(grup(6 * c * n), "k:çap, yarıçap gibi kullanıldı"), Y(grup(3 * c), "d:tur sayısıyla çarpılmadı")], `Bir tur = çevre = 3 × ${c} = ${3 * c} cm. ${n} tur: ${3 * c} × ${n} = ${grup(yol)} cm.`,
       () => grup(yol + pick([-1, 1]) * 3 * c * r(1, 3)));
   };
 
@@ -529,7 +533,7 @@ window.URETEC = window.URETEC || {};
     if (tip === 1) {
       let a; do { a = r(20, 170); } while (a === 90 || a === 120);
       return soru(`Bir merkez açının ölçüsü ${a}° ise bu açının gördüğü yayın ölçüsü kaç derecedir?`, derece(a),
-        [derece(2 * a), derece(180 - a), derece(360 - a), ...(a % 2 ? [] : [derece(a / 2)])], "Merkez açının ölçüsü, gördüğü yayın ölçüsüne eşittir.", yakinDerece(a));
+        [Y(derece(2 * a), "k:yay ölçüsü merkez açının iki katı sanıldı (çevre açıyla karıştırıldı)"), derece(180 - a), Y(derece(360 - a), "d:büyük yay hesaplandı"), ...(a % 2 ? [] : [Y(derece(a / 2), "k:merkez açı çevre açıyla karıştırıldı")])], "Merkez açının ölçüsü, gördüğü yayın ölçüsüne eşittir.", yakinDerece(a));
     }
     if (tip === 2) {
       const n = pick([3, 4, 5, 6, 8, 9, 10, 12]);
@@ -540,7 +544,7 @@ window.URETEC = window.URETEC || {};
     const aci = pick([30, 45, 60, 90, 120, 180, 270]), g = gcd(aci, 360), pay = aci / g, payda = 360 / g;
     const C = payda * r(2, Math.floor(120 / payda)), yay = (C * pay) / payda;
     return soru(`Çevresi ${C} cm olan bir çemberde ölçüsü ${aci}° olan merkez açının gördüğü yayın uzunluğu kaç cm'dir?`, yay,
-      [C - yay, yay * 2, aci, yay + payda], `${aci}°, tam çemberin (360°) ${pay}/${payda} kadarıdır. ${C} × ${pay}/${payda} = ${yay} cm.`);
+      [Y(C - yay, "d:geri kalan yay hesaplandı"), yay * 2, Y(aci, "k:açının ölçüsü yay uzunluğu sanıldı"), yay + payda], `${aci}°, tam çemberin (360°) ${pay}/${payda} kadarıdır. ${C} × ${pay}/${payda} = ${yay} cm.`);
   };
 
   // ---------- Ek konu: Üslü ifadeler ve işlem önceliği ----------
@@ -548,12 +552,12 @@ window.URETEC = window.URETEC || {};
     if (r(0, 1)) {
       let b, e; do { b = r(2, 10); e = r(2, 4); } while (b ** e > 10000 || (b === 2 && e === 2));
       const v = b ** e;
-      return soru(`${b}${UST[e]} ifadesinin değeri kaçtır?`, grup(v), [grup(b * e), grup(b + e), grup(b ** (e - 1)), grup(v + b)],
+      return soru(`${b}${UST[e]} ifadesinin değeri kaçtır?`, grup(v), [Y(grup(b * e), "k:taban ile üs çarpıldı"), Y(grup(b + e), "k:taban ile üs toplandı"), Y(grup(b ** (e - 1)), "d:taban bir kez eksik çarpıldı"), grup(v + b)],
         `${b}${UST[e]} = ${Array(e).fill(b).join(" × ")} = ${grup(v)}.`, () => grup(v + pick([-1, 1]) * r(1, 10)));
     }
     let a, e1, b, e2; do { a = r(2, 6); b = r(2, 6); e1 = r(2, 3); e2 = r(2, 3); } while (a ** e1 <= b ** e2);
     const v = a ** e1 - b ** e2;
-    return soru(`${a}${UST[e1]} − ${b}${UST[e2]} işleminin sonucu kaçtır?`, v, [a * e1 - b * e2, a ** e1, v + b, b ** e2],
+    return soru(`${a}${UST[e1]} − ${b}${UST[e2]} işleminin sonucu kaçtır?`, v, [Y(a * e1 - b * e2, "k:üslü ifadede taban ile üs çarpıldı"), a ** e1, v + b, b ** e2],
       `${a}${UST[e1]} = ${a ** e1}, ${b}${UST[e2]} = ${b ** e2}. ${a ** e1} − ${b ** e2} = ${v}.`);
   };
 
@@ -561,20 +565,20 @@ window.URETEC = window.URETEC || {};
     const tip = r(1, 3);
     if (tip === 1) {
       const a = r(2, 30), b = r(2, 9), c = r(2, 9), v = a + b * c;
-      return soru(`${a} + ${b} × ${c} işleminin sonucu kaçtır?`, v, [(a + b) * c, a + b + c, a * b + c], `Önce çarpma: ${b} × ${c} = ${b * c}. Sonra toplama: ${a} + ${b * c} = ${v}.`);
+      return soru(`${a} + ${b} × ${c} işleminin sonucu kaçtır?`, v, [Y((a + b) * c, "k:işlem önceliğine uyulmadı (önce çarpma yapılır)"), a + b + c, a * b + c], `Önce çarpma: ${b} × ${c} = ${b * c}. Sonra toplama: ${a} + ${b * c} = ${v}.`);
     }
     if (tip === 2) {
       const b = r(2, 9), c = r(2, 9), a = b * c + r(1, 20), v = a - b * c;
-      return soru(`${a} − ${b} × ${c} işleminin sonucu kaçtır?`, v, [(a - b) * c, a - b + c, a - b - c], `Önce çarpma: ${b} × ${c} = ${b * c}. Sonra çıkarma: ${a} − ${b * c} = ${v}.`);
+      return soru(`${a} − ${b} × ${c} işleminin sonucu kaçtır?`, v, [Y((a - b) * c, "k:işlem önceliğine uyulmadı (önce çarpma yapılır)"), a - b + c, a - b - c], `Önce çarpma: ${b} × ${c} = ${b * c}. Sonra çıkarma: ${a} − ${b * c} = ${v}.`);
     }
     const x = r(2, 6), b = r(2, 9), c = r(2, 9), v = x * x + b * c;
-    return soru(`${x}² + ${b} × ${c} işleminin sonucu kaçtır?`, v, [(x * x + b) * c, x * 2 + b * c, x * x + b + c],
+    return soru(`${x}² + ${b} × ${c} işleminin sonucu kaçtır?`, v, [Y((x * x + b) * c, "k:işlem önceliğine uyulmadı (önce çarpma yapılır)"), Y(x * 2 + b * c, "k:kare almak 2 ile çarpmak sanıldı"), x * x + b + c],
       `Önce üs: ${x}² = ${x * x}. Sonra çarpma: ${b} × ${c} = ${b * c}. En son toplama: ${x * x} + ${b * c} = ${v}.`);
   };
 
   U.m1k3 = () => {
     const a = r(3, 12), t = pick([10, 20, 30, 40, 50]), b = r(2, t - 2), c = t - b, v = a * t;
-    return soru(`${a} × ${b} + ${a} × ${c} işleminin sonucu kaçtır?`, v, [a * b + c, v + a, v - a, a + t],
+    return soru(`${a} × ${b} + ${a} × ${c} işleminin sonucu kaçtır?`, v, [Y(a * b + c, "k:ortak çarpan yalnızca ilk terimle çarpıldı"), v + a, v - a, a + t],
       `Ortak çarpan ${a} paranteze alınır: ${a} × (${b} + ${c}) = ${a} × ${t} = ${v}.`);
   };
 })();

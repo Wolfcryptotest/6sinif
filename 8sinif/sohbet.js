@@ -232,8 +232,10 @@
     let ozet = null, enO = 0;
     if (b) for (const t of b.k.ozet || []) { let o = 0; for (const w of new Set(kelimeler(t).map(kok))) o += (ck.has(w) ? 2 : 0) + (qk.has(w) ? 1 : 0); if (o > enO) { enO = o; ozet = t; } }
     if (enO < 2) ozet = null;
+    const teshis0 = window.USTALIK && USTALIK.hataTeshis && y.sec != null ? USTALIK.hataTeshis(y, y.sec) : null, teshis = teshis0 && teshis0.etiket ? teshis0 : null;
     return {
       html: `Son yanlış yaptığın soru 👇<br><i>${esc(y.soru.length > 160 ? y.soru.slice(0, 159) + "…" : y.soru)}</i><br>✅ Doğru cevap: <b>${esc(y.secenekler[y.dogru])}</b>` +
+        `${teshis ? `<br>🔍 <b>Teşhisim:</b> ${teshis.tur === "d" ? "Bu bir <b>dikkat hatası</b>" : "Bu bir <b>kavram yanılgısı</b>"}: ${esc(teshis.etiket)}.${teshis.tur === "d" ? " Konuyu biliyorsun; işlemi adım adım kontrol etmen yeter." : " Bu yanılgıyı düzeltmek için çözümü dikkatle oku."}` : ""}` +
         `${y.cozum ? `<br>💡 <b>Neden?</b> ${esc(y.cozum)}` : ""}` +
         `${ozet ? `<br><br>📌 Bu konunun anahtar bilgisi: ${esc(ozet)}` : ""}` +
         `${ayni > 1 ? `<br><br>Bu konuda <b>${ayni}</b> yanlışın birikmiş. Konuyu bir kez daha okuyup yanlışlarını tekrar çözmek iyi gelir.` : ""}` +

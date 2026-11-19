@@ -538,6 +538,7 @@ function test(kaynak, ad, tekrarModu, konuId) {
     btns[sira.indexOf(s.dogru)].classList.add("dogru");
     const ok = j === s.dogru;
     if (window.USTALIK) USTALIK.ipucuBitti();
+    const teshis = !ok && window.USTALIK && USTALIK.hataKaydet ? USTALIK.hataKaydet(s, s.secenekler[j]) : null;
     soruKaydet(s.konuId, ok, (Date.now() - t0) / 1000);
     const anahtar = (y) => y.konuId === s.konuId && y.soru === s.soru && y.secenekler[y.dogru] === s.secenekler[s.dogru];
     if (ok) {
@@ -546,13 +547,13 @@ function test(kaynak, ad, tekrarModu, konuId) {
     } else {
       btns[p].classList.add("yanlis");
       if (!kayit.yanlislar.some(anahtar)) {
-        kayit.yanlislar.push({ konuId: s.konuId, soru: s.soru, secenekler: s.secenekler, dogru: s.dogru, cozum: s.cozum, ceviri: s.ceviri, sozluk: s.sozluk, ses: s.ses });
+        kayit.yanlislar.push({ konuId: s.konuId, soru: s.soru, secenekler: s.secenekler, dogru: s.dogru, cozum: s.cozum, ceviri: s.ceviri, sozluk: s.sozluk, ses: s.ses, yanilgi: s.yanilgi, sec: s.secenekler[j] });
         if (kayit.yanlislar.length > 300) kayit.yanlislar.shift();
       }
     }
     kaydet();
     $("alt").innerHTML = `
-      <div class="cozum"><b>${ok ? "✅ Doğru!" : "❌ Senin cevabın yanlış"}</b>${ok ? "" : `<div class="ek-satir">Senin cevabın: <b>${"ABCD"[p]}) ${esc(s.secenekler[j])}</b><br>✅ Doğru cevap: <b>${"ABCD"[sira.indexOf(s.dogru)]}) ${esc(s.secenekler[s.dogru])}</b></div>`}<div style="margin-top:6px">${esc(s.cozum)}</div>
+      <div class="cozum"><b>${ok ? "✅ Doğru!" : "❌ Senin cevabın yanlış"}</b>${ok ? "" : `<div class="ek-satir">Senin cevabın: <b>${"ABCD"[p]}) ${esc(s.secenekler[j])}</b><br>✅ Doğru cevap: <b>${"ABCD"[sira.indexOf(s.dogru)]}) ${esc(s.secenekler[s.dogru])}</b></div>${window.USTALIK && USTALIK.hataHtml ? USTALIK.hataHtml(teshis) : ""}`}<div style="margin-top:6px">${esc(s.cozum)}</div>
         ${s.ses ? `<div class="ek-satir"><button class="ses-btn" id="sesli">🔊 Dinle</button> <span class="ing">${esc(s.ses)}</span></div>` : ""}
         ${s.ceviri ? `<div class="ek-satir"><b>Türkçesi:</b> ${esc(s.ceviri)}</div>` : ""}
         ${s.sozluk && s.sozluk.length ? `<div class="ek-satir"><b>📘 Kelimeler:</b> ${s.sozluk.map(([e, t]) => `<span class="kelime-cip"><b>${esc(e)}</b> = ${esc(t)}</span>`).join(" ")}</div>` : ""}

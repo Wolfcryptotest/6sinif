@@ -132,15 +132,19 @@
           const b = document.createElement("button"); b.className = "secenek"; b.textContent = "ABCD"[p] + ") " + s.secenekler[asil];
           b.onclick = () => cevap(asil, b); $("odSec").appendChild(b); return b;
         });
+        let secilen = null, teshis = null;
         const yanlisaEkle = () => {
           const ayni = (y) => y.konuId === k.id && y.soru === s.soru && y.secenekler[y.dogru] === s.secenekler[s.dogru];
-          if (!kayit.yanlislar.some(ayni)) { kayit.yanlislar.push({ konuId: k.id, soru: s.soru, secenekler: s.secenekler, dogru: s.dogru, cozum: s.cozum, ceviri: s.ceviri, sozluk: s.sozluk, ses: s.ses }); if (kayit.yanlislar.length > 300) kayit.yanlislar.shift(); }
+          if (!kayit.yanlislar.some(ayni)) { kayit.yanlislar.push({ konuId: k.id, soru: s.soru, secenekler: s.secenekler, dogru: s.dogru, cozum: s.cozum, ceviri: s.ceviri, sozluk: s.sozluk, ses: s.ses, yanilgi: s.yanilgi, sec: secilen }); if (kayit.yanlislar.length > 300) kayit.yanlislar.shift(); }
         };
         function cevap(asil, b) {
           const ok = asil === s.dogru;
           deneme++;
           // Puana yalnızca ilk deneme yazılır; ipucuyla bulunan cevap öğrenmeyi gösterir ama puanı şişirmez
-          if (deneme === 1) { window.soruKaydet(k.id, ok, (Date.now() - t0) / 1000); if (!s.benzer) ana++; if (!ok) yanlisaEkle(); }
+          if (deneme === 1) {
+            window.soruKaydet(k.id, ok, (Date.now() - t0) / 1000); if (!s.benzer) ana++;
+            if (!ok) { secilen = s.secenekler[asil]; teshis = window.USTALIK && USTALIK.hataKaydet ? USTALIK.hataKaydet({ ...s, konuId: k.id }, secilen) : null; yanlisaEkle(); }
+          }
           if (ok) {
             if (deneme === 1) dogru++;
             btns.forEach((x) => (x.disabled = true)); b.classList.add("dogru");
@@ -148,7 +152,7 @@
               <button class="btn od-ileri" id="odIleri">${i + 1 < liste.length ? "Sonraki soru →" : "Dersi bitir →"}</button>`;
           } else if (deneme === 1) {
             b.disabled = true; b.classList.add("yanlis");
-            $("odAlt").innerHTML = `<div class="od-ipucu">🦉 <b>Bir daha dene!</b> ${esc(ipucuBul(k, s, s.secenekler[asil]))}</div>`;
+            $("odAlt").innerHTML = (teshis && teshis.etiket ? USTALIK.hataHtml(teshis, "Bunu aklında tutarak bir daha dene.") : "") + `<div class="od-ipucu">🦉 <b>Bir daha dene!</b> ${esc(ipucuBul(k, s, s.secenekler[asil]))}</div>`;
             kaydet(); return;
           } else {
             btns.forEach((x) => (x.disabled = true)); b.classList.add("yanlis"); btns[sira.indexOf(s.dogru)].classList.add("dogru");

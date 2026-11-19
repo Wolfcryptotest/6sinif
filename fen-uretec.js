@@ -1,6 +1,6 @@
 // 6. sınıf Fen Bilimleri soru üreteçleri (ortak-uretec.js'ten sonra yüklenir)
 (function () {
-  const U = window.URETEC, { r, pick, karistir, soru, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
+  const U = window.URETEC, { r, pick, karistir, soru, Y, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
   const ond1 = (x) => (Math.round(x * 10) / 10).toString().replace(".", ",");
 
   // ---------- Güneş sistemi ----------
@@ -48,11 +48,11 @@
   // ---------- Kuvvet ve hareket ----------
   const YON = [["sağa", "sola"], ["doğuya", "batıya"], ["kuzeye", "güneye"], ["ileri", "geri"]];
   U.f2k1 = tiplerden([
-    () => { const a = r(2, 30) * 5, b = r(2, 30) * 5, [y] = pick(YON); return soru(`Bir cisme aynı yönde (${y}) ${a} N ve ${b} N büyüklüğünde iki kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, `${a + b} N, ${y}`, [`${Math.abs(a - b)} N, ${y}`, `${a + b} N, ters yöne`, `${a * b} N, ${y}`, `${Math.max(a, b)} N, ${y}`], `Aynı yönlü kuvvetler toplanır: ${a} + ${b} = ${a + b} N. Yön değişmez: ${y}.`); },
-    () => { let a, b; do { a = r(2, 30) * 5; b = r(2, 30) * 5; } while (a === b); const [y1, y2] = pick(YON), by = a > b ? y1 : y2; return soru(`Bir cisme ${a} N ${y1}, ${b} N ${y2} doğru iki kuvvet uygulanıyor. Bileşke kuvvet hangisidir?`, `${Math.abs(a - b)} N, ${by}`, [`${Math.abs(a - b)} N, ${by === y1 ? y2 : y1}`, `${a + b} N, ${by}`, `${a + b} N, ${by === y1 ? y2 : y1}`, "0 N"], `Zıt yönlü kuvvetlerde büyükten küçük çıkarılır: ${Math.max(a, b)} − ${Math.min(a, b)} = ${Math.abs(a - b)} N. Yön büyük kuvvetin yönü: ${by}.`); },
-    () => { const a = r(2, 15) * 10, [y1, y2] = pick(YON); return soru(`Bir cisme ${a} N ${y1}, ${a} N ${y2} doğru kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, "0", [String(2 * a), String(a), String(a / 2)], "Eşit büyüklükte ve zıt yönlü kuvvetlerin bileşkesi 0'dır."); },
-    () => { const a = r(3, 25) * 5, b = r(1, 15) * 5, [y1, y2] = pick(YON); return soru(`Halat çekme yarışında A takımı ${a + b} N ile ${y1}, B takımı ${a} N ile ${y2} çekiyor. Halat hangi yöne, kaç N'luk bileşke kuvvetle hareket eder?`, `${y1}, ${b} N`, [`${y2}, ${b} N`, `${y1}, ${2 * a + b} N`, `${y2}, ${2 * a + b} N`, "Hareket etmez"], `${a + b} − ${a} = ${b} N. Halat büyük kuvvetin yönüne, ${y1} hareket eder.`); },
-    () => { const top = r(6, 30) * 5, a = r(1, top / 5 - 1) * 5, [y] = pick(YON); return soru(`Aynı yönlü iki kuvvetin bileşkesi ${top} N'dur. Kuvvetlerden biri ${a} N ise diğeri kaç N'dur?`, String(top - a), [String(top + a), String(a), String(top)], `${top} − ${a} = ${top - a} N.`); }
+    () => { const a = r(2, 30) * 5, b = r(2, 30) * 5, [y] = pick(YON); return soru(`Bir cisme aynı yönde (${y}) ${a} N ve ${b} N büyüklüğünde iki kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, `${a + b} N, ${y}`, [Y(`${Math.abs(a - b)} N, ${y}`, "k:aynı yönlü kuvvetler çıkarıldı (toplanmalıydı)"), Y(`${a + b} N, ters yöne`, "d:yön dikkate alınmadı"), Y(`${a * b} N, ${y}`, "k:kuvvetler çarpıldı"), `${Math.max(a, b)} N, ${y}`], `Aynı yönlü kuvvetler toplanır: ${a} + ${b} = ${a + b} N. Yön değişmez: ${y}.`); },
+    () => { let a, b; do { a = r(2, 30) * 5; b = r(2, 30) * 5; } while (a === b); const [y1, y2] = pick(YON), by = a > b ? y1 : y2; return soru(`Bir cisme ${a} N ${y1}, ${b} N ${y2} doğru iki kuvvet uygulanıyor. Bileşke kuvvet hangisidir?`, `${Math.abs(a - b)} N, ${by}`, [Y(`${Math.abs(a - b)} N, ${by === y1 ? y2 : y1}`, "d:yön dikkate alınmadı (bileşke büyük kuvvetin yönündedir)"), Y(`${a + b} N, ${by}`, "k:zıt yönlü kuvvetler toplandı (çıkarılmalıydı)"), `${a + b} N, ${by === y1 ? y2 : y1}`, "0 N"], `Zıt yönlü kuvvetlerde büyükten küçük çıkarılır: ${Math.max(a, b)} − ${Math.min(a, b)} = ${Math.abs(a - b)} N. Yön büyük kuvvetin yönü: ${by}.`); },
+    () => { const a = r(2, 15) * 10, [y1, y2] = pick(YON); return soru(`Bir cisme ${a} N ${y1}, ${a} N ${y2} doğru kuvvet uygulanıyor. Bileşke kuvvet kaç N'dur?`, "0", [Y(String(2 * a), "k:zıt yönlü kuvvetler toplandı (çıkarılmalıydı)"), String(a), String(a / 2)], "Eşit büyüklükte ve zıt yönlü kuvvetlerin bileşkesi 0'dır."); },
+    () => { const a = r(3, 25) * 5, b = r(1, 15) * 5, [y1, y2] = pick(YON); return soru(`Halat çekme yarışında A takımı ${a + b} N ile ${y1}, B takımı ${a} N ile ${y2} çekiyor. Halat hangi yöne, kaç N'luk bileşke kuvvetle hareket eder?`, `${y1}, ${b} N`, [Y(`${y2}, ${b} N`, "d:yön dikkate alınmadı (halat büyük kuvvetin yönüne gider)"), Y(`${y1}, ${2 * a + b} N`, "k:zıt yönlü kuvvetler toplandı (çıkarılmalıydı)"), `${y2}, ${2 * a + b} N`, "Hareket etmez"], `${a + b} − ${a} = ${b} N. Halat büyük kuvvetin yönüne, ${y1} hareket eder.`); },
+    () => { const top = r(6, 30) * 5, a = r(1, top / 5 - 1) * 5, [y] = pick(YON); return soru(`Aynı yönlü iki kuvvetin bileşkesi ${top} N'dur. Kuvvetlerden biri ${a} N ise diğeri kaç N'dur?`, String(top - a), [Y(String(top + a), "k:bileşkeye kuvvet eklendi (çıkarılmalıydı)"), String(a), String(top)], `${top} − ${a} = ${top - a} N.`); }
   ]);
 
   U.f2k2 = tiplerden([
@@ -70,10 +70,10 @@
   ]);
 
   U.f2k3 = tiplerden([
-    () => { const v = r(2, 12), t = r(5, 60), x = v * t; return soru(`Bir koşucu ${x} metreyi ${t} saniyede koşuyor. Koşucunun sürati kaç m/s'dir?`, String(v), [String(v + 1), String(x - t), String(t)].filter((z) => z !== String(v)).concat([String(v * 2), String(v + 2)]), `Sürat = yol ÷ süre = ${x} ÷ ${t} = ${v} m/s.`); },
-    () => { const v = r(4, 12) * 10, t = r(2, 6); return soru(`Bir otomobil ${v} km/sa sabit süratle ${t} saat yol alıyor. Kaç km yol alır?`, String(v * t), [String(v + t), String(v * (t + 1)), String(v * (t - 1)), String(v / 10 * t)], `Yol = sürat × süre = ${v} × ${t} = ${v * t} km.`); },
+    () => { const v = r(2, 12), t = r(5, 60), x = v * t; return soru(`Bir koşucu ${x} metreyi ${t} saniyede koşuyor. Koşucunun sürati kaç m/s'dir?`, String(v), [String(v + 1), Y(String(x - t), "k:yoldan süre çıkarıldı (bölünmeliydi)"), String(t)].filter((z) => z !== String(v)).concat([String(v * 2), String(v + 2)]), `Sürat = yol ÷ süre = ${x} ÷ ${t} = ${v} m/s.`); },
+    () => { const v = r(4, 12) * 10, t = r(2, 6); return soru(`Bir otomobil ${v} km/sa sabit süratle ${t} saat yol alıyor. Kaç km yol alır?`, String(v * t), [Y(String(v + t), "k:sürat ile süre toplandı (çarpılmalıydı)"), String(v * (t + 1)), String(v * (t - 1)), String(v / 10 * t)], `Yol = sürat × süre = ${v} × ${t} = ${v * t} km.`); },
     () => { const v = r(4, 12) * 10, t = r(2, 7); return soru(`${v * t} km'lik yolu ${v} km/sa sabit süratle giden bir otobüs kaç saatte gider?`, String(t), [String(t + 1), String(t - 1), String(t + 2), String(v)].filter((z) => +z > 0), `Süre = yol ÷ sürat = ${v * t} ÷ ${v} = ${t} saat.`); },
-    () => { const [y1] = pick(YON), v = r(3, 25) * 5; return soru("Hangisi bir hız bildirir?", `${y1} doğru ${v} km/sa`, [`${v} km/sa`, `${v} m/s`, `saatte ${v} km`, `${v + 5} km/sa`], "Hız, sürate ek olarak yönü de belirtir."); },
+    () => { const [y1] = pick(YON), v = r(3, 25) * 5; return soru("Hangisi bir hız bildirir?", `${y1} doğru ${v} km/sa`, [Y(`${v} km/sa`, "k:yönü belirtilmeyen sürat hız sanıldı"), `${v} m/s`, `saatte ${v} km`, `${v + 5} km/sa`], "Hız, sürate ek olarak yönü de belirtir."); },
     () => { const v1 = r(2, 9), v2 = v1 + r(1, 5), t = r(10, 40), [A, B] = karistir(["Ali", "Ece", "Can", "Zeynep", "Mert", "Elif"]); return soru(`${A} ${v1 * t} metreyi, ${B} ${v2 * t} metreyi ${t} saniyede koşuyor. Hangisi doğrudur?`, `${B} daha süratlidir.`, [`${A} daha süratlidir.`, "İkisinin sürati eşittir.", `${A} saniyede ${v2} metre koşar.`], `${A}: ${v1 * t} ÷ ${t} = ${v1} m/s. ${B}: ${v2 * t} ÷ ${t} = ${v2} m/s. ${B} daha süratli.`); }
   ]);
 
@@ -131,9 +131,9 @@
 
   // ---------- Işık ----------
   U.f4k1 = tiplerden([
-    () => { let x; do { x = r(10, 80); } while (x === 45); return soru(`Bir ışın aynaya, yüzey ile ${x}° açı yapacak şekilde geliyor. Yansıma açısı kaç derecedir?`, `${90 - x}°`, [`${x}°`, `${180 - x}°`, `${2 * x}°`, `${90 + x}°`], `Açılar normalden ölçülür. Gelme açısı = 90° − ${x}° = ${90 - x}°. Yansıma açısı = gelme açısı = ${90 - x}°.`); },
-    () => { const g = r(10, 80); return soru(`Gelme açısı ${g}° olan bir ışının yansıma açısı kaç derecedir?`, `${g}°`, [`${90 - g}°`, `${180 - g}°`, `${2 * g}°`, `${g + 10}°`], "Yansıma kanununa göre gelme açısı yansıma açısına eşittir."); },
-    () => { const g = r(10, 80); return soru(`Gelme açısı ${g}° olan bir ışında gelen ışın ile yansıyan ışın arasındaki açı kaç derecedir?`, `${2 * g}°`, [`${g}°`, `${90 - g}°`, `${180 - 2 * g}°`, `${180 - g}°`], `Gelme ${g}° + yansıma ${g}° = ${2 * g}°.`); },
+    () => { let x; do { x = r(10, 80); } while (x === 45); return soru(`Bir ışın aynaya, yüzey ile ${x}° açı yapacak şekilde geliyor. Yansıma açısı kaç derecedir?`, `${90 - x}°`, [Y(`${x}°`, "k:açı normalden değil yüzeyden ölçüldü"), `${180 - x}°`, `${2 * x}°`, `${90 + x}°`], `Açılar normalden ölçülür. Gelme açısı = 90° − ${x}° = ${90 - x}°. Yansıma açısı = gelme açısı = ${90 - x}°.`); },
+    () => { const g = r(10, 80); return soru(`Gelme açısı ${g}° olan bir ışının yansıma açısı kaç derecedir?`, `${g}°`, [Y(`${90 - g}°`, "k:açılar normalden ölçülür; yüzeyle yapılan açı hesaplandı"), `${180 - g}°`, Y(`${2 * g}°`, "d:gelen ve yansıyan ışın arasındaki açı hesaplandı"), `${g + 10}°`], "Yansıma kanununa göre gelme açısı yansıma açısına eşittir."); },
+    () => { const g = r(10, 80); return soru(`Gelme açısı ${g}° olan bir ışında gelen ışın ile yansıyan ışın arasındaki açı kaç derecedir?`, `${2 * g}°`, [Y(`${g}°`, "d:yalnızca yansıma açısı bulundu, iki ışın arasındaki açı sorulmuştu"), `${90 - g}°`, `${180 - 2 * g}°`, `${180 - g}°`], `Gelme ${g}° + yansıma ${g}° = ${2 * g}°.`); },
     siniflandir({ "düzgün yansıma": ["ayna", "durgun su", "parlak metal tepsi", "cilalı mermer", "cam vitrin"], "dağınık yansıma": ["defter sayfası", "duvar", "kumaş", "tahta masa", "karton", "toprak"] },
       (g) => `Hangi yüzeyde ${g} olur?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}: ${g}. ${g === "düzgün yansıma" ? "Pürüzsüz yüzeyde görüntü oluşur." : "Pürüzlü yüzeyde ışınlar dağılır, görüntü oluşmaz."}`)
   ]);
@@ -161,7 +161,7 @@
       else g = "siyah";
       const ne = pick(["tişört", "top", "kalem", "kitap", "şapka"]);
       return soru(`Beyaz ışıkta ${RENK_EK[cisim]} görünen bir ${ne}, karanlık bir odada yalnızca ${isik} ışıkla aydınlatılırsa hangi renkte görünür?`, g.charAt(0).toLocaleUpperCase("tr") + g.slice(1),
-        ["Kırmızı", "Yeşil", "Mavi", "Beyaz", "Siyah"].filter((x) => x.toLocaleLowerCase("tr") !== g),
+        ["Kırmızı", "Yeşil", "Mavi", "Beyaz", "Siyah"].filter((x) => x.toLocaleLowerCase("tr") !== g).map((x) => { const l = x.toLocaleLowerCase("tr"); return g === "siyah" && l === cisim ? Y(x, "k:cisim her ışıkta kendi renginde görünür sanıldı") : g === "siyah" && l === isik ? Y(x, "k:cisim üzerine düşen ışığın rengini alır sanıldı") : x; }),
         isik === "beyaz" ? "Beyaz ışık bütün renkleri içerir; cisim kendi renginde görünür." : cisim === "beyaz" ? `Beyaz cisim gelen her rengi yansıtır; ${isik} görünür.` : cisim === isik ? `Cisim ${isik} ışığı yansıtır; ${isik} görünür.` : `${RENK_EK[cisim].charAt(0).toLocaleUpperCase("tr") + RENK_EK[cisim].slice(1)} cisim ${isik} ışığı soğurur, yansıtacak ışık olmadığı için siyah görünür.`);
     },
     () => { const sira = ["kırmızı", "turuncu", "sarı", "yeşil", "mavi", "lacivert", "mor"], i = r(0, 5); return soru(`Beyaz ışık prizmadan geçince oluşan renk sıralamasında "${sira[i]}" renginden sonra hangi renk gelir?`, sira[i + 1], sira.filter((_, j) => j !== i + 1 && j !== i), `Sıralama: ${sira.join(", ")}.`); },
@@ -209,7 +209,7 @@
       return soru(`Erime noktası ${e} °C, kaynama noktası ${k} °C olan ${ad} ${t} °C'de hangi hâldedir?`, hal.charAt(0).toLocaleUpperCase("tr") + hal.slice(1), ["Katı", "Sıvı", "Gaz", "Plazma"].filter((x) => x.toLocaleLowerCase("tr") !== hal),
         hal === "katı" ? `${t} °C erime noktasından (${e} °C) düşük → katı.` : hal === "sıvı" ? `${t} °C, erime (${e} °C) ile kaynama (${k} °C) noktası arasında → sıvı.` : `${t} °C kaynama noktasından (${k} °C) yüksek → gaz.`);
     },
-    () => { const [ad, e] = pick(MADDE); const n = (x) => String(x).replace("-", "−"); return soru(`Erime noktası ${n(e)} °C olan saf bir maddenin (${ad}) donma noktası kaç °C'dir?`, `${n(e)} °C`, [`${n(e + 10)} °C`, `${n(e - 10)} °C`, "0 °C", "100 °C"], "Saf maddelerde erime noktası donma noktasına eşittir."); },
+    () => { const [ad, e] = pick(MADDE); const n = (x) => String(x).replace("-", "−"); return soru(`Erime noktası ${n(e)} °C olan saf bir maddenin (${ad}) donma noktası kaç °C'dir?`, `${n(e)} °C`, [`${n(e + 10)} °C`, `${n(e - 10)} °C`, Y("0 °C", "k:her maddenin donma noktası suyunki gibi 0 °C sanıldı"), "100 °C"], "Saf maddelerde erime noktası donma noktasına eşittir."); },
     ifadeler([
       "Saf suyun donma noktası 0 °C'dir.", "Saf su deniz seviyesinde 100 °C'de kaynar.", "Hal değişimi sırasında sıcaklık sabit kalır.", "Erime noktası saf maddeler için ayırt edicidir.",
       "Saf maddede erime ve donma noktası aynıdır.", "Yükseklere çıkıldıkça suyun kaynama noktası düşer.", "Kaynama noktası saf maddeler için ayırt edicidir."
@@ -221,11 +221,11 @@
 
   const YOG = [["mantar", 0.2], ["tahta", 0.6], ["buz", 0.9], ["zeytinyağı", 0.9], ["su", 1], ["gliserin", 1.3], ["alüminyum", 2.7], ["demir", 7.9], ["bakır", 8.9], ["kurşun", 11.3], ["altın", 19.3]];
   U.f5k3 = tiplerden([
-    () => { const d = r(2, 12), V = r(3, 25), m = d * V; return soru(`Kütlesi ${m} g, hacmi ${V} cm³ olan bir maddenin yoğunluğu kaç g/cm³'tür?`, String(d), [String(m * V), String(m - V), String(d + 1), String(m + V), String(d * 2)], `Yoğunluk = kütle ÷ hacim = ${m} ÷ ${V} = ${d} g/cm³.`); },
-    () => { const d = r(2, 12), V = r(3, 20); return soru(`Yoğunluğu ${d} g/cm³ olan bir maddenin ${V} cm³'ünün kütlesi kaç gramdır?`, String(d * V), [String(d + V), String(d * V + d), String(d * (V - 1)), String(V)].filter((z) => z !== String(d * V)), `Kütle = yoğunluk × hacim = ${d} × ${V} = ${d * V} g.`); },
-    () => { const d = r(2, 10), V = r(3, 20), m = d * V; return soru(`Yoğunluğu ${d} g/cm³ olan ${m} g'lık bir maddenin hacmi kaç cm³'tür?`, String(V), [String(m * d), String(V + 1), String(V + d), String(d)].filter((z) => z !== String(V)), `Hacim = kütle ÷ yoğunluk = ${m} ÷ ${d} = ${V} cm³.`); },
+    () => { const d = r(2, 12), V = r(3, 25), m = d * V; return soru(`Kütlesi ${m} g, hacmi ${V} cm³ olan bir maddenin yoğunluğu kaç g/cm³'tür?`, String(d), [Y(String(m * V), "k:kütle ile hacim çarpıldı (bölünmeliydi)"), Y(String(m - V), "k:kütleden hacim çıkarıldı (bölünmeliydi)"), String(d + 1), Y(String(m + V), "k:kütle ile hacim toplandı"), String(d * 2)], `Yoğunluk = kütle ÷ hacim = ${m} ÷ ${V} = ${d} g/cm³.`); },
+    () => { const d = r(2, 12), V = r(3, 20); return soru(`Yoğunluğu ${d} g/cm³ olan bir maddenin ${V} cm³'ünün kütlesi kaç gramdır?`, String(d * V), [Y(String(d + V), "k:yoğunluk ile hacim toplandı (çarpılmalıydı)"), String(d * V + d), String(d * (V - 1)), String(V)].filter((z) => z !== String(d * V)), `Kütle = yoğunluk × hacim = ${d} × ${V} = ${d * V} g.`); },
+    () => { const d = r(2, 10), V = r(3, 20), m = d * V; return soru(`Yoğunluğu ${d} g/cm³ olan ${m} g'lık bir maddenin hacmi kaç cm³'tür?`, String(V), [Y(String(m * d), "k:kütle yoğunlukla çarpıldı (bölünmeliydi)"), String(V + 1), String(V + d), String(d)].filter((z) => z !== String(V)), `Hacim = kütle ÷ yoğunluk = ${m} ÷ ${d} = ${V} cm³.`); },
     () => { const yuz = YOG.filter((x) => x[1] < 1), bat = YOG.filter((x) => x[1] > 1), [a, d] = pick(yuz), diger = karistir(bat).slice(0, 3); return soru(`Yoğunlukları verilen maddelerden hangisi suda (1 g/cm³) yüzer? ${karistir([[a, d], ...diger]).map(([n, v]) => `${n}: ${ond1(v)} g/cm³`).join(" · ")}`, a, diger.map((x) => x[0]), `Yoğunluğu sudan küçük olan ${a} (${ond1(d)} g/cm³) yüzer.`); },
-    () => { const [n1, d1] = pick(YOG.filter((x) => x[1] > 2)); return soru(`Yoğunluğu ${ond1(d1)} g/cm³ olan ${n1} bir küp ikiye kesilirse parçalardan birinin yoğunluğu kaç g/cm³ olur?`, ond1(d1), [ond1(d1 / 2), ond1(d1 * 2), "1"], "Yoğunluk madde miktarına bağlı değildir; aynı kalır."); }
+    () => { const [n1, d1] = pick(YOG.filter((x) => x[1] > 2)); return soru(`Yoğunluğu ${ond1(d1)} g/cm³ olan ${n1} bir küp ikiye kesilirse parçalardan birinin yoğunluğu kaç g/cm³ olur?`, ond1(d1), [Y(ond1(d1 / 2), "k:cisim bölününce yoğunluğu da azalır sanıldı"), Y(ond1(d1 * 2), "k:yoğunluk madde miktarına bağlı sanıldı"), "1"], "Yoğunluk madde miktarına bağlı değildir; aynı kalır."); }
   ]);
 
   U.f5k4 = ifadeler([
