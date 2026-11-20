@@ -25,7 +25,7 @@
   const hedef = (() => { const h = String(window.HIKAYE_HEDEF || "").match(/(\d+)\D+(\d+)/); return h ? [+h[1], +h[2]] : NORM[Math.min(12, NO)] || [120, 160]; })();
   const SCH = NO <= 2 ? 3 : NO <= 5 ? 4 : 5;
   // Sesli okuma koçu ve Günlük Antrenman yalnızca ilkokulda (1–4); ortaokul ve lisede egzersizler tek tek seçilir.
-  const KOC_VAR = NO <= 4, ANTRENMAN_VAR = NO <= 4, KITAP_VAR = NO >= 9;
+  const KOC_VAR = NO <= 4, ANTRENMAN_VAR = NO <= 4, KITAP_VAR = NO >= 5;
   // Metin seviyesi (1–7): anlama %80+ → metin uzar, %60 altı → kısalır
   const seviyeNo = () => Math.round((veri.seviye - 0.6) / 0.2) + 1;
   const seviyeGuncelle = (anlama) => { const eski = veri.seviye; if (anlama >= 80) veri.seviye = Math.min(1.8, +(veri.seviye + 0.2).toFixed(2)); else if (anlama < 60) veri.seviye = Math.max(0.6, +(veri.seviye - 0.2).toFixed(2)); return veri.seviye > eski ? 1 : veri.seviye < eski ? -1 : 0; };
@@ -93,6 +93,30 @@
 .kt-bar{height:8px;border-radius:5px;background:var(--sinir,#e5e7eb);overflow:hidden}.kt-bar i{display:block;height:100%;background:#7c3aed}
 .kt-chip{border:1px solid var(--sinir,#ddd);background:var(--kart,#fff);color:inherit;border-radius:999px;padding:6px 12px;font-size:14px}.kt-chip.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
 .kt-in{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--sinir,#ddd);font-size:16px;background:var(--bg,#fff);color:inherit;box-sizing:border-box}
+.vk-buyuk{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:none;border-radius:16px;padding:14px 16px;margin-bottom:10px;background:linear-gradient(135deg,#0f766e,#2563eb);color:#fff;font:inherit;cursor:pointer}.vk-buyuk .i{font-size:34px}.vk-buyuk b{display:block;font-size:18px}.vk-buyuk small{color:#e0f2fe;font-size:14px}
+.vk-devam{display:grid;gap:4px;width:100%;text-align:left;border:2px solid #7c3aed;background:var(--kart,#fff);color:inherit;border-radius:14px;padding:10px 14px;margin:0 0 10px;font:inherit;cursor:pointer}.vk-devam b{font-size:16.5px}.vk-devam small{color:var(--soluk,#6b7280)}
+.vk-rozetler{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin:8px 0}.vk-rozetler span{display:grid;justify-items:center;font-size:24px;padding:6px 2px;border-radius:12px;background:var(--kart,#fff);border:1px solid var(--sinir,#e5e7eb);filter:grayscale(1);opacity:.45}.vk-rozetler span.on{filter:none;opacity:1;border-color:#f59e0b}.vk-rozetler small{font-size:10.5px;text-align:center;line-height:1.2}
+.vk-ara{position:sticky;top:58px;z-index:1;background:var(--bg,#fffaf0);padding:4px 0 8px}
+.vk-raflar{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}.vk-raflar .kt-chip{white-space:nowrap;flex:none}
+.vk-liste h3{margin:14px 0 6px}
+.vk-sat{display:grid;grid-template-columns:1fr auto;gap:0 8px;width:100%;text-align:left;border:none;border-bottom:1px solid var(--sinir,#e5e7eb);background:none;color:inherit;padding:10px 4px;font:inherit;cursor:pointer}.vk-sat .vk-ad{font-weight:700;font-size:16.5px}.vk-sat small{grid-column:1;color:var(--soluk,#6b7280);font-size:13.5px}.vk-sat em{grid-column:2;grid-row:1/3;align-self:center;font-style:normal;font-size:13px;color:#7c3aed;font-weight:700}.vk-sat em.ok{color:#16a34a}
+.vk-karar{text-align:center;padding:24px 8px;display:grid;gap:8px;justify-items:center}.vk-karar h2{margin:0}.vk-karar-dug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.vk-yuk{text-align:center;padding:60px 10px}.vk-donen{width:42px;height:42px;margin:0 auto 12px;border-radius:50%;border:4px solid var(--sinir,#ddd);border-top-color:#2563eb;animation:vkd 1s linear infinite}@keyframes vkd{to{transform:rotate(360deg)}}
+.oa-kat.vk-acik{--bg:#ffffff;--kart:#f7f7f8;--yazi:#1f2328;--sinir:#e4e4e7;--soluk:#6b7280;background:#fff;color:#1f2328}
+.oa-kat.vk-sepya{--bg:#f4ecd8;--kart:#faf4e6;--yazi:#3a2e1f;--sinir:#e0d3b6;--soluk:#7a6a50;background:#f4ecd8;color:#3a2e1f}
+.oa-kat.vk-koyu{--bg:#121417;--kart:#1c1f24;--yazi:#e4e4e4;--sinir:#2e333b;--soluk:#9aa0a8;background:#121417;color:#e4e4e4}
+.oa-kat.vk-okur .oa-ic{max-width:700px}
+.vk-bilgi{position:sticky;top:57px;z-index:1;background:var(--bg);padding:6px 0 4px;margin:-6px 0 8px}.vk-bilgi .kt-bar{height:4px}.vk-bilgi-s{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:13px;color:var(--soluk,#6b7280);margin-top:4px}.vk-bilgi-s button{border:1px solid var(--sinir);background:var(--kart);color:inherit;border-radius:10px;padding:4px 12px;font-size:16px;font-family:Georgia,serif}
+.vk-ayar[hidden]{display:none}.vk-ayar{display:grid;gap:8px;background:var(--kart);border:1px solid var(--sinir);border-radius:14px;padding:10px 12px;margin-top:6px}.vk-ayar div{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.vk-ayar span{min-width:96px;font-size:14px}.vk-ayar button{border:1px solid var(--sinir);background:var(--bg);color:inherit;border-radius:10px;padding:6px 10px;font-size:14px}.vk-ayar button.on{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb inset}
+.vk-metin{color:var(--yazi,inherit);hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word;padding-bottom:8px}.vk-metin.serif{font-family:Georgia,"Times New Roman",serif}.vk-metin.sans{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.vk-metin p{margin:0 0 .9em;white-space:pre-line;text-align:left}.vk-metin .vk-bas{text-align:center;margin:10px 0 26px}.vk-metin h1{font-size:1.45em;margin:0 0 4px;line-height:1.25}.vk-metin .vk-bas p{color:var(--soluk);margin:0;text-align:center}.vk-metin h2{font-size:1.15em;text-align:center;margin:1.2em 0 .8em}
+.vk-alt{display:flex;justify-content:space-between;gap:8px;margin:18px 0 6px}
+.vk-uyari{background:#fef3c7;color:#78350f;border-radius:10px;padding:8px 10px;font-size:14px}
+.vk-secim{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:6px;z-index:70;background:#111827;padding:6px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.3)}.vk-secim button{border:none;background:#1f2937;color:#fff;border-radius:10px;padding:9px 12px;font-size:15px}.vk-secim[hidden]{display:none}
+.vk-bildir{position:fixed;left:50%;top:80px;transform:translateX(-50%);background:#16a34a;color:#fff;padding:10px 16px;border-radius:12px;z-index:71;font-weight:700}
+.vk-yildiz button{border:none;background:none;font-size:32px;padding:2px;color:#f59e0b}
+.vk-oneri{display:grid;gap:4px;justify-items:center;border:2px dashed #7c3aed;border-radius:16px;padding:14px;margin:8px 0;max-width:420px}.vk-oneri b{font-size:19px}.vk-oneri span{color:var(--soluk)}.vk-oneri p{margin:4px 0}
+.vk-alinti p{font-family:Georgia,serif;font-size:17px;line-height:1.6;margin:0;white-space:pre-line}
 .kt-saat{font-size:44px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
 .oa-kart.ana{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none}.oa-kart.ana small{color:#e0e7ff}
 .oa-btn{display:inline-block;border:none;border-radius:14px;padding:13px 20px;font-size:18px;font-weight:700;background:#0ea5e9;color:#fff;margin:6px 4px}
@@ -121,12 +145,13 @@
 
   let kat = null, zam = [], adimlar = null;
   const temizle = () => { zam.forEach((z) => (clearInterval(z), clearTimeout(z))); zam = []; };
-  function ac(fn, baslik) {
+  function ac(fn, baslik, geri) {
     temizle();
-    if (!kat) { kat = document.createElement("div"); kat.className = "oa-kat"; document.body.appendChild(kat); document.body.style.overflow = "hidden"; }
-    kat.innerHTML = `<div class="oa-ust">${fn === menu ? "" : '<button data-geri>← Atölye</button>'}<b>📖 ${esc(baslik || "Okuma Atölyesi")}</b><button data-kapat>✕ Kapat</button></div><div class="oa-ic"></div>`;
+    if (!kat) { kat = document.createElement("div"); document.body.appendChild(kat); document.body.style.overflow = "hidden"; }
+    kat.className = "oa-kat";
+    kat.innerHTML = `<div class="oa-ust">${fn === menu ? "" : `<button data-geri>← ${geri ? "Geri" : "Atölye"}</button>`}<b>📖 ${esc(baslik || "Okuma Atölyesi")}</b><button data-kapat>✕ Kapat</button></div><div class="oa-ic"></div>`;
     kat.querySelector("[data-kapat]").onclick = kapat;
-    const g = kat.querySelector("[data-geri]"); if (g) g.onclick = () => { adimlar = null; ac(menu); };
+    const g = kat.querySelector("[data-geri]"); if (g) g.onclick = () => { adimlar = null; geri ? geri() : ac(menu); };
     kat.scrollTop = 0; fn(kat.querySelector(".oa-ic"));
   }
   function kapat() { temizle(); adimlar = null; if (kat) kat.remove(); kat = null; document.body.style.overflow = ""; }
@@ -253,7 +278,15 @@
 
   // ---------- 📚 Kitap Okuma (9–12): kitap seç, oku, sayfa ve süre takibi, kitap defteri ----------
   // Telifi serbest Türkçe eserler (yazarı 1955 ve öncesinde vefat etmiş) için Vikikaynak'ta arama bağlantısı verilir.
-  const KITAPLAR = [
+  const ORTA_KITAP = [
+    ["Küçük Prens", "Antoine de Saint-Exupéry", "Dünya klasikleri", 0], ["Beyaz Diş", "Jack London", "Dünya klasikleri", 0], ["Pinokyo", "Carlo Collodi", "Dünya klasikleri", 0],
+    ["Define Adası", "Robert Louis Stevenson", "Dünya klasikleri", 0], ["Heidi", "Johanna Spyri", "Dünya klasikleri", 0], ["Oliver Twist", "Charles Dickens", "Dünya klasikleri", 0],
+    ["Robinson Crusoe", "Daniel Defoe", "Dünya klasikleri", 0], ["Pollyanna", "Eleanor H. Porter", "Dünya klasikleri", 0], ["Tom Sawyer'ın Maceraları", "Mark Twain", "Dünya klasikleri", 0],
+    ["Alice Harikalar Diyarında", "Lewis Carroll", "Dünya klasikleri", 0], ["Seksen Günde Devriâlem", "Jules Verne", "Dünya klasikleri", 0], ["Şeker Portakalı", "José Mauro de Vasconcelos", "Dünya klasikleri", 0],
+    ["Martı", "Richard Bach", "Dünya klasikleri", 0], ["Momo", "Michael Ende", "Dünya klasikleri", 0], ["Charlie'nin Çikolata Fabrikası", "Roald Dahl", "Dünya klasikleri", 0],
+    ["Beyaz Gemi", "Cengiz Aytmatov", "Dünya klasikleri", 0], ["Dede Korkut Hikâyeleri", "Anonim", "Türk edebiyatı", 0], ["Seçme Hikâyeler", "Ömer Seyfettin", "Türk edebiyatı", 0]
+  ];
+  const LISE_KITAP = [
     ["İntibah", "Namık Kemal", "Türk romanı", 1], ["Araba Sevdası", "Recaizade Mahmut Ekrem", "Türk romanı", 1],
     ["Mai ve Siyah", "Halit Ziya Uşaklıgil", "Türk romanı", 1], ["Aşk-ı Memnu", "Halit Ziya Uşaklıgil", "Türk romanı", 1],
     ["Eylül", "Mehmet Rauf", "Türk romanı", 1], ["Kuyucaklı Yusuf", "Sabahattin Ali", "Türk romanı", 1],
@@ -274,32 +307,45 @@
     ["Dönüşüm", "Franz Kafka", "Dünya klasikleri", 0], ["Beyaz Diş", "Jack London", "Dünya klasikleri", 0],
     ["Martin Eden", "Jack London", "Dünya klasikleri", 0], ["Küçük Prens", "Antoine de Saint-Exupéry", "Dünya klasikleri", 0]
   ];
+  const KITAPLAR = NO >= 9 ? LISE_KITAP : ORTA_KITAP;
   const kv = () => { veri.kitap = veri.kitap || {}; const k = veri.kitap; k.liste = k.liste || []; k.gun = k.gun || {}; k.hedef = k.hedef || 20; return k; };
   const kgun = (i) => { const d = new Date(Date.now() - i * 864e5); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   const kSeri = () => { const g = kv().gun; let n = 0; for (let i = 0; i < 400; i++) { if (g[kgun(i)] > 0) n++; else if (i > 0) break; } return n; };
   const vikikaynak = (ad) => "https://tr.wikisource.org/w/index.php?search=" + encodeURIComponent(ad);
   function kitapAlt() {
     const k = kv(), okunan = k.liste.filter((x) => !x.bitti), biten = k.liste.filter((x) => x.bitti).length, bug = k.gun[bugun()] || 0;
-    if (!k.liste.length) return "Bir kitap seç, her gün okuduğun sayfaları kaydet, bitirince kitap defterini doldur.";
+    const dv = devamEdenler()[0]; if (dv) return `▶️ Devam et: ${esc(dv[1].ad)} %${dv[1].yuzde} · bugün ${bug}/${k.hedef} sayfa${kSeri() ? " · 🔥 " + kSeri() + " gün" : ""}`;
+    if (!k.liste.length) return "Ücretsiz hikâye, roman, fıkra ve şiirleri uygulamada oku; kaldığın yerden devam et.";
+    if (false) return "Bir kitap seç, her gün okuduğun sayfaları kaydet, bitirince kitap defterini doldur.";
     return `${okunan.length ? "Okuyorsun: " + esc(okunan[0].ad) + " · " : ""}bugün ${bug}/${k.hedef} sayfa · ${biten} kitap bitti${kSeri() ? " · 🔥 " + kSeri() + " gün" : ""}`;
   }
   function kitap(el) {
     const k = kv(), bug = k.gun[bugun()] || 0, biten = k.liste.filter((x) => x.bitti);
     const hafta = [...Array(7)].map((_, i) => k.gun[kgun(6 - i)] || 0), hMax = Math.max(k.hedef, ...hafta, 1);
-    el.innerHTML = `<div class="oa-serit"><b>📚 Bugün ${bug} / ${k.hedef} sayfa</b>
+    const dv = typeof devamEdenler === "function" ? devamEdenler()[0] : null, rd = rozetDurum(), bugDk = Math.round((vkv().dk || {})[bugun()] || 0);
+    const rafSay = RAFLAR.reduce((a, r) => { const c = yerel.al("vk-raf-" + r.id); return a + (c && c.l && r.hepsi ? c.l.length : 0); }, 0);
+    el.innerHTML = `<button class="vk-buyuk" id="vkKitaplik"><span class="i">📖</span><span><b>Kitaplık · uygulamada ücretsiz oku</b><small>${rafSay > 50 ? rafSay + "+ eser: " : ""}hikâye, roman, fıkra, şiir · arama, kaldığın yerden devam</small></span></button>
+      ${dv ? `<button class="vk-devam" id="vkDevamAna"><b>▶️ Devam et: ${esc(dv[1].ad)}</b><small>${esc(dv[1].yazar || "")} · %${dv[1].yuzde} okundu</small><div class="kt-bar"><i style="width:${dv[1].yuzde}%"></i></div></button>` : ""}
+      <div class="oa-serit"><b>📚 Bugün ${bug} / ${k.hedef} sayfa${bugDk ? ` · ⏱️ ${bugDk} dk` : ""}</b>
         <div class="kt-bar"><i style="width:${Math.min(100, (bug / k.hedef) * 100)}%"></i></div>
         <span>${kSeri() ? `🔥 ${kSeri()} gündür her gün okuyorsun.` : "Bugün okumaya başla, serini kur."} Bitirdiğin kitap: <b>${biten.length}</b>.
         Günlük hedef: <select id="ktHedef" class="kt-in" style="width:auto;display:inline-block;padding:4px 8px">${[10, 15, 20, 30, 40, 50].map((h) => `<option ${h === k.hedef ? "selected" : ""}>${h}</option>`).join("")}</select> sayfa</span></div>
       <div class="oa-graf" style="height:90px">${hafta.map((v, i) => `<div><small>${v || ""}</small><i style="height:${Math.round((v / hMax) * 100)}%;background:#7c3aed"></i><small>${["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"][new Date(Date.now() - (6 - i) * 864e5).getDay()]}</small></div>`).join("")}</div>
-      <h3>📖 Okuduğum kitaplar</h3>
+      <div class="vk-rozetler">${ROZETLER.map(([i, a, f]) => `<span class="${f(rd) ? "on" : ""}" title="${esc(a)}">${i}<small>${esc(a)}</small></span>`).join("")}</div>
+      <div class="kt-row" style="margin:6px 0 4px"><button id="vkAlinti">💬 Alıntılarım (${vkv().alinti.length})</button></div>
+      <h3>📖 Elimdeki kâğıt kitaplar</h3>
       ${k.liste.filter((x) => !x.bitti).map((b) => { const i = k.liste.indexOf(b); return `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar || "")}${b.toplam ? ` · ${b.okunan || 0} / ${b.toplam} sayfa` : ` · ${b.okunan || 0} sayfa okundu`}</small>
         ${b.toplam ? `<div class="kt-bar"><i style="width:${Math.min(100, ((b.okunan || 0) / b.toplam) * 100)}%"></i></div>` : ""}
-        <div class="kt-row"><button data-oku="${i}">⏱️ Okumaya başla</button><button data-sayfa="${i}">➕ Sayfa ekle</button><button data-bitir="${i}">✅ Bitirdim</button>${b.pd ? `<a href="${vikikaynak(b.ad)}" target="_blank" rel="noopener">🔗 Ücretsiz oku (Vikikaynak)</a>` : ""}<button data-sil="${i}" aria-label="Listeden çıkar">🗑️</button></div></div>`; }).join("") || '<p class="oa-not">Henüz okuduğun bir kitap yok. Aşağıdan bir kitap seç.</p>'}
-      <p style="text-align:center"><button class="oa-btn" id="ktSec">➕ Kitap seç</button></p>
+        <div class="kt-row"><button data-oku="${i}">⏱️ Okumaya başla</button><button data-sayfa="${i}">➕ Sayfa ekle</button><button data-bitir="${i}">✅ Bitirdim</button>${katalog[b.ad] ? `<button data-vkoku="${esc(b.ad)}">📖 Uygulamada oku</button>` : b.pd ? `<a href="${vikikaynak(b.ad)}" target="_blank" rel="noopener">🔗 Ücretsiz oku (Vikikaynak)</a>` : ""}<button data-sil="${i}" aria-label="Listeden çıkar">🗑️</button></div></div>`; }).join("") || '<p class="oa-not">Okul ya da halk kütüphanesinden aldığın kâğıt kitapları buraya ekleyip sayfa takibi yapabilirsin.</p>'}
+      <p style="text-align:center"><button class="oa-btn" id="ktSec">➕ Kâğıt kitap ekle</button></p>
       ${biten.length ? `<h3>🏁 Bitirdiğim kitaplar</h3>${biten.map((b) => `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar || "")} · ${b.bitis || ""}${b.puan ? " · " + "⭐".repeat(b.puan) : ""}</small>${b.defter && b.defter.tema ? `<small>📝 ${esc(b.defter.tema)}</small>` : ""}<div class="kt-row"><button data-defter="${k.liste.indexOf(b)}">📝 Kitap defteri</button></div></div>`).join("")}` : ""}
-      <p class="oa-not">Kayıtlar yalnızca bu cihazda tutulur. 🔗 işareti telifi serbest Türkçe eserlerde Vikikaynak aramasını açar; diğer kitapları okul ya da halk kütüphanesinden ödünç alabilirsin.</p>`;
+      <p class="oa-not">Kayıtlar yalnızca bu cihazda tutulur. Uygulamada okuduğun her ~250 kelime bir sayfa sayılır ve günlük hedefine eklenir.</p>`;
     el.querySelector("#ktHedef").onchange = (e) => { k.hedef = +e.target.value; kaydet(); ac(kitap, "Kitap Okuma"); };
     el.querySelector("#ktSec").onclick = () => ac(kitapSec, "Kitap seç");
+    el.querySelector("#vkKitaplik").onclick = () => ac(kitaplik, "Kitaplık", () => ac(kitap, "Kitap Okuma"));
+    el.querySelector("#vkAlinti").onclick = () => ac(alintilar, "Alıntılarım", () => ac(kitap, "Kitap Okuma"));
+    const dva = el.querySelector("#vkDevamAna"); if (dva) dva.onclick = () => eserAc(dv[0]);
+    el.querySelectorAll("[data-vkoku]").forEach((b) => (b.onclick = () => eserAc(b.dataset.vkoku)));
     el.querySelectorAll("[data-oku]").forEach((b) => (b.onclick = () => ac((x) => kitapOturum(x, +b.dataset.oku), "Okuma zamanı")));
     el.querySelectorAll("[data-sayfa]").forEach((b) => (b.onclick = () => ac((x) => kitapSayfa(x, +b.dataset.sayfa, 0), "Sayfa ekle")));
     el.querySelectorAll("[data-bitir]").forEach((b) => (b.onclick = () => ac((x) => kitapDefter(x, +b.dataset.bitir), "Kitap defteri")));
@@ -311,10 +357,11 @@
     const ciz = () => {
       const l = KITAPLAR.filter((x) => tur === "Hepsi" || x[2] === tur);
       el.innerHTML = `<div class="kt-row" style="margin-bottom:8px">${turler.map((t) => `<button class="kt-chip ${t === tur ? "on" : ""}" data-tur="${esc(t)}">${esc(t)}</button>`).join("")}</div>
-        ${l.map((x) => { const var_ = k.liste.some((b) => b.ad === x[0] && !b.bitti); return `<div class="kt-kitap"><b>${esc(x[0])}</b><small>${esc(x[1])} · ${esc(x[2])}${x[3] ? " · telifi serbest" : ""}</small><div class="kt-row"><button data-sec="${esc(x[0])}" ${var_ ? "disabled" : ""}>${var_ ? "✔ Listende" : "📖 Bu kitabı okuyacağım"}</button>${x[3] ? `<a href="${vikikaynak(x[0])}" target="_blank" rel="noopener">🔗 Vikikaynak'ta ara</a>` : ""}</div></div>`; }).join("")}
+        ${l.map((x) => { const var_ = k.liste.some((b) => b.ad === x[0] && !b.bitti); return `<div class="kt-kitap"><b>${esc(x[0])}</b><small>${esc(x[1])} · ${esc(x[2])}${x[3] ? " · telifi serbest" : ""}</small><div class="kt-row"><button data-sec="${esc(x[0])}" ${var_ ? "disabled" : ""}>${var_ ? "✔ Listende" : "📖 Bu kitabı okuyacağım"}</button>${katalog[x[0]] ? `<button data-vkoku="${esc(x[0])}">📖 Uygulamada oku</button>` : x[3] ? `<a href="${vikikaynak(x[0])}" target="_blank" rel="noopener">🔗 Vikikaynak'ta ara</a>` : ""}</div></div>`; }).join("")}
         <h3>✍️ Listede olmayan bir kitap</h3>
         <div class="kt-kitap"><input class="kt-in" id="ktAd" placeholder="Kitabın adı"><input class="kt-in" id="ktYazar" placeholder="Yazarı"><input class="kt-in" id="ktTop" type="number" min="1" placeholder="Sayfa sayısı (isteğe bağlı)"><div class="kt-row"><button id="ktEkle">➕ Ekle</button></div></div>`;
       el.querySelectorAll("[data-tur]").forEach((b) => (b.onclick = () => { tur = b.dataset.tur; ciz(); }));
+      el.querySelectorAll("[data-vkoku]").forEach((b) => (b.onclick = () => eserAc(b.dataset.vkoku)));
       el.querySelectorAll("[data-sec]").forEach((b) => (b.onclick = () => { const x = KITAPLAR.find((y) => y[0] === b.dataset.sec); ac((e) => kitapToplam(e, { ad: x[0], yazar: x[1], tur: x[2], pd: !!x[3] }), "Kitap seç"); }));
       el.querySelector("#ktEkle").onclick = () => { const ad = el.querySelector("#ktAd").value.trim(); if (!ad) { el.querySelector("#ktAd").focus(); return; } k.liste.push({ ad, yazar: el.querySelector("#ktYazar").value.trim(), toplam: Math.max(0, +el.querySelector("#ktTop").value || 0), okunan: 0, bas: bugun() }); kaydet(); ac(kitap, "Kitap Okuma"); };
     };
@@ -364,6 +411,333 @@
       isaretle(); kaydet(); el.innerHTML = `<div class="oa-sonuc"><div style="font-size:46px">🏆</div><p style="font-size:20px"><b>${esc(b.ad)}</b> bitti! Bu ${k.liste.filter((x) => x.bitti).length}. kitabın.</p></div>`; sonraki(el);
     };
   }
+
+  // ---------- 📖 Uygulama içi Kitaplık: telifi serbest Türkçe eserler Vikikaynak'tan (tr.wikisource.org) okunur ----------
+  // Metin, öğrencinin tarayıcısında Vikikaynak API'sinden alınır (origin=* ile CORS), bir kez açılan eser cihazda saklanır.
+  const VK = "https://tr.wikisource.org";
+  const LISE = NO >= 9;
+  const RAFLAR = [
+    { id: "oyku", ad: "Ömer Seyfettin Hikâyeleri", ikon: "📕", kat: "Ömer Seyfettin hikayeleri", yazar: "Ömer Seyfettin", tur: "Hikâye", hepsi: LISE },
+    { id: "fikra", ad: "Nasreddin Hoca Fıkraları", ikon: "😄", kat: "Nasreddin Hoca fıkraları", yazar: "Nasreddin Hoca", tur: "Fıkra", hepsi: true },
+    { id: "orhan", ad: "Orhan Veli Şiirleri", ikon: "✒️", kat: "Orhan Veli şiirleri", yazar: "Orhan Veli Kanık", tur: "Şiir", hepsi: true },
+    { id: "akif", ad: "Mehmet Âkif Ersoy Şiirleri", ikon: "🇹🇷", kat: "Mehmet Âkif Ersoy şiirleri", yazar: "Mehmet Âkif Ersoy", tur: "Şiir", hepsi: true },
+    { id: "fikret", ad: "Tevfik Fikret Şiirleri", ikon: "🖋️", kat: "Tevfik Fikret şiirleri", yazar: "Tevfik Fikret", tur: "Şiir", hepsi: true },
+    { id: "gokalp", ad: "Ziya Gökalp Şiirleri", ikon: "📜", kat: "Ziya Gökalp Şiirleri", yazar: "Ziya Gökalp", tur: "Şiir", hepsi: true },
+    { id: "sabahattin", ad: "Sabahattin Ali Şiirleri", ikon: "🌙", kat: "Sabahattin Ali şiirleri", yazar: "Sabahattin Ali", tur: "Şiir", hepsi: LISE }
+  ];
+  // Öne çıkanlar: [Vikikaynak sayfa adı, yazar, tür, seviye ("o": ortaokul ve lise, "l": yalnız lise)]. Yazar içindeki sıra, okullarda en çok okunanlardan başlar (öneri sırası).
+  const SECKI = [
+    ["Kürk Mantolu Madonna", "Sabahattin Ali", "Roman", "l"], ["Kuyucaklı Yusuf", "Sabahattin Ali", "Roman", "l"], ["Birdenbire Sönen Kandilin Hikâyesi", "Sabahattin Ali", "Hikâye", "l"],
+    ["Kaşağı", "Ömer Seyfettin", "Hikâye", "o"], ["Pembe İncili Kaftan", "Ömer Seyfettin", "Hikâye", "o"], ["Falaka", "Ömer Seyfettin", "Hikâye", "o"], ["Forsa", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Diyet", "Ömer Seyfettin", "Hikâye", "o"], ["Başını Vermeyen Şehit", "Ömer Seyfettin", "Hikâye", "o"], ["Kurbağa Duası", "Ömer Seyfettin", "Hikâye", "o"], ["Bomba", "Ömer Seyfettin", "Hikâye", "o"],
+    ["And", "Ömer Seyfettin", "Hikâye", "o"], ["Ferman", "Ömer Seyfettin", "Hikâye", "o"], ["Kütük", "Ömer Seyfettin", "Hikâye", "o"], ["Külah", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Elma", "Ömer Seyfettin", "Hikâye", "o"], ["Kerâmet", "Ömer Seyfettin", "Hikâye", "o"], ["Bir Temiz Havlu Uğruna", "Ömer Seyfettin", "Hikâye", "o"], ["Yalnız Efe", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Primo Türk Çocuğu", "Ömer Seyfettin", "Hikâye", "o"], ["Kızıl Elma Neresi?", "Ömer Seyfettin", "Hikâye", "o"], ["Yüksek Ökçeler", "Ömer Seyfettin", "Hikâye", "o"], ["Perili Köşk", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Pireler", "Ömer Seyfettin", "Hikâye", "o"], ["Üç Nasihat", "Ömer Seyfettin", "Hikâye", "o"], ["Zeytin Ekmek", "Ömer Seyfettin", "Hikâye", "o"], ["Bahar ve Kelebekler", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Çakmak", "Ömer Seyfettin", "Hikâye", "o"], ["Büyücü", "Ömer Seyfettin", "Hikâye", "o"], ["İlk Namaz", "Ömer Seyfettin", "Hikâye", "o"], ["Bir Hatıra", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Aleko", "Ömer Seyfettin", "Hikâye", "o"], ["Kurumuş Ağaçlar", "Ömer Seyfettin", "Hikâye", "o"], ["Dünyanın Düzeni", "Ömer Seyfettin", "Hikâye", "o"], ["Velinimet", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Korkunç Bir Ceza", "Ömer Seyfettin", "Hikâye", "o"], ["Yuf Borusu Seni Bekliyor", "Ömer Seyfettin", "Hikâye", "o"], ["Kır Sineği", "Ömer Seyfettin", "Hikâye", "o"], ["Vire", "Ömer Seyfettin", "Hikâye", "o"],
+    ["Parayı Veren Düdüğü Çalar", "Nasreddin Hoca", "Fıkra", "o"], ["O Konuşursa Bu da Düşünür", "Nasreddin Hoca", "Fıkra", "o"], ["Beni Baş Aşağı Gömün", "Nasreddin Hoca", "Fıkra", "o"],
+    ["Çok Gezseydi Bizim Eve de Uğrardı", "Nasreddin Hoca", "Fıkra", "o"], ["Allah Versin", "Nasreddin Hoca", "Fıkra", "o"],
+    ["Küfe", "Mehmet Âkif Ersoy", "Şiir", "o"], ["Seyfi Baba", "Mehmet Âkif Ersoy", "Şiir", "o"], ["Küçük Asker", "Tevfik Fikret", "Şiir", "o"], ["Ağustos Böceği ile Karınca", "Tevfik Fikret", "Şiir", "o"],
+    ["Han-ı Yağma", "Tevfik Fikret", "Şiir", "l"], ["Anlatamıyorum", "Orhan Veli Kanık", "Şiir", "o"], ["Bedava", "Orhan Veli Kanık", "Şiir", "o"], ["Gemilerim", "Orhan Veli Kanık", "Şiir", "o"], ["Deniz", "Orhan Veli Kanık", "Şiir", "o"]
+  ].filter((x) => LISE || x[3] === "o");
+  const KELIME_SAYFA = 250; // basılı kitapta bir sayfa ≈ 250 kelime
+  const PARCA = LISE ? 1800 : 1200; // bir okuma bölümü (kelime) — yaklaşık 10–12 dakikalık parça
+  const trNorm = (s) => String(s || "").toLocaleLowerCase("tr").replace(/[âà]/g, "a").replace(/[îı]/g, "i").replace(/û/g, "u").replace(/ş/g, "s").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ö/g, "o").replace(/ü/g, "u");
+  const vkAdres = (t) => VK + "/wiki/" + encodeURIComponent(String(t).replace(/ /g, "_"));
+  const vkApi = async (p) => {
+    const r = await fetch(VK + "/w/api.php?" + new URLSearchParams({ ...p, format: "json", formatversion: "2", origin: "*" }));
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json(); if (j.error) throw new Error(j.error.info || j.error.code); return j;
+  };
+  const yerel = { al: (a) => { try { return JSON.parse(localStorage.getItem(a)); } catch (e) { return null; } }, koy: (a, v) => { try { localStorage.setItem(a, JSON.stringify(v)); return true; } catch (e) { return false; } }, sil: (a) => { try { localStorage.removeItem(a); } catch (e) {} } };
+  const vkv = () => { const k = kv(); k.vk = k.vk || {}; k.alinti = k.alinti || []; k.ayar = k.ayar || { boy: NO <= 8 ? 21 : 19, aralik: 1.75, font: "serif", tema: "acik" }; k.dk = k.dk || {}; return k; };
+  const katalog = {}; // sayfa adı → {ad, yazar, tur, raf}
+  SECKI.forEach((x, i) => (katalog[x[0]] = { ad: x[0], yazar: x[1], tur: x[2], sira: i }));
+  const rafYukle = async (raf) => {
+    const an = "vk-raf-" + raf.id, c = yerel.al(an);
+    if (c && Date.now() - c.t < 7 * 864e5 && c.l && c.l.length) return c.l;
+    const l = []; let devam = {};
+    for (let i = 0; i < 5; i++) {
+      const j = await vkApi({ action: "query", list: "categorymembers", cmtitle: "Kategori:" + raf.kat, cmnamespace: "0", cmtype: "page", cmlimit: "500", ...devam });
+      (j.query && j.query.categorymembers || []).forEach((m) => l.push(m.title));
+      if (!j.continue) break; devam = j.continue;
+    }
+    if (l.length) yerel.koy(an, { t: Date.now(), l });
+    return l.length ? l : (c && c.l) || [];
+  };
+  const rafEserleri = (raf, l) => l.filter((t) => !vkv().bos || !vkv().bos[t]).map((t) => (katalog[t] = katalog[t] || { ad: t.replace(/ \((hikâye|Nasreddin Hoca fıkrası|Orhan Veli|Sabahattin Ali|Mehmet Âkif Ersoy|şiir)\)$/, ""), yazar: raf.yazar, tur: raf.tur, raf: raf.id }, t));
+
+  // HTML → paragraflar (şiirlerde satır sonları korunur) + alt sayfa (bölüm) bağlantıları
+  function vkCoz(html, baslik) {
+    const d = new DOMParser().parseFromString(html, "text/html"), kok = d.querySelector(".mw-parser-output") || d.body;
+    const eksik = /tamamlanmamış olduğu yönünde/i.test(kok.textContent);
+    const alt = [...new Set([...kok.querySelectorAll("a[title]:not(.new)")].map((a) => a.getAttribute("title")).filter((t) => t && t.indexOf(baslik + "/") === 0))];
+    kok.querySelectorAll("table,style,script,.ambox,[class*='mbox'],[class*='sister'],[class*='kardes'],[class*='license'],[class*='lisans'],[class*='metadata'],[role='navigation'],.toc,#toc,sup.reference,ol.references,.reference,.mw-references-wrap,.mw-editsection,.noprint,.ws-noexport,.navbox,img,figure,.thumb,.licenseContainer,#headertemplate,.header_template,.ws-header,.catlinks,.pagenum,.ws-pagenum,.mw-empty-elt,.mw-kartographer-maplink").forEach((e) => e.remove());
+    kok.querySelectorAll("br").forEach((b) => b.replaceWith("\n"));
+    kok.querySelectorAll("p,div,h1,h2,h3,h4,h5,h6,li,dd,dt,blockquote,center,pre,section").forEach((b) => b.append("\n\n"));
+    const par = kok.textContent.replace(/\r/g, "").split(/\n[ \t ]*\n/)
+      .map((s) => s.split("\n").map((x) => x.replace(/[ \t ]+/g, " ").trim()).filter(Boolean).join("\n"))
+      .filter((s) => s && !/^(Kaynak|İkincil kaynak|Telif durumu|İlk yayımlanış|Kaynakça)\s*:/i.test(s) && !/kamuya maledilmiştir|Fikir ve Sanat Eserleri Kanunu|koruma süresi dolmuştur|tamamlanmamış olduğu yönünde|kardeş projeler|Vikiveri ögesi|Daha fazla bilgi$/i.test(s) && !/^\[?\d+\]?$/.test(s));
+    return { par, alt, eksik };
+  }
+  async function vkSayfa(t) {
+    const j = await vkApi({ action: "parse", page: t, prop: "text", redirects: "1", disableeditsection: "1", disablelimitreport: "1" });
+    return vkCoz(j.parse.text, j.parse.title || t);
+  }
+  // Eseri getir: önbellek → Vikikaynak. Kısa ana sayfa + alt sayfalar varsa bölümler sırayla birleştirilir.
+  async function eserGetir(t, ilerle) {
+    const an = "vk-m-" + t, c = yerel.al(an); if (c && c.b) return c;
+    const ana = await vkSayfa(t), b = [];
+    if (ana.alt.length && wc(ana.par.join(" ")) < 600) {
+      for (let i = 0; i < ana.alt.length; i++) {
+        ilerle && ilerle(i + 1, ana.alt.length);
+        let s = await vkSayfa(ana.alt[i]);
+        if (s.alt.length && wc(s.par.join(" ")) < 600) { const ic = []; for (const a of s.alt) ic.push(...(await vkSayfa(a)).par); s = { ...s, par: ic }; }
+        b.push({ ad: ana.alt[i].slice(t.length + 1).replace(/\//g, " · "), par: s.par });
+      }
+    } else b.push({ ad: "", par: ana.par });
+    const e = { t: Date.now(), b, eksik: ana.eksik };
+    const k = vkv(); k.onbellek = (k.onbellek || []).filter((x) => x !== t); k.onbellek.push(t);
+    while (k.onbellek.length > 25) yerel.sil("vk-m-" + k.onbellek.shift());
+    if (!yerel.koy(an, e)) { while (k.onbellek.length > 1) { yerel.sil("vk-m-" + k.onbellek.shift()); if (yerel.koy(an, e)) break; } }
+    kaydet(); return e;
+  }
+  // Bölümleri ~PARCA kelimelik okuma parçalarına böl
+  function parcala(e) {
+    const p = [];
+    e.b.forEach((bol, bi) => {
+      let cur = { bol: bi, ad: bol.ad, par: [], kel: 0 };
+      bol.par.forEach((x) => { const n = wc(x); if (cur.kel && cur.kel + n > PARCA) { p.push(cur); cur = { bol: bi, ad: bol.ad, par: [], kel: 0 }; } cur.par.push(x); cur.kel += n; });
+      if (cur.par.length) p.push(cur);
+    });
+    return p;
+  }
+  const kisiHiz = () => { const k = vkv(); let kel = 0, sn = 0; Object.values(k.vk).forEach((x) => { kel += x.kelime || 0; sn += x.sure || 0; }); return sn > 300 && kel > 300 ? Math.max(80, Math.min(400, Math.round(kel / (sn / 60)))) : Math.round((hedef[0] + hedef[1]) / 2); };
+  const dkMetin = (kel) => { const d = Math.max(1, Math.round(kel / kisiHiz())); return d < 60 ? `~${d} dk` : `~${Math.floor(d / 60)} sa ${d % 60} dk`; };
+  const bitenSay = () => Object.values(vkv().vk).filter((x) => x.bitti).length;
+  const devamEdenler = () => Object.entries(vkv().vk).filter(([, x]) => !x.bitti && (x.yuzde || 0) > 0).sort((a, b) => (b[1].son || 0) - (a[1].son || 0));
+  function sayfaEkle(kel) { // uygulama içinde okunan kelimeleri günlük sayfa hedefine çevir
+    const k = vkv(); k.birikim = (k.birikim || 0) + kel; const s = Math.floor(k.birikim / KELIME_SAYFA);
+    if (s > 0) { k.birikim -= s * KELIME_SAYFA; k.gun[bugun()] = (k.gun[bugun()] || 0) + s; }
+  }
+  function oneri(t) { // aynı yazarın sıradaki (çok okunan) eseri; yoksa aynı raftan okunmamış bir eser
+    const k = vkv(), e = katalog[t] || {}, okunmamis = (x) => x !== t && !(k.vk[x] && k.vk[x].bitti) && !(k.bos && k.bos[x]);
+    const ayni = SECKI.filter((x) => x[1] === e.yazar).map((x) => x[0]).filter(okunmamis);
+    if (ayni.length) return ayni[0];
+    const raf = RAFLAR.find((r) => r.yazar === e.yazar || r.id === e.raf), c = raf && yerel.al("vk-raf-" + raf.id);
+    const l = c && c.l ? c.l.filter(okunmamis) : []; return l.length ? pick(l) : null;
+  }
+  const ROZETLER = [
+    ["🌱", "İlk eser", (s) => s.biten >= 1], ["📗", "5 eser", (s) => s.biten >= 5], ["📚", "15 eser", (s) => s.biten >= 15], ["🏛️", "40 eser", (s) => s.biten >= 40],
+    ["📖", "İlk roman", (s) => s.roman >= 1], ["🔥", "3 gün seri", (s) => s.seri >= 3], ["⚡", "7 gün seri", (s) => s.seri >= 7], ["🌟", "30 gün seri", (s) => s.seri >= 30],
+    ["⏱️", "1 saat okuma", (s) => s.dk >= 60], ["🕰️", "10 saat okuma", (s) => s.dk >= 600], ["💬", "5 alıntı", (s) => s.alinti >= 5], ["🧭", "4 farklı yazar", (s) => s.yazar >= 4]
+  ];
+  function rozetDurum() {
+    const k = vkv(), v = Object.entries(k.vk), biten = v.filter(([, x]) => x.bitti);
+    return { biten: biten.length + k.liste.filter((x) => x.bitti && !x.vk).length, roman: biten.filter(([t]) => (katalog[t] || {}).tur === "Roman").length + k.liste.filter((x) => x.bitti && !x.vk && /roman|klasik/i.test(x.tur || "")).length,
+      seri: kSeri(), dk: Math.round(v.reduce((a, [, x]) => a + (x.sure || 0), 0) / 60), alinti: k.alinti.length, yazar: new Set(biten.map(([t, x]) => x.yazar)).size };
+  }
+
+  // ---- Kitaplık ekranı: arama, devam edenler, raflar ----
+  function kitaplik(el, ilkRaf) {
+    const k = vkv(); let raf = ilkRaf || "secki", ara = "";
+    const satir = (t) => {
+      const e = katalog[t] || { ad: t, yazar: "" }, d = k.vk[t];
+      const dur = d ? (d.bitti ? "✔ Okundu" : d.yuzde ? `%${d.yuzde}` : "") : "";
+      return `<button class="vk-sat" data-ac="${esc(t)}"><span class="vk-ad">${esc(e.ad)}</span><small>${esc(e.yazar || "")}${e.tur ? " · " + esc(e.tur) : ""}${d && d.kel ? " · " + dkMetin(d.kel) : ""}</small>${dur ? `<em class="${d.bitti ? "ok" : ""}">${dur}</em>` : ""}</button>`;
+    };
+    const ciz = async () => {
+      const devam = devamEdenler().slice(0, 3);
+      el.innerHTML = `<div class="vk-ara"><input class="kt-in" id="vkAra" type="search" placeholder="🔎 Eser ya da yazar ara…" value="${esc(ara)}" autocomplete="off"></div>
+        ${devam.length && !ara ? `<h3>▶️ Okumaya devam et</h3>${devam.map(([t, x]) => `<button class="vk-devam" data-ac="${esc(t)}"><b>${esc(x.ad)}</b><small>${esc(x.yazar || "")} · %${x.yuzde} okundu</small><div class="kt-bar"><i style="width:${x.yuzde}%"></i></div></button>`).join("")}` : ""}
+        <div class="vk-raflar">${[["secki", "⭐ Öne çıkanlar"], ...RAFLAR.map((r) => [r.id, r.ikon + " " + r.ad])].map(([id, ad]) => `<button class="kt-chip ${id === raf && !ara ? "on" : ""}" data-raf="${id}">${esc(ad)}</button>`).join("")}</div>
+        <div id="vkListe" class="vk-liste"><p class="oa-not">Yükleniyor…</p></div>
+        <p style="text-align:center"><button class="oa-btn ik" id="vkZar">🎲 Bana bir eser seç</button></p>
+        <p class="oa-not">Metinler <a href="${VK}" target="_blank" rel="noopener">Vikikaynak</a>'tan (özgür kütüphane) alınır; telifi serbest eserlerdir. Açmak için internet gerekir; bir kez açtığın eser bu cihazda saklanır, sonra internetsiz de okunur. Eski yazımlı eserlerde bazı kelimeler bugünkünden farklı yazılmış olabilir.</p>`;
+      const liste = el.querySelector("#vkListe"), inp = el.querySelector("#vkAra");
+      inp.oninput = () => { ara = inp.value; clearTimeout(inp._z); inp._z = setTimeout(() => { listele(); el.querySelectorAll("[data-raf]").forEach((b) => b.classList.toggle("on", !ara && b.dataset.raf === raf)); }, 200); };
+      el.querySelectorAll("[data-raf]").forEach((b) => (b.onclick = () => { raf = b.dataset.raf; ara = ""; ciz(); }));
+      el.querySelector("#vkZar").onclick = async () => { const tum = await tumEserler(); const l = tum.filter((t) => !(k.vk[t] && k.vk[t].bitti)); if (l.length) eserAc(pick(l)); };
+      el.querySelectorAll("[data-ac]").forEach((b) => (b.onclick = () => eserAc(b.dataset.ac)));
+      const listele = async () => {
+        if (ara.trim()) {
+          const q = trNorm(ara.trim()), tum = await tumEserler();
+          const l = tum.filter((t) => { const e = katalog[t] || {}; return trNorm(e.ad + " " + t).includes(q) || trNorm(e.yazar).includes(q); }).slice(0, 80);
+          liste.innerHTML = (l.length ? l.map(satir).join("") : `<p class="oa-not">Kitaplıkta "${esc(ara)}" bulunamadı.</p>`) + `<p style="text-align:center"><button class="oa-btn" id="vkUzak">🌐 Vikikaynak'ın tamamında ara</button></p><div id="vkUzakL"></div>`;
+          liste.querySelector("#vkUzak").onclick = () => uzakAra(ara.trim(), liste.querySelector("#vkUzakL"));
+        } else if (raf === "secki") {
+          const gr = {}; SECKI.forEach((x) => (gr[x[2]] = gr[x[2]] || []).push(x[0]));
+          liste.innerHTML = Object.entries(gr).map(([tur, l]) => `<h3>${{ Roman: "📗 Romanlar ve uzun hikâyeler", Hikâye: "📕 Hikâyeler", Fıkra: "😄 Fıkralar", Şiir: "✒️ Şiirler" }[tur] || tur}</h3>${l.filter((t) => !(k.bos && k.bos[t])).map(satir).join("")}`).join("");
+        } else {
+          const r = RAFLAR.find((x) => x.id === raf);
+          try {
+            let l = rafEserleri(r, await rafYukle(r));
+            if (!r.hepsi) { const s = new Set(SECKI.map((x) => x[0])); l = l.filter((t) => s.has(t)); }
+            l.sort((a, b) => ((katalog[a].sira ?? 1e4) - (katalog[b].sira ?? 1e4)) || katalog[a].ad.localeCompare(katalog[b].ad, "tr"));
+            liste.innerHTML = `<p class="oa-not">${l.length} eser</p>` + l.map(satir).join("");
+          } catch (e) { liste.innerHTML = `<p class="oa-not">⚠️ Liste alınamadı (internet bağlantını kontrol et). <button class="kt-chip" id="vkTekrar">Tekrar dene</button></p>`; liste.querySelector("#vkTekrar").onclick = listele; }
+        }
+        liste.querySelectorAll("[data-ac]").forEach((b) => (b.onclick = () => eserAc(b.dataset.ac)));
+      };
+      listele();
+    };
+    ciz();
+  }
+  async function tumEserler() {
+    const s = new Set(SECKI.map((x) => x[0]));
+    for (const r of RAFLAR) { try { let l = rafEserleri(r, await rafYukle(r)); if (!r.hepsi) l = l.filter((t) => katalog[t] && katalog[t].sira !== undefined); l.forEach((t) => s.add(t)); } catch (e) {} }
+    return [...s].filter((t) => !(vkv().bos && vkv().bos[t]));
+  }
+  async function uzakAra(q, kutu) {
+    kutu.innerHTML = '<p class="oa-not">Aranıyor…</p>';
+    try {
+      const j = await vkApi({ action: "query", list: "search", srsearch: q, srnamespace: "0", srlimit: "25", srprop: "snippet" });
+      const l = (j.query && j.query.search) || [];
+      kutu.innerHTML = l.length ? `<p class="oa-not">Vikikaynak'taki her metin bir kitap değildir (mektup, belge, kanun da çıkabilir); açınca okuyabilirsin.</p>` + l.map((r) => `<button class="vk-sat" data-ac="${esc(r.title)}"><span class="vk-ad">${esc(r.title)}</span><small>${esc(String(r.snippet || "").replace(/<[^>]+>/g, "").slice(0, 110))}…</small></button>`).join("") : '<p class="oa-not">Sonuç bulunamadı.</p>';
+      kutu.querySelectorAll("[data-ac]").forEach((b) => (b.onclick = () => { const t = b.dataset.ac; katalog[t] = katalog[t] || { ad: t, yazar: "", tur: "" }; eserAc(t); }));
+    } catch (e) { kutu.innerHTML = '<p class="oa-not">⚠️ Vikikaynak\'a ulaşılamadı. İnternet bağlantını kontrol et.</p>'; }
+  }
+
+  // ---- Eseri aç: kaldığın yerden devam / baştan başla ----
+  const geriKitaplik = () => ac(kitaplik, "Kitaplık", () => ac(kitap, "Kitap Okuma"));
+  function eserAc(t) {
+    const k = vkv(), d = k.vk[t], e = katalog[t] || { ad: t, yazar: "" };
+    if (d && (d.yuzde > 0 || d.bitti)) {
+      return ac((el) => {
+        el.innerHTML = `<div class="vk-karar"><div style="font-size:44px">${d.bitti ? "🏆" : "📖"}</div><h2>${esc(e.ad)}</h2><p class="oa-not">${esc(e.yazar || "")}</p>
+          ${d.bitti ? `<p>Bu eseri ${esc(d.bitis || "")} tarihinde bitirdin.</p>` : `<p>Kaldığın yer: <b>%${d.yuzde}</b>${d.top > 1 ? ` · ${d.parca + 1}. bölüm / ${d.top}` : ""}</p><div class="kt-bar" style="max-width:320px;margin:0 auto 14px"><i style="width:${d.yuzde}%"></i></div>`}
+          <div class="vk-karar-dug">${d.bitti ? "" : `<button class="oa-btn" id="vkDevam">▶️ Kaldığın yerden devam et</button>`}<button class="oa-btn ik" id="vkBas">⏮️ ${d.bitti ? "Yeniden oku" : "Baştan başla"}</button></div></div>`;
+        const dv = el.querySelector("#vkDevam"); if (dv) dv.onclick = () => okuyucu(t, d.parca || 0, d.y || 0);
+        el.querySelector("#vkBas").onclick = () => { if (d.bitti) { d.bitti = false; d.tekrar = (d.tekrar || 0) + 1; } d.parca = 0; d.y = 0; d.yuzde = 0; kaydet(); okuyucu(t, 0, 0); };
+      }, e.ad, geriKitaplik);
+    }
+    okuyucu(t, 0, 0);
+  }
+
+  // ---- Okuyucu ----
+  function okuyucu(t, parcaNo, yKonum) {
+    const k = vkv(), e = katalog[t] || { ad: t, yazar: "" };
+    ac(async (el) => {
+      el.innerHTML = `<div class="vk-yuk"><div class="vk-donen"></div><p id="vkYukM">“${esc(e.ad)}” açılıyor…</p></div>`;
+      let eser;
+      try { eser = await eserGetir(t, (i, n) => { const m = el.querySelector("#vkYukM"); if (m) m.textContent = `Bölümler yükleniyor: ${i} / ${n}`; }); }
+      catch (err) {
+        el.innerHTML = `<div class="vk-karar"><div style="font-size:40px">📡</div><p>Eser açılamadı. İnternet bağlantını kontrol et; bir kez açılan eserler sonra internetsiz de okunur.</p><div class="vk-karar-dug"><button class="oa-btn" id="vkTek">🔄 Tekrar dene</button><a class="oa-btn ik" href="${vkAdres(t)}" target="_blank" rel="noopener">Vikikaynak'ta aç</a></div></div>`;
+        el.querySelector("#vkTek").onclick = () => okuyucu(t, parcaNo, yKonum); return;
+      }
+      const P = parcala(eser), top = P.reduce((a, p) => a + p.kel, 0);
+      if (top < 8) {
+        k.bos = k.bos || {}; k.bos[t] = 1; kaydet();
+        el.innerHTML = `<div class="vk-karar"><div style="font-size:40px">📭</div><p>Bu eserin metni Vikikaynak'ta henüz eklenmemiş görünüyor. Listeden çıkardık; başka bir eser seç.</p><button class="oa-btn" id="vkG">📚 Kitaplığa dön</button></div>`;
+        el.querySelector("#vkG").onclick = geriKitaplik; return;
+      }
+      const d = (k.vk[t] = k.vk[t] || { ad: e.ad, yazar: e.yazar, tur: e.tur, bas: bugun(), sure: 0, kelime: 0 });
+      d.kel = top; d.top = P.length; d.son = Date.now();
+      let no = Math.max(0, Math.min(P.length - 1, parcaNo || 0)), enUzak = 0, oncekiKel = 0, sessiz = 0, kayitZ = 0;
+      const kat_ = el.closest(".oa-kat"), A = k.ayar;
+      const temaUygula = () => { kat_.classList.remove("vk-acik", "vk-sepya", "vk-koyu"); kat_.classList.add("vk-" + A.tema, "vk-okur"); };
+      temaUygula();
+      const parcaCiz = (y) => {
+        const p = P[no], sonP = no === P.length - 1;
+        el.innerHTML = `<div class="vk-bilgi"><div class="kt-bar"><i id="vkBar"></i></div><div class="vk-bilgi-s"><span id="vkYuzde"></span><span id="vkKalan"></span><button id="vkAa" aria-label="Yazı ayarları">Aa</button></div>
+            <div class="vk-ayar" id="vkAyar" hidden>
+              <div><span>Yazı boyu</span><button data-a="boy-">A−</button><b>${A.boy}</b><button data-a="boy+">A+</button></div>
+              <div><span>Satır aralığı</span><button data-a="ar-">−</button><b>${A.aralik.toFixed(2)}</b><button data-a="ar+">+</button></div>
+              <div><span>Yazı tipi</span><button data-a="f-serif" class="${A.font === "serif" ? "on" : ""}" style="font-family:Georgia,serif">Tırnaklı</button><button data-a="f-sans" class="${A.font === "sans" ? "on" : ""}">Düz</button></div>
+              <div><span>Görünüm</span><button data-a="t-acik" class="${A.tema === "acik" ? "on" : ""}">☀️ Açık</button><button data-a="t-sepya" class="${A.tema === "sepya" ? "on" : ""}">📜 Sepya</button><button data-a="t-koyu" class="${A.tema === "koyu" ? "on" : ""}">🌙 Koyu</button></div>
+            </div></div>
+          ${eser.eksik ? `<p class="vk-uyari">⚠️ Vikikaynak'ta bu eserin metninin eksik olabileceği belirtilmiş.</p>` : ""}
+          <article class="vk-metin ${A.font}" lang="tr" style="font-size:${A.boy}px;line-height:${A.aralik}">
+            ${no === 0 ? `<div class="vk-bas"><h1>${esc(e.ad)}</h1><p>${esc(e.yazar || "")}</p></div>` : ""}
+            ${p.ad && (no === 0 || P[no - 1].bol !== p.bol) ? `<h2>${esc(p.ad)}</h2>` : ""}
+            ${p.par.map((x) => `<p>${esc(x)}</p>`).join("")}
+          </article>
+          <div class="vk-alt">${no > 0 ? `<button class="oa-btn ik" id="vkOnc">← Önceki bölüm</button>` : "<span></span>"}
+            ${sonP ? `<button class="oa-btn" id="vkBit" style="background:#16a34a">🏁 Bitirdim</button>` : `<button class="oa-btn" id="vkSon">Sonraki bölüm →</button>`}</div>
+          <p class="oa-not" style="text-align:center">Bir kelimeyi ya da cümleyi seçersen sözlükte bakabilir, alıntı olarak kaydedebilirsin.</p>`;
+        const metin = el.querySelector(".vk-metin");
+        el.querySelector("#vkAa").onclick = () => { const a = el.querySelector("#vkAyar"); a.hidden = !a.hidden; };
+        el.querySelectorAll("[data-a]").forEach((b) => (b.onclick = () => {
+          const v = b.dataset.a, oran = konum();
+          if (v === "boy-") A.boy = Math.max(14, A.boy - 1); else if (v === "boy+") A.boy = Math.min(34, A.boy + 1);
+          else if (v === "ar-") A.aralik = Math.max(1.3, +(A.aralik - 0.15).toFixed(2)); else if (v === "ar+") A.aralik = Math.min(2.4, +(A.aralik + 0.15).toFixed(2));
+          else if (v.startsWith("f-")) A.font = v.slice(2); else if (v.startsWith("t-")) { A.tema = v.slice(2); temaUygula(); }
+          kaydet(); parcaCiz(oran); el.querySelector("#vkAyar").hidden = false;
+        }));
+        const onc = el.querySelector("#vkOnc"); if (onc) onc.onclick = () => { kaydetKonum(); no--; parcaCiz(0); };
+        const son = el.querySelector("#vkSon"); if (son) son.onclick = () => { ilerleKaydet(1); no++; enUzak = 0; parcaCiz(0); };
+        const bit = el.querySelector("#vkBit"); if (bit) bit.onclick = () => { ilerleKaydet(1); bitir(); };
+        enUzak = Math.max(enUzak, y || 0); if (y) oncekiKel = Math.max(oncekiKel, Math.round(P[no].kel * y));
+        clearTimeout(kayitZ); sessiz = Date.now() + 400;
+        const yerles = () => { kat_.scrollTop = y ? metin.offsetTop + (metin.offsetHeight * y) - kat_.clientHeight * 0.25 : 0; guncelle(); };
+        yerles(); requestAnimationFrame(yerles);
+      };
+      const konum = () => { const m = el.querySelector(".vk-metin"); if (!m) return 0; return Math.max(0, Math.min(1, (kat_.scrollTop + kat_.clientHeight * 0.25 - m.offsetTop) / Math.max(1, m.offsetHeight))); };
+      const ilerleKaydet = (oran) => { // okunan kelime: bu parçada ulaşılan en uzak nokta
+        enUzak = Math.max(enUzak, oran); const kel = Math.round(P[no].kel * enUzak), fark = Math.max(0, kel - oncekiKel);
+        if (fark) { d.kelime = (d.kelime || 0) + fark; sayfaEkle(fark); oncekiKel = kel; }
+        if (oran >= 1) oncekiKel = 0;
+        kaydetKonum(oran >= 1 ? 1 : undefined);
+      };
+      const kaydetKonum = (zorla) => {
+        const y = zorla === 1 ? 0 : konum(), nn = zorla === 1 ? Math.min(no + 1, P.length - 1) : no;
+        const okunan = P.slice(0, no).reduce((a, p) => a + p.kel, 0) + P[no].kel * (zorla === 1 ? 1 : y);
+        d.parca = nn; d.y = y; d.yuzde = Math.min(zorla === 1 && no === P.length - 1 ? 100 : 99, Math.max(d.bitti ? 100 : 0, Math.round((okunan / top) * 100))); d.son = Date.now(); kaydet();
+      };
+      const guncelle = () => {
+        const y = konum(), okunan = P.slice(0, no).reduce((a, p) => a + p.kel, 0) + P[no].kel * y, yz = Math.round((okunan / top) * 100);
+        const bar = el.querySelector("#vkBar"); if (!bar) return;
+        bar.style.width = yz + "%"; el.querySelector("#vkYuzde").textContent = `%${yz}${P.length > 1 ? ` · Bölüm ${no + 1}/${P.length}` : ""}`;
+        el.querySelector("#vkKalan").textContent = `Bu bölümde ${dkMetin(P[no].kel * (1 - y))} kaldı`;
+      };
+      let sonHareket = Date.now();
+      const kaydir = () => { if (!document.body.contains(el) || !el.querySelector(".vk-metin")) return; sonHareket = Date.now(); if (Date.now() < sessiz) return; enUzak = Math.max(enUzak, konum()); guncelle(); clearTimeout(kayitZ); kayitZ = setTimeout(() => { if (document.body.contains(el) && el.querySelector(".vk-metin")) ilerleKaydet(konum()); }, 800); };
+      kat_.addEventListener("scroll", kaydir, { passive: true });
+      ["touchstart", "keydown", "mousemove"].forEach((o) => kat_.addEventListener(o, () => (sonHareket = Date.now()), { passive: true }));
+      // Okuma süresi: sekme açık ve son 2 dakikada hareket varsa sayılır
+      const zz = setInterval(() => {
+        if (!document.body.contains(el)) { clearInterval(zz); kat_.removeEventListener("scroll", kaydir); return; }
+        if (document.visibilityState === "visible" && Date.now() - sonHareket < 120000) { d.sure = (d.sure || 0) + 5; k.dk[bugun()] = (k.dk[bugun()] || 0) + 5 / 60; if (!d._isaret) { d._isaret = 1; isaretle(); } }
+      }, 5000); zam.push(zz);
+      // Seçim araç çubuğu: sözlük ve alıntı
+      const cubuk = document.createElement("div"); cubuk.className = "vk-secim"; cubuk.hidden = true;
+      cubuk.innerHTML = `<button data-s="soz">📘 Sözlükte bak</button><button data-s="al">💬 Alıntı kaydet</button>`; kat_.appendChild(cubuk);
+      const secimMetni = () => { const s = window.getSelection(); if (!s || s.isCollapsed) return ""; const m = el.querySelector(".vk-metin"); return m && m.contains(s.anchorNode) ? String(s).trim() : ""; };
+      const secimDinle = () => { if (!document.body.contains(cubuk)) return document.removeEventListener("selectionchange", secimDinle); cubuk.hidden = !secimMetni(); };
+      document.addEventListener("selectionchange", secimDinle);
+      cubuk.querySelector('[data-s="soz"]').onclick = () => { const s = secimMetni().split(/\s+/)[0].replace(/[^\p{L}'-]/gu, ""); if (s) window.open("https://tr.wiktionary.org/wiki/" + encodeURIComponent(s.toLocaleLowerCase("tr")), "_blank", "noopener"); };
+      cubuk.querySelector('[data-s="al"]').onclick = () => { const s = secimMetni(); if (!s) return; k.alinti.unshift({ m: s.slice(0, 600), ad: e.ad, yazar: e.yazar || "", t: bugun() }); kaydet(); window.getSelection().removeAllRanges(); cubuk.hidden = true; bildir("💬 Alıntı kaydedildi"); };
+      const bildir = (m) => { const b = document.createElement("div"); b.className = "vk-bildir"; b.textContent = m; kat_.appendChild(b); setTimeout(() => b.remove(), 1800); };
+      const bitir = () => {
+        const ilk = !d.bitti; d.bitti = true; d.bitis = bugun(); d.yuzde = 100; d.parca = 0; d.y = 0;
+        if (ilk) { const l = k.liste.find((x) => x.vk === t); if (!l) k.liste.push({ ad: e.ad, yazar: e.yazar || "", tur: e.tur || "", vk: t, bitti: true, bitis: bugun(), okunan: Math.max(1, Math.round(top / KELIME_SAYFA)), toplam: Math.max(1, Math.round(top / KELIME_SAYFA)) }); }
+        kaydet(); cubuk.remove(); kat_.classList.remove("vk-okur");
+        const o = oneri(t), oe = o && (katalog[o] || { ad: o, yazar: "" });
+        el.innerHTML = `<div class="vk-karar"><div style="font-size:56px">🏆</div><h2>${esc(e.ad)} bitti!</h2>
+          <p>Bu, bitirdiğin <b>${bitenSay()}.</b> eser. ${d.sure ? `Toplam ${Math.max(1, Math.round(d.sure / 60))} dakika okudun.` : ""}</p>
+          <p>Nasıl buldun?</p><div class="vk-yildiz">${[1, 2, 3, 4, 5].map((i) => `<button data-p="${i}" aria-label="${i} yıldız">${i <= (d.puan || 0) ? "⭐" : "☆"}</button>`).join("")}</div>
+          ${oe ? `<div class="vk-oneri"><small>${oe.yazar === e.yazar && e.yazar ? `${esc(e.yazar)}'in çok okunan bir eseri daha var` : "Sıradaki için önerimiz"}</small><b>📖 ${esc(oe.ad)}</b><span>${esc(oe.yazar || "")}${oe.tur ? " · " + esc(oe.tur) : ""}</span><p>Bunu okumak ister misin?</p>
+            <div class="vk-karar-dug"><button class="oa-btn" id="vkOneri">Evet, aç</button><button class="oa-btn ik" id="vkKit">Kitaplığa dön</button></div></div>` : `<div class="vk-karar-dug"><button class="oa-btn" id="vkKit">📚 Kitaplığa dön</button></div>`}
+          <p><button class="kt-chip" id="vkPaylas">📤 Arkadaşına öner</button></p></div>`;
+        el.querySelectorAll("[data-p]").forEach((b) => (b.onclick = () => { d.puan = +b.dataset.p; const l = k.liste.find((x) => x.vk === t); if (l) l.puan = d.puan; kaydet(); el.querySelectorAll("[data-p]").forEach((x) => (x.textContent = +x.dataset.p <= d.puan ? "⭐" : "☆")); }));
+        const on = el.querySelector("#vkOneri"); if (on) on.onclick = () => eserAc(o);
+        el.querySelector("#vkKit").onclick = geriKitaplik;
+        el.querySelector("#vkPaylas").onclick = () => paylas(`${e.ad}${e.yazar ? " — " + e.yazar : ""} okudum${d.puan ? " " + "⭐".repeat(d.puan) : ""}. Sen de ücretsiz oku: ${vkAdres(t)}`);
+      };
+      parcaCiz(yKonum || 0);
+    }, e.ad, () => { const s = document.querySelector(".vk-secim"); if (s) s.remove(); geriKitaplik(); });
+  }
+  const paylas = (m) => { if (navigator.share) navigator.share({ text: m }).catch(() => {}); else if (navigator.clipboard) navigator.clipboard.writeText(m).then(() => alert("Panoya kopyalandı, istediğin yere yapıştırabilirsin.")); };
+  function alintilar(el) {
+    const k = vkv();
+    el.innerHTML = k.alinti.length ? k.alinti.map((a, i) => `<div class="kt-kitap vk-alinti"><p>“${esc(a.m)}”</p><small>— ${esc(a.yazar)}${a.yazar ? ", " : ""}${esc(a.ad)} · ${esc(a.t)}</small><div class="kt-row"><button data-pay="${i}">📤 Paylaş</button><button data-sil="${i}">🗑️</button></div></div>`).join("")
+      : '<p class="oa-not">Henüz alıntın yok. Okurken beğendiğin bir cümleyi seç, “💬 Alıntı kaydet”e bas.</p>';
+    el.querySelectorAll("[data-pay]").forEach((b) => (b.onclick = () => { const a = k.alinti[+b.dataset.pay]; paylas(`“${a.m}” — ${a.yazar}${a.yazar ? ", " : ""}${a.ad}`); }));
+    el.querySelectorAll("[data-sil]").forEach((b) => (b.onclick = () => { k.alinti.splice(+b.dataset.sil, 1); kaydet(); alintilar(el); }));
+  }
+
   window.KITAP_OKUMA_AC = KITAP_VAR ? () => ac(kitap, "Kitap Okuma") : null;
 
   // ---------- Menü ----------
