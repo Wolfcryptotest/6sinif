@@ -1,6 +1,6 @@
 // 7. sınıf Fen Bilimleri soru üreteçleri
 (function () {
-  const U = window.URETEC, { r, pick, soru, tiplerden, eslestir, siniflandir, ifadeler, dir } = window.UR;
+  const U = window.URETEC, { r, pick, soru, Y, tiplerden, eslestir, siniflandir, ifadeler, dir } = window.UR;
   const B = (s) => s.charAt(0).toLocaleUpperCase("tr") + s.slice(1);
 
   U.f1k1 = tiplerden([
@@ -15,8 +15,8 @@
   ]);
 
   U.f2k1 = tiplerden([
-    () => { const F = r(2, 20) * 5, x = r(2, 12); return soru(`${F} N'luk kuvvet uygulanan bir cisim kuvvet yönünde ${x} m ilerliyor. Yapılan iş kaç J'dür?`, String(F * x), [String(F + x), String(F * x / 2), String(F * (x + 1))], `İş = ${F} × ${x} = ${F * x} J`); },
-    () => { const W = r(4, 30) * 10, x = pick([2, 4, 5, 10]); if (W % x) return null; return soru(`Bir cisme ${W} J iş yapılarak kuvvet yönünde ${x} m yol aldırılıyor. Uygulanan kuvvet kaç N'dur?`, String(W / x), [String(W * x), String(W - x), String(W / x + x)], `Kuvvet = ${W} ÷ ${x} = ${W / x} N`); },
+    () => { const F = r(2, 20) * 5, x = r(2, 12); return soru(`${F} N'luk kuvvet uygulanan bir cisim kuvvet yönünde ${x} m ilerliyor. Yapılan iş kaç J'dür?`, String(F * x), [Y(String(F + x), "k:kuvvet ile yol toplandı (çarpılmalıydı)"), String(F * x / 2), String(F * (x + 1))], `İş = ${F} × ${x} = ${F * x} J`); },
+    () => { const W = r(4, 30) * 10, x = pick([2, 4, 5, 10]); if (W % x) return null; return soru(`Bir cisme ${W} J iş yapılarak kuvvet yönünde ${x} m yol aldırılıyor. Uygulanan kuvvet kaç N'dur?`, String(W / x), [Y(String(W * x), "k:iş yol ile çarpıldı (bölünmeliydi)"), Y(String(W - x), "k:işten yol çıkarıldı (bölünmeliydi)"), String(W / x + x)], `Kuvvet = ${W} ÷ ${x} = ${W / x} N`); },
     siniflandir({ "fiziksel iş yapılan": ["yerdeki çantayı masaya kaldırmak", "alışveriş arabasını itip ilerletmek", "kovayı kuyudan yukarı çekmek", "kutuyu rafa koymak", "bisikleti iterek ilerletmek"], "fiziksel iş yapılmayan": ["duvarı itmek", "elindeki çantayla yatay yolda yürümek", "kımıldatamadığı bir dolabı itmek", "başının üstünde sabit tuttuğu kitap", "ders çalışırken düşünmek"] }, (g) => `Hangisi ${g} bir durumdur?`, (d, g) => `"${d}": ${g}.`)
   ]);
   U.f2k2 = tiplerden([
@@ -50,7 +50,7 @@
 
   U.f4k1 = tiplerden([
     ifadeler(["Işık farklı yoğunluktaki ortamlara geçerken kırılır.", "Yüzeye dik gelen ışın kırılmaz.", "Havuz olduğundan daha sığ görünür.", "Gökkuşağı ışığın kırılmasıyla oluşur.", "Işık sudan havaya geçerken normalden uzaklaşır.", "Normal, ortamların ayrıldığı yüzeye çizilen dik doğrudur."], ["Işık aynı ortamda kırılarak ilerler.", "Yüzeye dik gelen ışın en çok kırılır.", "Havuz olduğundan daha derin görünür.", "Gökkuşağı ışığın soğurulmasıyla oluşur.", "Işık havadan suya geçerken normalden uzaklaşır.", "Kırılma yalnızca aynalarda olur."], "Işığın kırılması"),
-    () => { const [g, h, n] = pick([["havadan", "suya", "normale yaklaşarak"], ["havadan", "cama", "normale yaklaşarak"], ["sudan", "havaya", "normalden uzaklaşarak"], ["camdan", "havaya", "normalden uzaklaşarak"]]); return soru(`Işık ${g} ${h} eğik olarak geçerken nasıl kırılır?`, B(n), ["Normale yaklaşarak", "Normalden uzaklaşarak", "Hiç kırılmadan", "Geri yansıyarak"].filter((x) => x !== B(n)), "Az yoğundan çok yoğuna: normale yaklaşır; çok yoğundan az yoğuna: uzaklaşır."); },
+    () => { const [g, h, n] = pick([["havadan", "suya", "normale yaklaşarak"], ["havadan", "cama", "normale yaklaşarak"], ["sudan", "havaya", "normalden uzaklaşarak"], ["camdan", "havaya", "normalden uzaklaşarak"]]); return soru(`Işık ${g} ${h} eğik olarak geçerken nasıl kırılır?`, B(n), ["Normale yaklaşarak", "Normalden uzaklaşarak", Y("Hiç kırılmadan", "k:eğik gelen ışık da kırılmaz sanıldı (yalnızca dik gelen ışın kırılmaz)"), Y("Geri yansıyarak", "k:kırılma ile yansıma karıştırıldı")].map((x) => (x === "Normale yaklaşarak" || x === "Normalden uzaklaşarak") ? Y(x, "k:az yoğundan çok yoğuna ve çok yoğundan az yoğuna geçiş karıştırıldı") : x).filter((x) => x.v !== B(n)), "Az yoğundan çok yoğuna: normale yaklaşır; çok yoğundan az yoğuna: uzaklaşır."); },
     siniflandir({ "kırılmaya örnek": ["suya batırılan kalemin kırık görünmesi", "havuzun olduğundan sığ görünmesi", "gökkuşağının oluşması", "sudaki balığın farklı yerde görünmesi"], "yansımaya örnek": ["aynada görüntümüzü görmek", "durgun gölde ağaçların görüntüsü", "parlak kaşıkta yüzümüzü görmek"] }, (g) => `Hangisi ışığın ${g === "kırılmaya örnek" ? "kırılmasına" : "yansımasına"} bir örnektir?`, (d, g) => `${d}: ${g}.`)
   ]);
   U.f4k2 = tiplerden([
@@ -63,7 +63,7 @@
   U.f5k1 = tiplerden([
     eslestir([["proton", "çekirdekte bulunan pozitif yüklü tanecik"], ["nötron", "çekirdekte bulunan yüksüz tanecik"], ["elektron", "katmanlarda hareket eden negatif yüklü tanecik"], ["çekirdek", "atomun proton ve nötronların bulunduğu merkezi"]], (a) => `Atomda ${a} nedir?`, (b) => `Atomda "${b}" hangisidir?`, (a, b) => `${a}: ${b}.`),
     () => { const S = ["Demokritos", "Dalton", "Thomson", "Rutherford", "Bohr"]; const i = r(0, 3); return soru(`Atom modelinin gelişiminde "${S[i]}" modelinden sonra hangi bilim insanının modeli gelir?`, S[i + 1], S.filter((_, j) => j !== i + 1 && j !== i).concat(["Aristoteles"]), `Sıra: ${S.join(" → ")} → modern model`); },
-    () => { const p = r(1, 18); return soru(`Nötr bir atomda ${p} proton varsa kaç elektron vardır?`, String(p), [String(p + 1), String(p * 2), String(Math.max(0, p - 1)) === String(p) ? "0" : String(Math.max(0, p - 1))], "Nötr atomda proton sayısı = elektron sayısı."); }
+    () => { const p = r(1, 18); return soru(`Nötr bir atomda ${p} proton varsa kaç elektron vardır?`, String(p), [String(p + 1), Y(String(p * 2), "k:elektron sayısı proton sayısının iki katı sanıldı"), String(Math.max(0, p - 1)) === String(p) ? "0" : String(Math.max(0, p - 1))], "Nötr atomda proton sayısı = elektron sayısı."); }
   ]);
   U.f5k2 = tiplerden([
     eslestir(ELEM, (a) => `"${a}" hangi elementin sembolüdür?`, (b) => `${B(b)} elementinin sembolü hangisidir?`, (a, b) => `${a}: ${b}.`),
@@ -72,7 +72,7 @@
   ]);
   U.f5k3 = tiplerden([
     siniflandir({ "homojen karışım": ["şekerli su", "tuzlu su", "hava", "kolonya", "çelik (alaşım)", "limonata"], "heterojen karışım": ["zeytinyağı-su", "kum-su", "ayran", "salata", "çakıl-kum", "tebeşir tozu-su"] }, (g) => `Hangisi ${dir(g)}?`, (d, g) => `${d}: ${g}.`, (d) => `"${d}" nasıl bir karışımdır?`),
-    () => { const [c, cz] = pick([["şekerli su", ["su", "şeker"]], ["tuzlu su", ["su", "tuz"]], ["kolonya", ["alkol", "esans"]], ["limonata", ["su", "şeker"]]]); const t = pick(["çözücü", "çözünen"]); const d = t === "çözücü" ? cz[0] : cz[1]; return soru(`${B(c)} çözeltisinde ${t} hangisidir?`, B(d), [B(t === "çözücü" ? cz[1] : cz[0]), "Hava", "Kum"], `Miktarı fazla olan çözücü, az olan çözünendir.`); },
+    () => { const [c, cz] = pick([["şekerli su", ["su", "şeker"]], ["tuzlu su", ["su", "tuz"]], ["kolonya", ["alkol", "esans"]], ["limonata", ["su", "şeker"]]]); const t = pick(["çözücü", "çözünen"]); const d = t === "çözücü" ? cz[0] : cz[1]; return soru(`${B(c)} çözeltisinde ${t} hangisidir?`, B(d), [Y(B(t === "çözücü" ? cz[1] : cz[0]), "k:çözücü ile çözünen karıştırıldı"), "Hava", "Kum"], `Miktarı fazla olan çözücü, az olan çözünendir.`); },
     siniflandir({ "çözünme hızını artırır": ["sıcaklığı artırmak", "karıştırmak", "çözüneni toz hâline getirmek"], "çözünme hızını azaltır": ["çözücüyü soğutmak", "karıştırmadan bekletmek", "küp şeker kullanmak"] }, (g) => `Hangisi ${g}?`, (d, g) => `${d}: ${g}.`)
   ]);
   U.f5k4 = tiplerden([
@@ -81,8 +81,8 @@
   ]);
 
   U.f6k1 = tiplerden([
-    () => { const p = r(2, 12), n = r(2, 12); const d = p === n ? "Nötr" : p > n ? "Pozitif" : "Negatif"; return soru(`Bir cisimde ${p} birim pozitif, ${n} birim negatif yük vardır. Cisim nasıl yüklüdür?`, d, ["Nötr", "Pozitif", "Negatif", "Hem pozitif hem negatif değildir"].filter((x) => x !== d), "Hangi yük fazlaysa cisim o yükle yüklüdür; eşitse nötrdür."); },
-    () => { const [a, b] = pick([["pozitif", "pozitif"], ["negatif", "negatif"], ["pozitif", "negatif"]]); const d = a === b ? "Birbirini iter" : "Birbirini çeker"; return soru(`${B(a)} yüklü bir cisim ile ${b} yüklü bir cisim birbirine yaklaştırılırsa ne olur?`, d, [a === b ? "Birbirini çeker" : "Birbirini iter", "Hiçbir etkileşim olmaz", "İkisi de nötr olur"], "Aynı yükler iter, zıt yükler çeker."); },
+    () => { const p = r(2, 12), n = r(2, 12); const d = p === n ? "Nötr" : p > n ? "Pozitif" : "Negatif"; return soru(`Bir cisimde ${p} birim pozitif, ${n} birim negatif yük vardır. Cisim nasıl yüklüdür?`, d, ["Nötr", "Pozitif", "Negatif", "Hem pozitif hem negatif değildir"].filter((x) => x !== d).map((x) => (x === "Nötr" ? Y(x, "k:pozitif ve negatif yük sayısı eşit değilken cisim nötr sanıldı") : x === "Pozitif" || x === "Negatif" ? Y(x, d === "Nötr" ? "k:pozitif ve negatif yük eşitken cisim nötrdür" : "d:hangi yükün daha fazla olduğu ters okundu") : x)), "Hangi yük fazlaysa cisim o yükle yüklüdür; eşitse nötrdür."); },
+    () => { const [a, b] = pick([["pozitif", "pozitif"], ["negatif", "negatif"], ["pozitif", "negatif"]]); const d = a === b ? "Birbirini iter" : "Birbirini çeker"; return soru(`${B(a)} yüklü bir cisim ile ${b} yüklü bir cisim birbirine yaklaştırılırsa ne olur?`, d, [Y(a === b ? "Birbirini çeker" : "Birbirini iter", "k:aynı yükler iter, zıt yükler çeker kuralı karıştırıldı"), "Hiçbir etkileşim olmaz", "İkisi de nötr olur"], "Aynı yükler iter, zıt yükler çeker."); },
     siniflandir({ "sürtünme ile elektriklenme": ["balonun kazağa sürtülmesi", "saçın tarakla taranması", "cam çubuğun ipek kumaşa sürtülmesi"], "dokunma ile elektriklenme": ["yüklü bir çubuğun elektroskop topuzuna dokundurulması", "yüklü kürenin nötr küreye değdirilmesi"], "etki ile elektriklenme": ["yüklü çubuğun nötr cisme dokundurmadan yaklaştırılması", "yüklü balonun kâğıt parçalarına yaklaştırılması"] }, (g) => `Hangisi ${g}ye örnektir?`, (d, g) => `${d}: ${g}.`, (d) => `"${d}" hangi elektriklenme çeşididir?`),
     ifadeler(["Elektriklenmede yalnızca elektronlar yer değiştirir.", "Elektroskop cismin yüklü olup olmadığını gösterir.", "Paratoner yıldırımı toprağa iletir.", "Elektron alan cisim negatif yüklenir.", "Nötr cisimde pozitif ve negatif yük eşittir."], ["Elektriklenmede protonlar yer değiştirir.", "Aynı cins yükler birbirini çeker.", "Elektron veren cisim negatif yüklenir.", "Fırtınada ağaç altına sığınmak güvenlidir.", "Nötr cisimde hiç yük yoktur."], "Elektriklenme")
   ]);
