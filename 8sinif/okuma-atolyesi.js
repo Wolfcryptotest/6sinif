@@ -1,4 +1,5 @@
 // 📖 Okuma Atölyesi — akıcı okuma ve okuma becerisi egzersizleri (1–12. sınıfta aynı dosya).
+// 9–12: Kitap Okuma (kitap seç, sayfa ve süre takibi, kitap defteri). Sesli koç ve Günlük Antrenman yalnızca 1–4.
 // Schultz tablosu, kelime/kelime grubu flaşı, işaretçili okuma + anlama soruları, kamera zihni, göz egzersizi, gelişim grafiği.
 // Hız tek başına hedef değildir: her okumanın sonunda anlama soruları sorulur; hız ancak anlama iyiyse artırılır.
 // Uygulamaya dokunmaz: kendi tam ekran katmanında açılır. Giriş: 5–12'de ana sayfa kartı (ANA_KARTLAR), 1–4'te ana menüye düğme.
@@ -23,6 +24,8 @@
   const NORM = { 1: [40, 60], 2: [60, 80], 3: [80, 100], 4: [100, 120], 5: [110, 150], 6: [120, 160], 7: [130, 170], 8: [140, 180], 9: [150, 190], 10: [160, 200], 11: [170, 210], 12: [180, 220] };
   const hedef = (() => { const h = String(window.HIKAYE_HEDEF || "").match(/(\d+)\D+(\d+)/); return h ? [+h[1], +h[2]] : NORM[Math.min(12, NO)] || [120, 160]; })();
   const SCH = NO <= 2 ? 3 : NO <= 5 ? 4 : 5;
+  // Sesli okuma koçu ve Günlük Antrenman yalnızca ilkokulda (1–4); ortaokul ve lisede egzersizler tek tek seçilir.
+  const KOC_VAR = NO <= 4, ANTRENMAN_VAR = NO <= 4, KITAP_VAR = NO >= 9;
   // Metin seviyesi (1–7): anlama %80+ → metin uzar, %60 altı → kısalır
   const seviyeNo = () => Math.round((veri.seviye - 0.6) / 0.2) + 1;
   const seviyeGuncelle = (anlama) => { const eski = veri.seviye; if (anlama >= 80) veri.seviye = Math.min(1.8, +(veri.seviye + 0.2).toFixed(2)); else if (anlama < 60) veri.seviye = Math.max(0.6, +(veri.seviye - 0.2).toFixed(2)); return veri.seviye > eski ? 1 : veri.seviye < eski ? -1 : 0; };
@@ -83,6 +86,14 @@
 .oa-kart{border:2px solid var(--sinir,#eadfc8);background:var(--kart,#fff);border-radius:18px;padding:16px;text-align:left;font-size:17px;color:inherit;box-shadow:0 4px 0 rgba(0,0,0,.06)}
 .oa-kart b{display:block;font-size:19px;margin:4px 0}.oa-kart small{color:var(--soluk,#7a6f8f)}.oa-kart .i{font-size:34px}
 /*oa-telefon*/@media (max-width:560px){.oa-ic{padding:12px}.oa-menu{grid-template-columns:1fr;gap:8px}.oa-kart{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;padding:10px 14px;font-size:15px;border-radius:14px}.oa-kart .i{grid-row:1/3;font-size:28px;text-align:center}.oa-kart b{font-size:16.5px;margin:0}.oa-kart small{font-size:13px;line-height:1.35}.oa-btn{padding:10px 16px;font-size:16px}.oa-ust{padding:8px 12px}}
+.oa-kart.kitap{background:linear-gradient(135deg,#7c3aed,#db2777)!important;color:#fff!important;border:none!important}.oa-kart.kitap small{color:#fdf4ff!important}
+.kt-kitap{background:var(--kart,#fff);border:1px solid var(--sinir,#eadfc8);border-radius:14px;padding:12px 14px;margin:8px 0;display:grid;gap:6px}
+.kt-kitap b{font-size:17px}.kt-kitap small{color:var(--soluk,#6b7280)}.kt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.kt-row button,.kt-row a{border:1px solid var(--sinir,#ddd);background:var(--bg,#fff);color:inherit;border-radius:10px;padding:7px 11px;font-size:15px;text-decoration:none}
+.kt-bar{height:8px;border-radius:5px;background:var(--sinir,#e5e7eb);overflow:hidden}.kt-bar i{display:block;height:100%;background:#7c3aed}
+.kt-chip{border:1px solid var(--sinir,#ddd);background:var(--kart,#fff);color:inherit;border-radius:999px;padding:6px 12px;font-size:14px}.kt-chip.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.kt-in{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--sinir,#ddd);font-size:16px;background:var(--bg,#fff);color:inherit;box-sizing:border-box}
+.kt-saat{font-size:44px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
 .oa-kart.ana{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none}.oa-kart.ana small{color:#e0e7ff}
 .oa-btn{display:inline-block;border:none;border-radius:14px;padding:13px 20px;font-size:18px;font-weight:700;background:#0ea5e9;color:#fff;margin:6px 4px}
 .oa-btn.ik{background:var(--kart,#fff);color:inherit;border:2px solid var(--sinir,#eadfc8)}
@@ -129,16 +140,17 @@
   const etkili = (x) => Math.round((x.hiz * (x.anlama || 0)) / 100);
   const rekor = () => veri.olcum.filter((x) => x.gecerli !== false).reduce((m, x) => Math.max(m, etkili(x)), 0);
   const gunOnce = (t) => Math.round((new Date(bugun()) - new Date(t)) / 864e5);
+  const gecerliOlcum = () => veri.olcum.filter((x) => x.gecerli !== false);
   function olcumAlt() {
-    const son = veri.olcum.slice(-1)[0];
+    const son = gecerliOlcum().slice(-1)[0];
     if (!son) return "Kendi hızında oku, kaç kelime okuduğunu ve ne kadar anladığını öğren. Haftada bir ölç, gelişimini gör.";
     const g = gunOnce(son.t);
     return `Son: ${son.hiz} kelime/dk · anlama %${son.anlama} · rekor ${rekor()}${g >= 7 ? " · ⏰ Yeniden ölçme zamanı!" : g === 0 ? " · bugün ölçtün ✅" : ` · ${g} gün önce`}`;
   }
   function ozetSerit() {
-    const son = veri.olcum.slice(-1)[0], ilk = veri.olcum[0];
+    const go = gecerliOlcum(), son = go.slice(-1)[0], ilk = go[0];
     if (!son) return `<div class="oa-serit"><b>📖 Okuma hızını hiç ölçmedin.</b><span>Önce "Okuma Hızımı Ölç" ile başla; ${NO}. sınıf hedefi dakikada <b>${hedef[0]}–${hedef[1]}</b> kelime, anlama en az %80.</span></div>`;
-    const fark = veri.olcum.length > 1 ? son.hiz - ilk.hiz : 0;
+    const fark = go.length > 1 ? son.hiz - ilk.hiz : 0;
     const yer = Math.max(0, Math.min(100, ((son.hiz - hedef[0] * 0.5) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100));
     return `<div class="oa-serit"><b>📖 Okuma hızın: ${son.hiz} kelime/dk · Anlama: %${son.anlama}</b>
       <div class="oa-bant"><i style="left:${((hedef[0] - hedef[0] * 0.5) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100}%;width:${((hedef[1] - hedef[0]) / (hedef[1] * 1.25 - hedef[0] * 0.5)) * 100}%"></i><b style="left:${yer}%"></b></div>
@@ -171,7 +183,7 @@
         const e = etkili(x), yeniRekor = gecerli && e > onceRekor && onceRekor > 0, hedefSonraki = Math.ceil((Math.max(gecerli ? e : 0, onceRekor, 20) * 1.05) / 5) * 5;
         const tavsiye = !gecerli ? "⚠️ Metni çok hızlı geçtin; bu ölçüm rekora sayılmadı. Bir dahakinde gerçekten okuyarak dene."
           : anlama < 70 ? "🐢 Hızlı okudun ama anlaman düştü. Bir dahaki ölçümde biraz yavaşla; önce anlamak gelir."
-          : hiz < hedef[0] ? "🌱 Anlaman iyi! Hızını artırmak için her gün <b>Günlük Antrenman</b> yap; 2 hafta sonra yeniden ölç."
+          : hiz < hedef[0] ? (ANTRENMAN_VAR ? "🌱 Anlaman iyi! Hızını artırmak için her gün <b>Günlük Antrenman</b> yap; 2 hafta sonra yeniden ölç." : "🌱 Anlaman iyi! Hızını artırmak için her gün birkaç dakika <b>İşaretçili Okuma</b> ve <b>Kelime Flaşı</b> yap; 2 hafta sonra yeniden ölç.")
           : hiz > hedef[1] && anlama >= 80 ? "🚀 Sınıf hedefinin üstündesin! Daha uzun metinlerle anlamayı korumaya çalış."
           : "👍 Sınıf hedefindesin. Düzenli okumaya devam; haftada bir ölç.";
         el.innerHTML = `<div class="oa-sonuc">
@@ -239,15 +251,131 @@
     };
   }
 
+  // ---------- 📚 Kitap Okuma (9–12): kitap seç, oku, sayfa ve süre takibi, kitap defteri ----------
+  // Telifi serbest Türkçe eserler (yazarı 1955 ve öncesinde vefat etmiş) için Vikikaynak'ta arama bağlantısı verilir.
+  const KITAPLAR = [
+    ["İntibah", "Namık Kemal", "Türk romanı", 1], ["Araba Sevdası", "Recaizade Mahmut Ekrem", "Türk romanı", 1],
+    ["Mai ve Siyah", "Halit Ziya Uşaklıgil", "Türk romanı", 1], ["Aşk-ı Memnu", "Halit Ziya Uşaklıgil", "Türk romanı", 1],
+    ["Eylül", "Mehmet Rauf", "Türk romanı", 1], ["Kuyucaklı Yusuf", "Sabahattin Ali", "Türk romanı", 1],
+    ["İçimizdeki Şeytan", "Sabahattin Ali", "Türk romanı", 1], ["Kürk Mantolu Madonna", "Sabahattin Ali", "Türk romanı", 1],
+    ["Ayaşlı ve Kiracıları", "Memduh Şevket Esendal", "Türk romanı", 1], ["Çalıkuşu", "Reşat Nuri Güntekin", "Türk romanı", 0],
+    ["Yaprak Dökümü", "Reşat Nuri Güntekin", "Türk romanı", 0], ["Kiralık Konak", "Yakup Kadri Karaosmanoğlu", "Türk romanı", 0],
+    ["Yaban", "Yakup Kadri Karaosmanoğlu", "Türk romanı", 0], ["Sinekli Bakkal", "Halide Edib Adıvar", "Türk romanı", 0],
+    ["Ateşten Gömlek", "Halide Edib Adıvar", "Türk romanı", 0], ["Huzur", "Ahmet Hamdi Tanpınar", "Türk romanı", 0],
+    ["Saatleri Ayarlama Enstitüsü", "Ahmet Hamdi Tanpınar", "Türk romanı", 0], ["Dokuzuncu Hariciye Koğuşu", "Peyami Safa", "Türk romanı", 0],
+    ["İnce Memed", "Yaşar Kemal", "Türk romanı", 0], ["Bereketli Topraklar Üzerinde", "Orhan Kemal", "Türk romanı", 0],
+    ["Yorgun Savaşçı", "Kemal Tahir", "Türk romanı", 0],
+    ["Seçme Hikâyeler", "Ömer Seyfettin", "Hikâye, şiir, anı", 1], ["Semaver", "Sait Faik Abasıyanık", "Hikâye, şiir, anı", 1],
+    ["Safahat", "Mehmet Akif Ersoy", "Hikâye, şiir, anı", 1], ["Dede Korkut Hikâyeleri", "Anonim", "Hikâye, şiir, anı", 1],
+    ["Nutuk", "Mustafa Kemal Atatürk", "Hikâye, şiir, anı", 1],
+    ["Suç ve Ceza", "Fyodor Dostoyevski", "Dünya klasikleri", 0], ["Sefiller", "Victor Hugo", "Dünya klasikleri", 0],
+    ["Don Kişot", "Miguel de Cervantes", "Dünya klasikleri", 0], ["Hayvan Çiftliği", "George Orwell", "Dünya klasikleri", 0],
+    ["Fareler ve İnsanlar", "John Steinbeck", "Dünya klasikleri", 0], ["Yaşlı Adam ve Deniz", "Ernest Hemingway", "Dünya klasikleri", 0],
+    ["Dönüşüm", "Franz Kafka", "Dünya klasikleri", 0], ["Beyaz Diş", "Jack London", "Dünya klasikleri", 0],
+    ["Martin Eden", "Jack London", "Dünya klasikleri", 0], ["Küçük Prens", "Antoine de Saint-Exupéry", "Dünya klasikleri", 0]
+  ];
+  const kv = () => { veri.kitap = veri.kitap || {}; const k = veri.kitap; k.liste = k.liste || []; k.gun = k.gun || {}; k.hedef = k.hedef || 20; return k; };
+  const kgun = (i) => { const d = new Date(Date.now() - i * 864e5); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+  const kSeri = () => { const g = kv().gun; let n = 0; for (let i = 0; i < 400; i++) { if (g[kgun(i)] > 0) n++; else if (i > 0) break; } return n; };
+  const vikikaynak = (ad) => "https://tr.wikisource.org/w/index.php?search=" + encodeURIComponent(ad);
+  function kitapAlt() {
+    const k = kv(), okunan = k.liste.filter((x) => !x.bitti), biten = k.liste.filter((x) => x.bitti).length, bug = k.gun[bugun()] || 0;
+    if (!k.liste.length) return "Bir kitap seç, her gün okuduğun sayfaları kaydet, bitirince kitap defterini doldur.";
+    return `${okunan.length ? "Okuyorsun: " + esc(okunan[0].ad) + " · " : ""}bugün ${bug}/${k.hedef} sayfa · ${biten} kitap bitti${kSeri() ? " · 🔥 " + kSeri() + " gün" : ""}`;
+  }
+  function kitap(el) {
+    const k = kv(), bug = k.gun[bugun()] || 0, biten = k.liste.filter((x) => x.bitti);
+    const hafta = [...Array(7)].map((_, i) => k.gun[kgun(6 - i)] || 0), hMax = Math.max(k.hedef, ...hafta, 1);
+    el.innerHTML = `<div class="oa-serit"><b>📚 Bugün ${bug} / ${k.hedef} sayfa</b>
+        <div class="kt-bar"><i style="width:${Math.min(100, (bug / k.hedef) * 100)}%"></i></div>
+        <span>${kSeri() ? `🔥 ${kSeri()} gündür her gün okuyorsun.` : "Bugün okumaya başla, serini kur."} Bitirdiğin kitap: <b>${biten.length}</b>.
+        Günlük hedef: <select id="ktHedef" class="kt-in" style="width:auto;display:inline-block;padding:4px 8px">${[10, 15, 20, 30, 40, 50].map((h) => `<option ${h === k.hedef ? "selected" : ""}>${h}</option>`).join("")}</select> sayfa</span></div>
+      <div class="oa-graf" style="height:90px">${hafta.map((v, i) => `<div><small>${v || ""}</small><i style="height:${Math.round((v / hMax) * 100)}%;background:#7c3aed"></i><small>${["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"][new Date(Date.now() - (6 - i) * 864e5).getDay()]}</small></div>`).join("")}</div>
+      <h3>📖 Okuduğum kitaplar</h3>
+      ${k.liste.filter((x) => !x.bitti).map((b) => { const i = k.liste.indexOf(b); return `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar || "")}${b.toplam ? ` · ${b.okunan || 0} / ${b.toplam} sayfa` : ` · ${b.okunan || 0} sayfa okundu`}</small>
+        ${b.toplam ? `<div class="kt-bar"><i style="width:${Math.min(100, ((b.okunan || 0) / b.toplam) * 100)}%"></i></div>` : ""}
+        <div class="kt-row"><button data-oku="${i}">⏱️ Okumaya başla</button><button data-sayfa="${i}">➕ Sayfa ekle</button><button data-bitir="${i}">✅ Bitirdim</button>${b.pd ? `<a href="${vikikaynak(b.ad)}" target="_blank" rel="noopener">🔗 Ücretsiz oku (Vikikaynak)</a>` : ""}<button data-sil="${i}" aria-label="Listeden çıkar">🗑️</button></div></div>`; }).join("") || '<p class="oa-not">Henüz okuduğun bir kitap yok. Aşağıdan bir kitap seç.</p>'}
+      <p style="text-align:center"><button class="oa-btn" id="ktSec">➕ Kitap seç</button></p>
+      ${biten.length ? `<h3>🏁 Bitirdiğim kitaplar</h3>${biten.map((b) => `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar || "")} · ${b.bitis || ""}${b.puan ? " · " + "⭐".repeat(b.puan) : ""}</small>${b.defter && b.defter.tema ? `<small>📝 ${esc(b.defter.tema)}</small>` : ""}<div class="kt-row"><button data-defter="${k.liste.indexOf(b)}">📝 Kitap defteri</button></div></div>`).join("")}` : ""}
+      <p class="oa-not">Kayıtlar yalnızca bu cihazda tutulur. 🔗 işareti telifi serbest Türkçe eserlerde Vikikaynak aramasını açar; diğer kitapları okul ya da halk kütüphanesinden ödünç alabilirsin.</p>`;
+    el.querySelector("#ktHedef").onchange = (e) => { k.hedef = +e.target.value; kaydet(); ac(kitap, "Kitap Okuma"); };
+    el.querySelector("#ktSec").onclick = () => ac(kitapSec, "Kitap seç");
+    el.querySelectorAll("[data-oku]").forEach((b) => (b.onclick = () => ac((x) => kitapOturum(x, +b.dataset.oku), "Okuma zamanı")));
+    el.querySelectorAll("[data-sayfa]").forEach((b) => (b.onclick = () => ac((x) => kitapSayfa(x, +b.dataset.sayfa, 0), "Sayfa ekle")));
+    el.querySelectorAll("[data-bitir]").forEach((b) => (b.onclick = () => ac((x) => kitapDefter(x, +b.dataset.bitir), "Kitap defteri")));
+    el.querySelectorAll("[data-defter]").forEach((b) => (b.onclick = () => ac((x) => kitapDefter(x, +b.dataset.defter), "Kitap defteri")));
+    el.querySelectorAll("[data-sil]").forEach((b) => (b.onclick = () => { const i = +b.dataset.sil; if (b.dataset.onay) { k.liste.splice(i, 1); kaydet(); ac(kitap, "Kitap Okuma"); } else { b.dataset.onay = 1; b.textContent = "Emin misin? 🗑️"; } }));
+  }
+  function kitapSec(el) {
+    const k = kv(), turler = ["Hepsi", ...new Set(KITAPLAR.map((x) => x[2]))]; let tur = "Hepsi";
+    const ciz = () => {
+      const l = KITAPLAR.filter((x) => tur === "Hepsi" || x[2] === tur);
+      el.innerHTML = `<div class="kt-row" style="margin-bottom:8px">${turler.map((t) => `<button class="kt-chip ${t === tur ? "on" : ""}" data-tur="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+        ${l.map((x) => { const var_ = k.liste.some((b) => b.ad === x[0] && !b.bitti); return `<div class="kt-kitap"><b>${esc(x[0])}</b><small>${esc(x[1])} · ${esc(x[2])}${x[3] ? " · telifi serbest" : ""}</small><div class="kt-row"><button data-sec="${esc(x[0])}" ${var_ ? "disabled" : ""}>${var_ ? "✔ Listende" : "📖 Bu kitabı okuyacağım"}</button>${x[3] ? `<a href="${vikikaynak(x[0])}" target="_blank" rel="noopener">🔗 Vikikaynak'ta ara</a>` : ""}</div></div>`; }).join("")}
+        <h3>✍️ Listede olmayan bir kitap</h3>
+        <div class="kt-kitap"><input class="kt-in" id="ktAd" placeholder="Kitabın adı"><input class="kt-in" id="ktYazar" placeholder="Yazarı"><input class="kt-in" id="ktTop" type="number" min="1" placeholder="Sayfa sayısı (isteğe bağlı)"><div class="kt-row"><button id="ktEkle">➕ Ekle</button></div></div>`;
+      el.querySelectorAll("[data-tur]").forEach((b) => (b.onclick = () => { tur = b.dataset.tur; ciz(); }));
+      el.querySelectorAll("[data-sec]").forEach((b) => (b.onclick = () => { const x = KITAPLAR.find((y) => y[0] === b.dataset.sec); ac((e) => kitapToplam(e, { ad: x[0], yazar: x[1], tur: x[2], pd: !!x[3] }), "Kitap seç"); }));
+      el.querySelector("#ktEkle").onclick = () => { const ad = el.querySelector("#ktAd").value.trim(); if (!ad) { el.querySelector("#ktAd").focus(); return; } k.liste.push({ ad, yazar: el.querySelector("#ktYazar").value.trim(), toplam: Math.max(0, +el.querySelector("#ktTop").value || 0), okunan: 0, bas: bugun() }); kaydet(); ac(kitap, "Kitap Okuma"); };
+    };
+    ciz();
+  }
+  function kitapToplam(el, b) {
+    el.innerHTML = `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar)}</small>
+      <label>Elindeki baskı kaç sayfa? <input class="kt-in" id="ktTop" type="number" min="1" placeholder="Örn. 240"></label>
+      <p class="oa-not">Sayfa sayısı baskıya göre değişir; kitabının son sayfasına bakabilirsin. Bilmiyorsan boş bırak.</p>
+      <div class="kt-row"><button id="ktTamam">✅ Listeme ekle</button></div></div>`;
+    el.querySelector("#ktTamam").onclick = () => { const k = kv(); k.liste.push({ ...b, toplam: Math.max(0, +el.querySelector("#ktTop").value || 0), okunan: 0, bas: bugun() }); kaydet(); ac(kitap, "Kitap Okuma"); };
+  }
+  function kitapSayfa(el, i, dk) {
+    const k = kv(), b = k.liste[i]; if (!b) return ac(kitap, "Kitap Okuma");
+    el.innerHTML = `<div class="kt-kitap"><b>${esc(b.ad)}</b>${dk ? `<p>⏱️ ${dk} dakika okudun. Aferin!</p>` : ""}
+      <label>Kaçıncı sayfada kaldın? <input class="kt-in" id="ktKal" type="number" min="0" value="${b.okunan || ""}" placeholder="Örn. ${(b.okunan || 0) + 20}"></label>
+      <p class="oa-not">Şu ana kadar kaydettiğin: ${b.okunan || 0}${b.toplam ? " / " + b.toplam : ""} sayfa.</p>
+      <div class="kt-row"><button id="ktKaydet">💾 Kaydet</button></div><p class="oa-not" id="ktUyari"></p></div>`;
+    el.querySelector("#ktKaydet").onclick = () => {
+      const yeni = Math.floor(+el.querySelector("#ktKal").value || 0), fark = yeni - (b.okunan || 0);
+      if (b.toplam && yeni > b.toplam) { el.querySelector("#ktUyari").textContent = `Kitap ${b.toplam} sayfa; daha büyük bir sayı girilemez.`; return; }
+      if (fark < 0) { el.querySelector("#ktUyari").textContent = "Kaldığın sayfa öncekinden küçük olamaz."; return; }
+      b.okunan = yeni; k.gun[bugun()] = (k.gun[bugun()] || 0) + fark; if (dk) b.dakika = (b.dakika || 0) + dk; isaretle(); kaydet();
+      if (b.toplam && yeni >= b.toplam) return ac((x) => kitapDefter(x, i), "Kitap defteri");
+      ac(kitap, "Kitap Okuma");
+    };
+  }
+  function kitapOturum(el, i) {
+    const b = kv().liste[i]; if (!b) return ac(kitap, "Kitap Okuma");
+    el.innerHTML = `<h3 style="text-align:center">${esc(b.ad)}</h3><div class="kt-saat" id="ktSaat">00:00</div>
+      <p class="oa-not" style="text-align:center">Telefonu sessize al, kitabını aç ve oku. Bitince "Bitirdim"e bas, kaldığın sayfayı yaz.</p>
+      <p style="text-align:center"><button class="oa-btn" id="ktBitti" style="background:#16a34a">✅ Bitirdim</button></p>`;
+    const bas = Date.now(), z = setInterval(() => { const sn = Math.floor((Date.now() - bas) / 1000), e = el.querySelector("#ktSaat"); if (e) e.textContent = String(Math.floor(sn / 60)).padStart(2, "0") + ":" + String(sn % 60).padStart(2, "0"); }, 500); zam.push(z);
+    el.querySelector("#ktBitti").onclick = () => { clearInterval(z); const dk = Math.max(1, Math.round((Date.now() - bas) / 60000)); ac((x) => kitapSayfa(x, i, dk), "Sayfa ekle"); };
+  }
+  function kitapDefter(el, i) {
+    const k = kv(), b = k.liste[i]; if (!b) return ac(kitap, "Kitap Okuma"); const d = b.defter || {};
+    el.innerHTML = `<div class="kt-kitap"><b>📝 ${esc(b.ad)} — Kitap defteri</b><small>Kısa yazman yeterli; kendi cümlelerinle yaz.</small>
+      <label>Kitabın konusu ve ana fikri (tema) nedir?<textarea class="kt-in" id="ktTema" rows="3">${esc(d.tema || "")}</textarea></label>
+      <label>En çok etkilendiğin karakter kim, neden?<textarea class="kt-in" id="ktKarakter" rows="3">${esc(d.karakter || "")}</textarea></label>
+      <label>Kitaptan aklında kalan bir sahne ya da düşünce:<textarea class="kt-in" id="ktSahne" rows="3">${esc(d.sahne || "")}</textarea></label>
+      <label>Puanın: <select class="kt-in" id="ktPuan" style="width:auto;display:inline-block">${[5, 4, 3, 2, 1].map((p) => `<option value="${p}" ${b.puan === p ? "selected" : ""}>${"⭐".repeat(p)}</option>`).join("")}</select></label>
+      <div class="kt-row"><button id="ktDefter">💾 Kaydet ve kitabı bitir</button></div></div>`;
+    el.querySelector("#ktDefter").onclick = () => {
+      b.defter = { tema: el.querySelector("#ktTema").value.trim(), karakter: el.querySelector("#ktKarakter").value.trim(), sahne: el.querySelector("#ktSahne").value.trim() };
+      b.puan = +el.querySelector("#ktPuan").value; if (!b.bitti) { b.bitti = true; b.bitis = bugun(); if (b.toplam && (b.okunan || 0) < b.toplam) { k.gun[bugun()] = (k.gun[bugun()] || 0) + (b.toplam - (b.okunan || 0)); b.okunan = b.toplam; } }
+      isaretle(); kaydet(); el.innerHTML = `<div class="oa-sonuc"><div style="font-size:46px">🏆</div><p style="font-size:20px"><b>${esc(b.ad)}</b> bitti! Bu ${k.liste.filter((x) => x.bitti).length}. kitabın.</p></div>`; sonraki(el);
+    };
+  }
+  window.KITAP_OKUMA_AC = KITAP_VAR ? () => ac(kitap, "Kitap Okuma") : null;
+
   // ---------- Menü ----------
   function menu(el) {
     const son = veri.okuma.slice(-1)[0], seri = (() => { let n = 0; const d = new Date(); for (let i = 0; i < 60; i++) { const k = new Date(d - i * 864e5); const s = k.getFullYear() + "-" + String(k.getMonth() + 1).padStart(2, "0") + "-" + String(k.getDate()).padStart(2, "0"); if (veri.gun[s]) n++; else if (i > 0) break; } return n; })();
     el.innerHTML = `
       ${ozetSerit()}
       <div class="oa-menu">
-        <button class="oa-kart koc" data-g="koc"><span class="i">🎤</span><b>Sesli Okuma Koçu</b><small>${(() => { const k = veri.koc.slice(-1)[0]; return k ? `Son: %${k.dogruluk} doğru okuma · ${k.hiz} kelime/dk` : "Metni sesli oku; doğru okuduğun kelimeler yeşil olsun, zorlandıklarını birlikte çalışalım."; })()}</small></button>
+        ${KITAP_VAR ? `<button class="oa-kart kitap" data-g="kitap"><span class="i">📚</span><b>Kitap Okuma</b><small>${kitapAlt()}</small></button>` : ""}
+        ${KOC_VAR ? `<button class="oa-kart koc" data-g="koc"><span class="i">🎤</span><b>Sesli Okuma Koçu</b><small>${(() => { const k = veri.koc.slice(-1)[0]; return k ? `Son: %${k.dogruluk} doğru okuma · ${k.hiz} kelime/dk` : "Metni sesli oku; doğru okuduğun kelimeler yeşil olsun, zorlandıklarını birlikte çalışalım."; })()}</small></button>` : ""}
         <button class="oa-kart ana olc" data-g="olc"><span class="i">⏱️</span><b>Okuma Hızımı Ölç</b><small>${olcumAlt()}</small></button>
-        <button class="oa-kart ana" data-g="gunluk"><span class="i">🏋️</span><b>Günlük Antrenman</b><small>Göz egzersizi → Schultz → Kelime flaşı → İşaretçili okuma · ~8 dk${seri ? ` · 🔥 ${seri} gün` : ""}</small></button>
+        ${ANTRENMAN_VAR ? `<button class="oa-kart ana" data-g="gunluk"><span class="i">🏋️</span><b>Günlük Antrenman</b><small>Göz egzersizi → Schultz → Kelime flaşı → İşaretçili okuma · ~8 dk${seri ? ` · 🔥 ${seri} gün` : ""}</small></button>` : ""}
         <button class="oa-kart" data-g="okuma"><span class="i">👉</span><b>İşaretçili Okuma</b><small>Metin seçtiğin hızda vurgulanır, sonra anlama soruları${son ? ` · son: ${son.hiz} k/dk, %${son.anlama}` : ""}</small></button>
         <button class="oa-kart" data-g="flas"><span class="i">⚡</span><b>Kelime Flaşı</b><small>${NO <= 2 ? "Kelimeyi bir bakışta tanı" : "Kelime gruplarını bir bakışta oku"}${veri.flas.ms ? ` · ${veri.flas.ms} ms` : ""}</small></button>
         <button class="oa-kart" data-g="schultz"><span class="i">🔢</span><b>Schultz Tablosu</b><small>Gözünü ortada tut, sayıları sırayla bul${veri.schultz.length ? ` · en iyi: ${Math.min(...veri.schultz.map((x) => x.sn))} sn` : ""}</small></button>
@@ -256,7 +384,7 @@
         <button class="oa-kart" data-g="gelisim"><span class="i">📈</span><b>Gelişimim</b><small>Okuma hızı, anlama ve egzersiz sonuçların</small></button>
       </div>
       <p class="oa-not">${NO}. sınıf için yaklaşık akıcı okuma hedefi: dakikada <b>${hedef[0]}–${hedef[1]}</b> kelime, anlama en az %80. Her çocuğun hızı farklıdır; önemli olan kendi gelişimin.</p>`;
-    const G = { koc: [koc, "Sesli Okuma Koçu"], olc: [olc, "Okuma Hızımı Ölç"], okuma: [isaretci, "İşaretçili Okuma"], flas: [flas, "Kelime Flaşı"], schultz: [schultz, "Schultz Tablosu"], kamera: [kamera, "Kamera Zihni"], goz: [goz, "Göz Egzersizi"], gelisim: [gelisim, "Gelişimim"] };
+    const G = { kitap: [kitap, "Kitap Okuma"], koc: [koc, "Sesli Okuma Koçu"], olc: [olc, "Okuma Hızımı Ölç"], okuma: [isaretci, "İşaretçili Okuma"], flas: [flas, "Kelime Flaşı"], schultz: [schultz, "Schultz Tablosu"], kamera: [kamera, "Kamera Zihni"], goz: [goz, "Göz Egzersizi"], gelisim: [gelisim, "Gelişimim"] };
     el.querySelectorAll("[data-g]").forEach((b) => (b.onclick = () => {
       if (b.dataset.g === "gunluk") { adimlar = [[schultz, "Schultz Tablosu"], [flas, "Kelime Flaşı"], [isaretci, "İşaretçili Okuma"]]; return ac(goz, "Göz Egzersizi"); }
       ac(...G[b.dataset.g]);
@@ -393,10 +521,10 @@
   function gelisim(el) {
     const ok = veri.okuma.slice(-12), enCok = Math.max(hedef[1], ...ok.map((x) => x.hiz), 1);
     const sch = veri.schultz.slice(-12), schMax = Math.max(1, ...sch.map((x) => x.sn));
-    const ol = veri.olcum.slice(-12), olMax = Math.max(hedef[1], ...ol.map((x) => x.hiz), 1), ilk = veri.olcum[0], son = veri.olcum.slice(-1)[0];
+    const go = gecerliOlcum(), ol = go.slice(-12), olMax = Math.max(hedef[1], ...ol.map((x) => x.hiz), 1), ilk = go[0], son = go.slice(-1)[0];
     el.innerHTML = `
       <h3>⏱️ Okuma ölçümlerim</h3>
-      ${ol.length ? `<div class="oa-karolar"><div><small>Son hız</small><b>${son.hiz}</b><small>kelime/dk</small></div><div><small>Son anlama</small><b>%${son.anlama}</b></div><div><small>Rekor (etkili)</small><b>${rekor()}</b></div>${veri.olcum.length > 1 ? `<div><small>İlk ölçümden beri</small><b>${son.hiz - ilk.hiz >= 0 ? "+" : ""}${son.hiz - ilk.hiz}</b><small>kelime/dk</small></div>` : ""}</div>
+      ${ol.length ? `<div class="oa-karolar"><div><small>Son hız</small><b>${son.hiz}</b><small>kelime/dk</small></div><div><small>Son anlama</small><b>%${son.anlama}</b></div><div><small>Rekor (etkili)</small><b>${rekor()}</b></div>${go.length > 1 ? `<div><small>İlk ölçümden beri</small><b>${son.hiz - ilk.hiz >= 0 ? "+" : ""}${son.hiz - ilk.hiz}</b><small>kelime/dk</small></div>` : ""}</div>
         <div class="oa-graf">${ol.map((x) => `<div><small>${x.hiz}</small><i style="height:${Math.round((x.hiz / olMax) * 100)}%;background:${x.anlama >= 80 ? "#22c55e" : x.anlama >= 60 ? "#f59e0b" : "#ef4444"}"></i><small>%${x.anlama}</small></div>`).join("")}</div>
         <p class="oa-hedefcizgi">Sütun: kelime/dk · altı: anlama. Yeşil %80+, turuncu %60–79, kırmızı %60 altı.</p>` : '<p class="oa-not">Henüz ölçüm yapmadın. "Okuma Hızımı Ölç" ile başla.</p>'}
       <h3>👉 İşaretçili okuma</h3>
@@ -418,6 +546,11 @@
       const son = veri.okuma.slice(-1)[0];
       b.innerHTML = `<span class="ikon">📖</span><span><b>Okuma Atölyesi</b><small>${son ? `Son okuma: ${son.hiz} kelime/dk · anlama %${son.anlama ?? "–"}` : "Hızlı ve anlayarak okuma egzersizleri"}</small></span>`;
       b.onclick = () => ac(menu); kutu.appendChild(b);
+      if (KITAP_VAR) {
+        const c = document.createElement("button"); c.className = "ozel-kart"; c.style.background = "linear-gradient(135deg,#7c3aed,#db2777)";
+        c.innerHTML = `<span class="ikon">📚</span><span><b>Kitap Okuma</b><small>${kitapAlt()}</small></span>`;
+        c.onclick = () => ac(kitap, "Kitap Okuma"); kutu.appendChild(c);
+      }
     });
     if (window.ANA_YENILE) window.ANA_YENILE();
   } else {
