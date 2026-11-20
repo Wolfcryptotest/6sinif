@@ -96,3 +96,18 @@
   };
   window.OYUN_MENU = menu;
 })();
+
+// 🇹🇷 Türkiye Keşif bilgi yarışması (5–12): ana sayfa kartı. Ortaokulda "Ortaokul", lisede "Lise" seviyesiyle açılır.
+(function () {
+  if (window.TURKIYE_KESIF_KART || !window.ANA_KARTLAR) return;
+  window.TURKIYE_KESIF_KART = true;
+  const no = parseInt((window.SINIF && SINIF.anahtar) || document.title, 10) || 6;
+  const yol = location.pathname, kok = /\/(?:[0-9]+sinif|v2)\/[^/]*$/.test(yol) && !/^\/6sinif\/[^/]*$/.test(yol) ? "../" : "";
+  window.ANA_KARTLAR.push((kutu) => {
+    const a = document.createElement("a"); a.className = "ozel-kart"; a.style.background = "linear-gradient(135deg,#20c997,#087f5b)"; a.style.textDecoration = "none";
+    a.href = kok + "turkiye-kesif/?lv=" + (no >= 9 ? "l" : "o");
+    a.innerHTML = `<span class="ikon">🇹🇷</span><span><b>Türkiye Keşif</b><small>81 il bilgi yarışması: tarih, coğrafya, ürünler, yer altı kaynakları</small></span>`;
+    kutu.appendChild(a);
+  });
+  if (window.ANA_YENILE) window.ANA_YENILE();
+})();

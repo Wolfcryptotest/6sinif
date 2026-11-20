@@ -243,16 +243,16 @@ h1.logo{font-size:40px;line-height:1.08;font-weight:800;text-align:center;margin
 <script>
 // r: bölge | h: tarihi/turistik yerler | y: yemek-içecek | t: tarım-hayvancılık | m: yer altı zenginliği | s: sanayi-el sanatı | b: biliyor muydun
 const IL=[
-{p:1,n:'Adana',r:'AKD',h:['Taşköprü','Varda Köprüsü','Yılankale'],y:['Adana kebabı','Şalgam suyu'],t:['Pamuk','Portakal'],m:[],s:[],b:'Taşköprü, Roma döneminden kalan ve hâlâ ayakta olan dünyanın en eski köprülerinden biridir.'},
-{p:2,n:'Adıyaman',r:'GDA',h:['Nemrut Dağı heykelleri','Cendere Köprüsü','Perre Antik Kenti'],y:['Çiğ köfte'],t:['Tütün'],m:[],s:[],b:'Nemrut Dağı\'ndaki dev heykeller Kommagene Kralı I. Antiochos tarafından yaptırılmıştır ve UNESCO Dünya Mirası listesindedir.'},
-{p:3,n:'Afyonkarahisar',r:'EGE',h:['Afyon Kalesi','Kocatepe'],y:['Afyon kaymağı','Afyon sucuğu','Afyon lokumu'],t:['Haşhaş'],m:['Mermer'],s:[],b:'Büyük Taarruz, 26 Ağustos 1922\'de Atatürk tarafından Kocatepe\'den yönetildi.'},
+{p:1,n:'Adana',r:'AKD',h:['Taşköprü','Varda Köprüsü','Yılankale'],y:['Adana kebabı','Şalgam suyu'],t:['Pamuk','Portakal'],m:['Krom (Aladağ)'],s:[],b:'Taşköprü, Roma döneminden kalan ve hâlâ ayakta olan dünyanın en eski köprülerinden biridir.'},
+{p:2,n:'Adıyaman',r:'GDA',h:['Nemrut Dağı heykelleri','Cendere Köprüsü','Perre Antik Kenti'],y:['Çiğ köfte'],t:['Tütün'],m:['Petrol'],s:[],b:'Nemrut Dağı\'ndaki dev heykeller Kommagene Kralı I. Antiochos tarafından yaptırılmıştır ve UNESCO Dünya Mirası listesindedir.'},
+{p:3,n:'Afyonkarahisar',r:'EGE',h:['Afyon Kalesi','Kocatepe'],y:['Afyon kaymağı','Afyon sucuğu','Afyon lokumu'],t:['Haşhaş'],m:['Mermer','Jeotermal (termal kaynaklar)'],s:[],b:'Büyük Taarruz, 26 Ağustos 1922\'de Atatürk tarafından Kocatepe\'den yönetildi.'},
 {p:4,n:'Ağrı',r:'DOG',h:['İshak Paşa Sarayı','Ağrı Dağı','Meteor Çukuru'],y:['Abdigör köftesi'],t:[],m:[],s:[],b:'Türkiye\'nin en yüksek dağı olan Ağrı Dağı 5137 metredir.'},
 {p:5,n:'Amasya',r:'KAR',h:['Kral Kaya Mezarları','Harşena Kalesi','Yalıboyu Evleri'],y:['Amasya çöreği'],t:['Amasya elması','Bamya'],m:[],s:[],b:'Amasya, Osmanlı döneminde şehzadelerin yetiştirildiği "Şehzadeler Şehri" olarak bilinir.'},
-{p:6,n:'Ankara',r:'ICA',h:['Anıtkabir','Ankara Kalesi','Anadolu Medeniyetleri Müzesi','Hacı Bayram Veli Camii'],y:['Ankara tava'],t:['Tiftik keçisi'],m:[],s:[],b:'Ankara, 13 Ekim 1923\'te Türkiye Cumhuriyeti\'nin başkenti oldu.'},
-{p:7,n:'Antalya',r:'AKD',h:['Aspendos Antik Tiyatrosu','Perge Antik Kenti','Hadrian Kapısı','Myra Antik Kenti'],y:['Antalya piyazı'],t:['Muz','Seracılık (sebze)','Portakal'],m:[],s:[],b:'Aspendos Antik Tiyatrosu, dünyanın en iyi korunmuş Roma tiyatrolarından biridir.'},
+{p:6,n:'Ankara',r:'ICA',h:['Anıtkabir','Ankara Kalesi','Anadolu Medeniyetleri Müzesi','Hacı Bayram Veli Camii'],y:['Ankara tava'],t:['Tiftik keçisi'],m:['Trona (Beypazarı)'],s:[],b:'Ankara, 13 Ekim 1923\'te Türkiye Cumhuriyeti\'nin başkenti oldu.'},
+{p:7,n:'Antalya',r:'AKD',h:['Aspendos Antik Tiyatrosu','Perge Antik Kenti','Hadrian Kapısı','Myra Antik Kenti'],y:['Antalya piyazı'],t:['Muz','Seracılık (sebze)','Portakal'],m:['Boksit (Akseki)'],s:[],b:'Aspendos Antik Tiyatrosu, dünyanın en iyi korunmuş Roma tiyatrolarından biridir.'},
 {p:8,n:'Artvin',r:'KAR',h:['Şavşat Karagöl','Ardanuç Kalesi','Dolishane Kilisesi'],y:[],t:[],m:['Bakır (Murgul)'],s:[],b:'Artvin\'in Murgul ilçesi bakır madeniyle tanınır.'},
-{p:9,n:'Aydın',r:'EGE',h:['Afrodisias Antik Kenti','Milet Antik Kenti','Priene Antik Kenti','Didim Apollon Tapınağı'],y:['Çine çöp şişi'],t:['İncir','Zeytin','Pamuk'],m:[],s:[],b:'Türkiye dünyanın en çok incir üreten ülkesidir ve incirin büyük kısmı Aydın\'da yetişir.'},
-{p:10,n:'Balıkesir',r:'MAR',h:['Kyzikos Antik Kenti','Cunda Adası taş evleri','Zağanos Paşa Camii'],y:['Balıkesir höşmerimi'],t:['Zeytin (Edremit-Ayvalık)'],m:['Bor (Bigadiç)','Mermer (Marmara Adası)'],s:[],b:'Marmara Denizi, adını Balıkesir\'e bağlı Marmara Adası\'nın mermerinden alır.'},
+{p:9,n:'Aydın',r:'EGE',h:['Afrodisias Antik Kenti','Milet Antik Kenti','Priene Antik Kenti','Didim Apollon Tapınağı'],y:['Çine çöp şişi'],t:['İncir','Zeytin','Pamuk'],m:['Jeotermal (Germencik)'],s:[],b:'Türkiye dünyanın en çok incir üreten ülkesidir ve incirin büyük kısmı Aydın\'da yetişir.'},
+{p:10,n:'Balıkesir',r:'MAR',h:['Kyzikos Antik Kenti','Cunda Adası taş evleri','Zağanos Paşa Camii'],y:['Balıkesir höşmerimi'],t:['Zeytin (Edremit-Ayvalık)'],m:['Bor (Bigadiç)','Mermer (Marmara Adası)','Kurşun-çinko (Balya)'],s:[],b:'Marmara Denizi, adını Balıkesir\'e bağlı Marmara Adası\'nın mermerinden alır.'},
 {p:11,n:'Bilecik',r:'MAR',h:['Ertuğrul Gazi Türbesi','Söğüt','Orhan Gazi Camii'],y:[],t:[],m:[],s:['Seramik (Bozüyük)'],b:'Osmanlı Devleti, Bilecik\'in Söğüt ilçesinde kuruldu.'},
 {p:12,n:'Bingöl',r:'DOG',h:['Solhan Yüzen Adalar'],y:[],t:['Bingöl balı'],m:[],s:[],b:'Bingöl\'deki Hacılar Turna Gölü üzerinde yüzen adalar bulunur.'},
 {p:13,n:'Bitlis',r:'DOG',h:['Ahlat Selçuklu Meydan Mezarlığı','Bitlis Kalesi','Nemrut Krater Gölü'],y:[],t:['Tütün'],m:[],s:[],b:'Ahlat\'taki Selçuklu Mezarlığı, dünyanın en büyük Türk-İslam mezarlıklarından biridir.'},
@@ -262,7 +262,7 @@ const IL=[
 {p:17,n:'Çanakkale',r:'MAR',h:['Troya Antik Kenti','Assos Antik Kenti','Gelibolu Yarımadası Tarihi Alanı','Çimenlik Kalesi'],y:['Peynir helvası'],t:[],m:[],s:['Seramik (Çan)'],b:'Çanakkale Kara ve Deniz Savaşlarında 1915\'te büyük bir zafer kazanıldı.'},
 {p:18,n:'Çankırı',r:'ICA',h:['Çankırı Tuz Mağarası','Taş Mektep'],y:[],t:[],m:['Kaya tuzu'],s:[],b:'Çankırı Tuz Mağarası binlerce yıldır kullanılan bir kaya tuzu yatağıdır.'},
 {p:19,n:'Çorum',r:'KAR',h:['Hattuşa','Alacahöyük','Şapinuva'],y:['Çorum leblebisi'],t:[],m:[],s:[],b:'Hititlerin başkenti Hattuşa, UNESCO Dünya Mirası listesindedir.'},
-{p:20,n:'Denizli',r:'EGE',h:['Pamukkale travertenleri','Hierapolis Antik Kenti','Laodikya Antik Kenti'],y:['Denizli kebabı'],t:['Çal üzümü'],m:[],s:['Ev tekstili (havlu)'],b:'Pamukkale travertenleri ve Hierapolis birlikte UNESCO Dünya Mirası listesindedir.'},
+{p:20,n:'Denizli',r:'EGE',h:['Pamukkale travertenleri','Hierapolis Antik Kenti','Laodikya Antik Kenti'],y:['Denizli kebabı'],t:['Çal üzümü'],m:['Jeotermal (Sarayköy-Kızıldere)'],s:['Ev tekstili (havlu)'],b:'Pamukkale travertenleri ve Hierapolis birlikte UNESCO Dünya Mirası listesindedir.'},
 {p:21,n:'Diyarbakır',r:'GDA',h:['Diyarbakır Surları','Hevsel Bahçeleri','On Gözlü Köprü'],y:['Diyarbakır ciğer kebabı','Kaburga dolması'],t:['Karpuz'],m:[],s:[],b:'Diyarbakır Surları ve Hevsel Bahçeleri 2015\'te UNESCO Dünya Mirası listesine girdi.'},
 {p:22,n:'Edirne',r:'MAR',h:['Selimiye Camii','Eski Cami','Meriç Köprüsü','Kırkpınar Er Meydanı'],y:['Tava ciğer','Badem ezmesi'],t:['Ayçiçeği'],m:[],s:[],b:'Selimiye Camii, Mimar Sinan\'ın "ustalık eserim" dediği yapıdır.'},
 {p:23,n:'Elazığ',r:'DOG',h:['Harput Kalesi','Hazar Gölü','Harput Ulu Camii'],y:['Harput köftesi'],t:['Öküzgözü üzümü'],m:['Krom (Guleman)','Bakır (Maden ilçesi)'],s:[],b:'Harput Ulu Camii\'nin minaresi eğik olduğu için ilgi çeker.'},
@@ -274,49 +274,49 @@ const IL=[
 {p:29,n:'Gümüşhane',r:'KAR',h:['Santa Harabeleri','Karaca Mağarası'],y:['Gümüşhane pestili','Köme'],t:[],m:['Altın (Mastra)'],s:[],b:'Gümüşhane, adını tarihte işletilen gümüş madenlerinden alır.'},
 {p:30,n:'Hakkari',r:'DOG',h:['Meydan Medresesi','Cilo Dağları','Zap Vadisi'],y:[],t:[],m:[],s:[],b:'Cilo Dağları\'nda Türkiye\'nin en büyük buzulları bulunur.'},
 {p:31,n:'Hatay',r:'AKD',h:['Sen Piyer Kilisesi','Habib-i Neccar Camii','Hatay Arkeoloji Müzesi','Titus Tüneli'],y:['Künefe','Humus','Oruk'],t:['Zeytin'],m:[],s:['Demir-çelik (İskenderun)'],b:'Hatay Arkeoloji Müzesi, dünyanın en zengin mozaik koleksiyonlarından birine sahiptir.'},
-{p:32,n:'Isparta',r:'AKD',h:['Eğirdir Gölü','Adada Antik Kenti','Yazılı Kanyon'],y:['Isparta kebabı'],t:['Gül (gül yağı)','Elma'],m:[],s:['Halı'],b:'Isparta "Güller Şehri" olarak bilinir; dünyada gül yağı üretiminde öncüdür.'},
+{p:32,n:'Isparta',r:'AKD',h:['Eğirdir Gölü','Adada Antik Kenti','Yazılı Kanyon'],y:['Isparta kebabı'],t:['Gül (gül yağı)','Elma'],m:['Kükürt (Keçiborlu)'],s:['Halı'],b:'Isparta "Güller Şehri" olarak bilinir; dünyada gül yağı üretiminde öncüdür.'},
 {p:33,n:'Mersin',r:'AKD',h:['Kızkalesi','Cennet ve Cehennem Obrukları','St. Paul Kuyusu (Tarsus)','Kleopatra Kapısı'],y:['Tantuni','Cezerye'],t:['Limon','Anamur muzu','Silifke çileği'],m:[],s:[],b:'Kızkalesi, denizin içindeki küçük bir adaya kurulmuş bir kaledir.'},
 {p:34,n:'İstanbul',r:'MAR',h:['Ayasofya','Topkapı Sarayı','Sultanahmet Camii','Galata Kulesi','Yerebatan Sarnıcı'],y:['Balık ekmek','Simit'],t:[],m:[],s:[],b:'İstanbul, hem Avrupa hem Asya kıtasında toprağı olan bir şehirdir.'},
-{p:35,n:'İzmir',r:'EGE',h:['Efes Antik Kenti','Saat Kulesi','Kemeraltı Çarşısı','Bergama Akropolü','Meryem Ana Evi'],y:['Boyoz','Kumru'],t:['Zeytin','Tütün'],m:['Altın (Bergama)'],s:[],b:'Efes, Antik Çağın en büyük kentlerinden biriydi ve UNESCO Dünya Mirası listesindedir.'},
+{p:35,n:'İzmir',r:'EGE',h:['Efes Antik Kenti','Saat Kulesi','Kemeraltı Çarşısı','Bergama Akropolü','Meryem Ana Evi'],y:['Boyoz','Kumru'],t:['Zeytin','Tütün'],m:['Altın (Bergama)','Deniz tuzu (Çamaltı Tuzlası)'],s:[],b:'Efes, Antik Çağın en büyük kentlerinden biriydi ve UNESCO Dünya Mirası listesindedir.'},
 {p:36,n:'Kars',r:'DOG',h:['Ani Harabeleri','Kars Kalesi','Sarıkamış'],y:['Kars kaşarı','Kars gravyeri'],t:['Kars balı'],m:[],s:[],b:'Ani Harabeleri "Bin Bir Kilise Şehri" olarak anılır ve UNESCO Dünya Mirası listesindedir.'},
 {p:37,n:'Kastamonu',r:'KAR',h:['Mahmut Bey Camii','Kastamonu Kalesi','Valla Kanyonu'],y:['Banduma','Siyez bulguru'],t:['Taşköprü sarımsağı'],m:['Bakır (Küre)'],s:[],b:'Kasaba köyündeki Mahmut Bey Camii, çivisiz ahşap işçiliğiyle ünlüdür.'},
-{p:38,n:'Kayseri',r:'ICA',h:['Kültepe (Kaniş)','Gevher Nesibe Şifahanesi','Kayseri Kalesi','Erciyes Dağı'],y:['Kayseri mantısı','Pastırma'],t:[],m:[],s:[],b:'Kültepe\'de bulunan Asur ticaret tabletleri, Anadolu\'daki en eski yazılı belgelerdir.'},
-{p:39,n:'Kırklareli',r:'MAR',h:['Dupnisa Mağarası','Vize Antik Tiyatrosu'],y:['Hardaliye'],t:['Ayçiçeği','Bağcılık'],m:[],s:[],b:'Dupnisa Mağarası, Yıldız Dağları\'nda ziyarete açık bir mağaradır.'},
+{p:38,n:'Kayseri',r:'ICA',h:['Kültepe (Kaniş)','Gevher Nesibe Şifahanesi','Kayseri Kalesi','Erciyes Dağı'],y:['Kayseri mantısı','Pastırma'],t:[],m:['Demir (Yahyalı)','Kurşun-çinko (Zamantı)'],s:[],b:'Kültepe\'de bulunan Asur ticaret tabletleri, Anadolu\'daki en eski yazılı belgelerdir.'},
+{p:39,n:'Kırklareli',r:'MAR',h:['Dupnisa Mağarası','Vize Antik Tiyatrosu'],y:['Hardaliye'],t:['Ayçiçeği','Bağcılık'],m:['Doğal gaz (Hamitabat)'],s:[],b:'Dupnisa Mağarası, Yıldız Dağları\'nda ziyarete açık bir mağaradır.'},
 {p:40,n:'Kırşehir',r:'ICA',h:['Cacabey Medresesi','Ahi Evran Türbesi'],y:[],t:[],m:[],s:[],b:'Ahilik teşkilatının kurucusu Ahi Evran\'ın türbesi Kırşehir\'dedir.'},
 {p:41,n:'Kocaeli',r:'MAR',h:['İzmit Saat Kulesi','Hereke Kalesi','Kartepe'],y:['Pişmaniye'],t:[],m:[],s:['Otomotiv','Hereke halısı'],b:'Kocaeli, Türkiye\'nin en çok sanayi tesisinin bulunduğu illerden biridir.'},
 {p:42,n:'Konya',r:'ICA',h:['Mevlana Müzesi','Çatalhöyük','Alaeddin Camii','İnce Minareli Medrese','Karatay Medresesi'],y:['Etli ekmek','Fırın kebabı'],t:['Buğday','Şeker pancarı'],m:['Boksit (Seydişehir alüminyum)'],s:['Tarım makineleri'],b:'Konya, Anadolu Selçuklu Devleti\'nin başkentiydi ve "Türkiye\'nin tahıl ambarı" olarak anılır.'},
 {p:43,n:'Kütahya',r:'EGE',h:['Aizanoi Zeus Tapınağı','Kütahya Kalesi'],y:[],t:[],m:['Bor (Emet)','Linyit (Tunçbilek)'],s:['Çini'],b:'Kütahya, İznik ile birlikte Türk çini sanatının en önemli merkezidir.'},
 {p:44,n:'Malatya',r:'DOG',h:['Arslantepe Höyüğü','Battalgazi Ulu Camii','Levent Vadisi'],y:[],t:['Kayısı'],m:['Demir (Hekimhan)'],s:[],b:'Malatya dünyada kuru kayısı üretiminin merkezidir; Arslantepe UNESCO listesindedir.'},
-{p:45,n:'Manisa',r:'EGE',h:['Sardes Antik Kenti','Muradiye Camii','Spil Dağı'],y:['Mesir macunu'],t:['Sultaniye üzümü (kuru üzüm)','Zeytin'],m:['Linyit (Soma)'],s:[],b:'Manisa Mesir Macunu Festivali UNESCO Somut Olmayan Kültürel Miras listesindedir.'},
+{p:45,n:'Manisa',r:'EGE',h:['Sardes Antik Kenti','Muradiye Camii','Spil Dağı'],y:['Mesir macunu'],t:['Sultaniye üzümü (kuru üzüm)','Zeytin'],m:['Linyit (Soma)','Jeotermal (Alaşehir, Salihli)'],s:[],b:'Manisa Mesir Macunu Festivali UNESCO Somut Olmayan Kültürel Miras listesindedir.'},
 {p:46,n:'Kahramanmaraş',r:'AKD',h:['Kahramanmaraş Kalesi','Germanicia Mozaikleri'],y:['Maraş dondurması','Maraş tarhanası'],t:['Pul biber'],m:['Linyit (Afşin-Elbistan)'],s:[],b:'Maraş dondurması salep ve keçi sütüyle yapıldığı için uzayan, kesilerek yenen bir dondurmadır.'},
 {p:47,n:'Mardin',r:'GDA',h:['Mardin Kalesi ve taş evler','Deyrulzafaran Manastırı','Zinciriye Medresesi','Dara Antik Kenti'],y:['Sembusek','İkbebet'],t:['Mercimek'],m:['Fosfat (Mazıdağı)'],s:['Telkari (Midyat)'],b:'Mardin\'in taş evleri Mezopotamya ovasına bakan bir yamaçta basamak basamak dizilir.'},
-{p:48,n:'Muğla',r:'EGE',h:['Bodrum Kalesi','Halikarnas Mozolesi','Kaunos Kaya Mezarları','Ölüdeniz'],y:['Çökertme kebabı'],t:['Çam balı'],m:[],s:[],b:'Halikarnas Mozolesi, Antik Dünyanın Yedi Harikası\'ndan biridir.'},
+{p:48,n:'Muğla',r:'EGE',h:['Bodrum Kalesi','Halikarnas Mozolesi','Kaunos Kaya Mezarları','Ölüdeniz'],y:['Çökertme kebabı'],t:['Çam balı'],m:['Linyit (Yatağan, Milas)','Krom (Fethiye)'],s:[],b:'Halikarnas Mozolesi, Antik Dünyanın Yedi Harikası\'ndan biridir.'},
 {p:49,n:'Muş',r:'DOG',h:['Malazgirt Meydan Muharebesi Alanı'],y:[],t:['Muş lalesi'],m:[],s:[],b:'1071 Malazgirt Zaferi ile Anadolu\'nun kapıları Türklere açıldı.'},
 {p:50,n:'Nevşehir',r:'ICA',h:['Kapadokya peri bacaları','Göreme Açık Hava Müzesi','Derinkuyu Yeraltı Şehri','Kaymaklı Yeraltı Şehri'],y:['Testi kebabı'],t:[],m:[],s:['Çömlekçilik (Avanos)'],b:'Peri bacaları, volkanik tüflerin rüzgâr ve yağmurla aşınmasıyla oluşmuştur.'},
 {p:51,n:'Niğde',r:'ICA',h:['Gümüşler Manastırı','Niğde Alaeddin Camii'],y:['Niğde gazozu'],t:['Elma'],m:[],s:[],b:'Niğde, Türkiye\'de patates ve elma üretiminin önde gelen illerindendir.'},
 {p:52,n:'Ordu',r:'KAR',h:['Boztepe','Yason Burnu','Taşbaşı Kilisesi'],y:[],t:['Fındık'],m:[],s:[],b:'Türkiye dünya fındık üretiminde birincidir; en çok fındık Ordu\'da yetişir.'},
-{p:53,n:'Rize',r:'KAR',h:['Ayder Yaylası','Zilkale','Rize Kalesi'],y:['Muhlama','Hamsili pilav'],t:['Çay','Anzer balı'],m:[],s:[],b:'Türkiye\'de çay en çok Rize\'de yetiştirilir.'},
+{p:53,n:'Rize',r:'KAR',h:['Ayder Yaylası','Zilkale','Rize Kalesi'],y:['Muhlama','Hamsili pilav'],t:['Çay','Anzer balı'],m:['Bakır (Çayeli)'],s:[],b:'Türkiye\'de çay en çok Rize\'de yetiştirilir.'},
 {p:54,n:'Sakarya',r:'MAR',h:['Justinianus Köprüsü'],y:['Islama köfte'],t:['Fındık'],m:[],s:['Otomotiv'],b:'Justinianus Köprüsü, Bizans döneminde Sakarya Nehri üzerine yapılmıştır.'},
 {p:55,n:'Samsun',r:'KAR',h:['Bandırma Vapuru Müzesi','Amisos Tepesi','İkiztepe'],y:['Bafra pidesi','Nokul'],t:['Tütün (Bafra)'],m:[],s:[],b:'Atatürk 19 Mayıs 1919\'da Samsun\'a çıkarak Milli Mücadele\'yi başlattı.'},
 {p:56,n:'Siirt',r:'GDA',h:['Veysel Karani Türbesi','Siirt Ulu Camii'],y:['Büryan kebabı','Perde pilavı'],t:['Siirt fıstığı'],m:[],s:['Battaniye'],b:'Siirt fıstığı, Antep fıstığından daha iri ve dolgun taneleriyle bilinir.'},
 {p:57,n:'Sinop',r:'KAR',h:['Sinop Tarihi Cezaevi','Sinop Kalesi','Hamsilos Koyu'],y:['Sinop mantısı'],t:[],m:[],s:[],b:'Türkiye\'nin en kuzey noktası İnceburun, Sinop\'tadır.'},
-{p:58,n:'Sivas',r:'ICA',h:['Divriği Ulu Camii ve Darüşşifası','Gök Medrese','Sivas Kongre Binası'],y:['Sivas köftesi'],t:['Kangal köpeği'],m:['Demir (Divriği)'],s:[],b:'Sivas Kongresi 4 Eylül 1919\'da toplandı; Divriği Ulu Camii UNESCO listesindedir.'},
+{p:58,n:'Sivas',r:'ICA',h:['Divriği Ulu Camii ve Darüşşifası','Gök Medrese','Sivas Kongre Binası'],y:['Sivas köftesi'],t:['Kangal köpeği'],m:['Demir (Divriği)','Linyit (Kangal)'],s:[],b:'Sivas Kongresi 4 Eylül 1919\'da toplandı; Divriği Ulu Camii UNESCO listesindedir.'},
 {p:59,n:'Tekirdağ',r:'MAR',h:['Rakoczi Müzesi','Rüstem Paşa Külliyesi'],y:['Tekirdağ köftesi'],t:['Ayçiçeği'],m:[],s:[],b:'Türkiye\'de ayçiçeği en çok Trakya\'da, özellikle Tekirdağ ve Edirne\'de yetişir.'},
 {p:60,n:'Tokat',r:'KAR',h:['Ballıca Mağarası','Tokat Kalesi','Sulusokak'],y:['Tokat kebabı'],t:['Narince üzümü (yaprağı)'],m:[],s:['Yazmacılık'],b:'Tokat, el baskısı yazmalarıyla ünlüdür.'},
 {p:61,n:'Trabzon',r:'KAR',h:['Sümela Manastırı','Uzungöl','Atatürk Köşkü'],y:['Akçaabat köftesi'],t:['Fındık','Çay'],m:[],s:[],b:'Sümela Manastırı, Altındere Vadisi\'nde sarp bir kayalığa oyulmuştur.'},
 {p:62,n:'Tunceli',r:'DOG',h:['Munzur Vadisi','Pertek Kalesi'],y:[],t:[],m:[],s:[],b:'Munzur Vadisi Milli Parkı, Türkiye\'nin en büyük milli parklarından biridir.'},
-{p:63,n:'Şanlıurfa',r:'GDA',h:['Göbeklitepe','Balıklıgöl','Harran Konik Evleri','Halfeti'],y:['Urfa kebabı'],t:['Pamuk (Harran Ovası)','Isot biberi'],m:[],s:[],b:'Göbeklitepe yaklaşık 12.000 yıllıktır ve bilinen en eski anıtsal tapınak alanlarından biridir.'},
+{p:63,n:'Şanlıurfa',r:'GDA',h:['Göbeklitepe','Balıklıgöl','Harran Konik Evleri','Halfeti'],y:['Urfa kebabı'],t:['Pamuk (Harran Ovası)','Fıstık','Isot biberi'],m:[],s:[],b:'Göbeklitepe yaklaşık 12.000 yıllıktır ve bilinen en eski anıtsal tapınak alanlarından biridir.'},
 {p:64,n:'Uşak',r:'EGE',h:['Ulubey Kanyonu','Karun Hazinesi (Uşak Müzesi)','Blaundus Antik Kenti'],y:[],t:[],m:['Altın (Kışladağ)'],s:['Battaniye ve tekstil','Halı'],b:'Lidya Kralı Karun\'a ait hazine eserleri Uşak Müzesi\'nde sergilenir.'},
 {p:65,n:'Van',r:'DOG',h:['Akdamar Kilisesi','Van Kalesi','Hoşap Kalesi','Muradiye Şelalesi'],y:['Van kahvaltısı','Otlu peynir'],t:['İnci kefali','Van kedisi'],m:[],s:[],b:'Van Gölü Türkiye\'nin en büyük gölüdür; sodalı suyunda yalnızca inci kefali yaşar.'},
 {p:66,n:'Yozgat',r:'ICA',h:['Kerkenes Antik Kenti','Çapanoğlu Camii','Yozgat Çamlığı'],y:[],t:[],m:[],s:[],b:'Yozgat Çamlığı, Türkiye\'nin ilk milli parkıdır (1958).'},
-{p:67,n:'Zonguldak',r:'KAR',h:['Gökgöl Mağarası','Filyos (Tios) Antik Kenti'],y:[],t:[],m:['Taş kömürü'],s:['Demir-çelik (Ereğli)'],b:'Zonguldak Türkiye\'nin taş kömürü merkezidir.'},
+{p:67,n:'Zonguldak',r:'KAR',h:['Gökgöl Mağarası','Filyos (Tios) Antik Kenti'],y:[],t:[],m:['Taş kömürü','Doğal gaz (Karadeniz, Filyos)'],s:['Demir-çelik (Ereğli)'],b:'Zonguldak Türkiye\'nin taş kömürü merkezidir.'},
 {p:68,n:'Aksaray',r:'ICA',h:['Ihlara Vadisi','Sultanhanı Kervansarayı'],y:[],t:[],m:['Tuz (Tuz Gölü)'],s:[],b:'Sultanhanı Kervansarayı, Anadolu\'nun en büyük Selçuklu kervansaraylarından biridir.'},
 {p:69,n:'Bayburt',r:'KAR',h:['Bayburt Kalesi','Baksı Müzesi','Aydıntepe Yeraltı Şehri'],y:['Lor dolması'],t:[],m:[],s:[],b:'Baksı Müzesi, 2014\'te Avrupa Konseyi Müze Ödülü\'nü kazandı.'},
 {p:70,n:'Karaman',r:'ICA',h:['Binbir Kilise','Taşkale Tahıl Ambarları','İbrahim Bey İmareti'],y:[],t:['Elma'],m:[],s:['Bisküvi'],b:'Karaman, Türkiye\'nin bisküvi üretim merkezlerinden biridir.'},
 {p:71,n:'Kırıkkale',r:'ICA',h:['Hasandede Türbesi'],y:[],t:[],m:[],s:['Savunma sanayi (MKE)'],b:'Kırıkkale, Makine ve Kimya Endüstrisi (MKE) fabrikalarıyla tanınır.'},
 {p:72,n:'Batman',r:'GDA',h:['Hasankeyf','Malabadi Köprüsü'],y:[],t:[],m:['Petrol (Raman)'],s:[],b:'Türkiye\'nin ilk ticari petrolü 1940\'ta Batman\'daki Raman Dağı\'nda bulundu.'},
-{p:73,n:'Şırnak',r:'GDA',h:['Cudi Dağı','Cizre Kırmızı Medrese'],y:[],t:[],m:['Asfaltit'],s:[],b:'Şırnak\'ta asfaltit adlı kömüre benzer bir yakıt çıkarılır.'},
-{p:74,n:'Bartın',r:'KAR',h:['Amasra Kalesi','Amasra'],y:['Amasra salatası'],t:[],m:[],s:[],b:'Amasra, Batı Karadeniz\'in en eski ve en güzel sahil kasabalarından biridir.'},
+{p:73,n:'Şırnak',r:'GDA',h:['Cudi Dağı','Cizre Kırmızı Medrese'],y:[],t:[],m:['Asfaltit','Petrol (Gabar Dağı)'],s:[],b:'Şırnak\'ta asfaltit adlı kömüre benzer bir yakıt çıkarılır.'},
+{p:74,n:'Bartın',r:'KAR',h:['Amasra Kalesi','Amasra'],y:['Amasra salatası'],t:[],m:['Taş kömürü (Amasra)'],s:[],b:'Amasra, Batı Karadeniz\'in en eski ve en güzel sahil kasabalarından biridir.'},
 {p:75,n:'Ardahan',r:'DOG',h:['Şeytan Kalesi','Ardahan Kalesi'],y:['Ardahan kaz eti'],t:[],m:[],s:[],b:'Çıldır Gölü kışın donar ve üzerinde atlı kızaklarla gezilir.'},
 {p:76,n:'Iğdır',r:'DOG',h:[],y:[],t:['Iğdır kayısısı'],m:[],s:[],b:'Iğdır Ovası, alçak rakımı sayesinde Doğu Anadolu\'nun en ılıman ovasıdır.'},
 {p:77,n:'Yalova',r:'MAR',h:['Termal Kaplıcaları','Yürüyen Köşk'],y:[],t:['Süs bitkileri ve çiçek'],m:[],s:[],b:'Yalova, Türkiye\'nin süs bitkisi ve kesme çiçek üretiminde öne çıkar.'},
@@ -356,6 +356,50 @@ const DENIZLER=['Karadeniz','Akdeniz','Ege Denizi','Marmara Denizi','Basra Körf
 const REKOR=[['Yüzölçümü en büyük ilimiz hangisidir?',42],['Yüzölçümü en küçük ilimiz hangisidir?',77],['Nüfusu en kalabalık ilimiz hangisidir?',34],
  ['Türkiye\'nin başkenti hangi ildir?',6],['Türkiye\'nin en kuzey noktası (İnceburun) hangi ildedir?',57],['Türkiye\'nin en güney noktası hangi ildedir?',31],
  ['Türkiye\'nin en doğu noktası (Dilucu) hangi ildedir?',76],['Türkiye\'nin en batı noktası (Bababurnu) hangi ildedir?',17]];
+const YERALTI_TF=[['Türkiye\'nin dünya rezervlerinde ilk sırada olduğu maden hangisidir?','Bor',['Bakır','Demir','Altın']],
+ ['Kömür, petrol ve doğal gaz gibi enerji kaynaklarına ne ad verilir?','Fosil yakıtlar',['Yenilenebilir kaynaklar','Metalik madenler','Endüstriyel ham maddeler']],
+ ['Yer altındaki sıcak su ve buhardan elde edilen enerji hangisidir?','Jeotermal enerji',['Hidroelektrik enerji','Rüzgâr enerjisi','Güneş enerjisi']],
+ ['Alüminyum hangi madenden elde edilir?','Boksit',['Krom','Bor','Linyit']],
+ ['Paslanmaz çelik üretiminde kullanılan maden hangisidir?','Krom',['Boksit','Bor','Fosfat']],
+ ['Gübre sanayisinin temel ham maddelerinden olan maden hangisidir?','Fosfat',['Krom','Bakır','Boksit']],
+ ['Türkiye\'de termik santrallerde en çok kullanılan yerli kömür türü hangisidir?','Linyit',['Taş kömürü','Asfaltit','Antrasit']],
+ ['Aşağıdaki yer altı kaynaklarından hangisi yenilenebilir bir enerji kaynağıdır?','Jeotermal enerji',['Petrol','Doğal gaz','Linyit']],
+ ['Mermer hangi kayaç grubunda yer alır?','Başkalaşım (metamorfik) kayaçları',['Tortul kayaçlar','Derinlik püskürük kayaçları','Yüzey püskürük kayaçları']],
+ ['Karadeniz\'de keşfedilip Zonguldak\'ın Filyos bölgesinden karaya ulaştırılan kaynak hangisidir?','Doğal gaz',['Bor','Linyit','Bakır']],
+ ['Türkiye\'de ilk ticari petrol hangi dağda bulunmuştur?','Raman Dağı',['Gabar Dağı','Cudi Dağı','Nemrut Dağı']]];
+const COG_TF=[['Türkiye\'nin en uzun kıyı şeridine sahip coğrafi bölgesi hangisidir?','Ege Bölgesi',['Karadeniz Bölgesi','Akdeniz Bölgesi','Marmara Bölgesi']],
+ ['Türkiye\'de yıllık yağışın en fazla olduğu il hangisidir?','Rize',['Konya','Iğdır','Ankara']],
+ ['Türkiye\'de yıllık yağışın en az olduğu yerlerden biri hangisidir?','Tuz Gölü çevresi',['Rize kıyıları','Antalya kıyıları','İstanbul Boğazı çevresi']],
+ ['Pamukkale travertenleri nasıl oluşmuştur?','Kireçli suların çökelterek biriktirmesiyle',['Rüzgârın aşındırmasıyla','Lav akıntılarıyla','Buzulların aşındırmasıyla']],
+ ['Kapadokya\'daki peri bacaları nasıl oluşmuştur?','Volkanik tüflerin sel ve yağmur sularıyla aşınmasıyla',['Buzulların biriktirmesiyle','Deniz dalgalarının aşındırmasıyla','Kireçli suların çökeltmesiyle']],
+ ['Akdeniz ikliminin doğal bitki örtüsü hangisidir?','Maki',['Bozkır','Tayga','Savan']],
+ ['İç Anadolu\'da yaygın doğal bitki örtüsü hangisidir?','Bozkır (step)',['Maki','Orman','Çayır']],
+ ['Türkiye\'de nüfus yoğunluğunun en fazla olduğu bölge hangisidir?','Marmara Bölgesi',['Doğu Anadolu Bölgesi','İç Anadolu Bölgesi','Akdeniz Bölgesi']],
+ ['Türkiye\'de nüfus yoğunluğunun en az olduğu bölge hangisidir?','Doğu Anadolu Bölgesi',['Marmara Bölgesi','Ege Bölgesi','Karadeniz Bölgesi']],
+ ['Türkiye\'nin en büyük ovası hangisidir?','Konya Ovası',['Çukurova','Harran Ovası','Bafra Ovası']],
+ ['Türkiye\'nin en büyük barajı hangisidir?','Atatürk Barajı',['Keban Barajı','Hirfanlı Barajı','Sarıyar Barajı']],
+ ['GAP (Güneydoğu Anadolu Projesi) hangi iki akarsu üzerine kurulmuştur?','Fırat ve Dicle',['Kızılırmak ve Yeşilırmak','Seyhan ve Ceyhan','Sakarya ve Gediz']],
+ ['Türkiye\'deki en önemli ve en uzun fay hattı hangisidir?','Kuzey Anadolu Fay Hattı',['Ölü Deniz Fay Hattı','San Andreas Fay Hattı','Ege Graben Sistemi']],
+ ['6 Şubat 2023\'te art arda meydana gelen iki büyük depremin merkez üssü hangi ildir?','Kahramanmaraş',['Hatay','Malatya','Adıyaman']],
+ ['Karadeniz kıyılarında yaygın olan doğal bitki örtüsü hangisidir?','Orman',['Maki','Bozkır','Çöl bitkileri']],
+ ['Harran Ovası\'nın sulanmasını sağlayan proje hangisidir?','GAP',['KOP','DAP','DOKAP']],
+ ['Konya Ovası\'nın sulanmasını amaçlayan proje hangisidir?','KOP (Konya Ovası Projesi)',['GAP','DAP','ZBK']]];
+const LISE_TF=[['Türkiye 26° ve 45° doğu meridyenleri arasındadır. En doğusu ile en batısı arasındaki yerel saat farkı kaç dakikadır?','76 dakika',['60 dakika','45 dakika','19 dakika']],
+ ['Türkiye hangi paraleller arasında yer alır?','36° ve 42° kuzey paralelleri',['26° ve 45° kuzey paralelleri','30° ve 36° kuzey paralelleri','42° ve 48° kuzey paralelleri']],
+ ['Van Gölü oluşumuna göre hangi tür göldür?','Volkanik set gölü',['Buzul gölü','Karstik göl','Kıyı set gölü (lagün)']],
+ ['Tuz Gölü oluşumuna göre hangi tür göldür?','Tektonik göl',['Volkanik set gölü','Buzul gölü','Heyelan set gölü']],
+ ['Bafa Gölü oluşumuna göre hangi tür göldür?','Alüvyal set gölü',['Krater gölü','Buzul gölü','Tektonik göl']],
+ ['Dağların kıyıya dik uzandığı, girintili çıkıntılı Ege kıyıları hangi kıyı tipine örnektir?','Enine kıyı',['Boyuna kıyı','Fiyort kıyı','Skyer kıyı']],
+ ['Haliç hangi kıyı tipine örnektir?','Ria kıyı',['Fiyort kıyı','Enine kıyı','Lagün kıyı']],
+ ['Dağların kıyıya paralel uzandığı Karadeniz ve Akdeniz kıyıları hangi kıyı tipine örnektir?','Boyuna kıyı',['Enine kıyı','Ria kıyı','Dalmaçya kıyı']],
+ ['Keban Barajı hangi ilimizdedir?','Elazığ',['Malatya','Adıyaman','Diyarbakır']],
+ ['Atatürk Barajı hangi akarsu üzerine kurulmuştur?','Fırat',['Dicle','Seyhan','Kızılırmak']],
+ ['Türkiye\'de sanayi tesislerinin en yoğun olduğu bölge hangisidir?','Marmara Bölgesi',['Doğu Anadolu Bölgesi','Karadeniz Bölgesi','İç Anadolu Bölgesi']],
+ ['Çay ve fındık tarımına uygun, her mevsimi yağışlı iklim hangisidir?','Karadeniz iklimi',['Akdeniz iklimi','Karasal iklim','Muson iklimi']],
+ ['Yazları sıcak ve kurak, kışları ılık ve yağışlı geçen iklim hangisidir?','Akdeniz iklimi',['Karadeniz iklimi','Karasal iklim','Ilıman okyanus iklimi']],
+ ['Ergene Havzası hangi bölgemizdedir?','Marmara Bölgesi',['Ege Bölgesi','Karadeniz Bölgesi','İç Anadolu Bölgesi']],
+ ['Doğu Anadolu\'da kışların çok soğuk ve uzun geçmesinin temel nedeni hangisidir?','Yükseltinin fazla olması',['Denize yakın olması','Ekvatora yakın olması','Ormanların çok olması']],
+ ['Türkiye\'de aynı anda Güneş\'in en erken doğduğu ilimiz hangisidir?','Iğdır',['Çanakkale','Edirne','Sinop']]];
 const GENEL_TF=[['Türkiye\'nin en uzun nehri hangisidir?','Kızılırmak',['Fırat','Sakarya Nehri','Yeşilırmak']],['Türkiye\'nin en büyük gölü hangisidir?','Van Gölü',['Tuz Gölü','Beyşehir Gölü','Eğirdir Gölü']],
  ['Türkiye\'nin en yüksek dağı hangisidir?','Ağrı Dağı',['Erciyes Dağı','Uludağ','Palandöken Dağı']],['Türkiye kaç coğrafi bölgeye ayrılır?','7',['5','6','8']],['Türkiye\'de kaç il vardır?','81',['76','79','83']],
  ['Türkiye\'yi Avrupa ve Asya olarak ayıran boğazlardan biri hangisidir?','İstanbul Boğazı',['Cebelitarık Boğazı','Hürmüz Boğazı','Babülmendep Boğazı']]];
@@ -481,7 +525,7 @@ const DUNYA_TF=[
 const $=id=>document.getElementById(id);
 const REG=['MAR','EGE','AKD','ICA','KAR','DOG','GDA'];
 const RCOL={MAR:'#4dabf7',EGE:'#38d9a9',AKD:'#ffa94d',ICA:'#ffd43b',KAR:'#69db7c',DOG:'#b197fc',GDA:'#ff8787'};
-const CATS={h:{n:'Tarihi Yerler',ic:'🏛️',c:'#7b2cbf'},y:{n:'Yemek ve İçecek',ic:'🍽️',c:'#e8590c'},t:{n:'Tarım ve Hayvancılık',ic:'🌾',c:'#2b8a3e'},m:{n:'Yer Altı Zenginlikleri',ic:'⛏️',c:'#495057'},s:{n:'Sanayi ve El Sanatları',ic:'🏭',c:'#1971c2'},c:{n:'Doğa ve Coğrafya',ic:'🏔️',c:'#0b7285'},g:{n:'Harita ve Plaka',ic:'📍',c:'#d6336c'},w:{n:'Dünya Turu',ic:'🌍',c:'#1864ab'}};
+const CATS={h:{n:'Tarihi Yerler',ic:'🏛️',c:'#7b2cbf'},y:{n:'Yemek ve İçecek',ic:'🍽️',c:'#e8590c'},t:{n:'Tarım ve Hayvancılık',ic:'🌾',c:'#2b8a3e'},m:{n:'Yer Altı Kaynakları',ic:'⛏️',c:'#495057'},s:{n:'Sanayi ve El Sanatları',ic:'🏭',c:'#1971c2'},c:{n:'Doğa ve Coğrafya',ic:'🏔️',c:'#0b7285'},g:{n:'Harita ve Plaka',ic:'📍',c:'#d6336c'},w:{n:'Dünya Turu',ic:'🌍',c:'#1864ab'}};
 const BYP={};IL.forEach(c=>BYP[c.p]=c);
 
 /* ===== STATE ===== */
@@ -489,6 +533,7 @@ const DEF={daily:{},lv:'o',xp:0,best:{},badges:{},disc:{},sound:true,music:false
 let S=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem('trkesif'));if(s)S=Object.assign(S,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('trkesif',JSON.stringify(S))}catch(e){}};
+try{const ql=new URLSearchParams(location.search).get('lv');if(ql&&'oly'.includes(ql)&&ql.length===1&&!sessionStorage.getItem('tk_lv')){S.lv=ql;sessionStorage.setItem('tk_lv',1);save()}}catch(e){}
 
 /* ===== SOUND ===== */
 const A={};
@@ -553,11 +598,11 @@ const TIX={};IL.forEach(c=>['h','y','t','m','s'].forEach(k=>c[k].forEach(it=>tok
 function conflicts(item,p){return toks(item).some(t=>TIX[t]&&TIX[t].has(p))}
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const LV={o:{n:'Ortaokul',opts:3,time:60,famous:true},l:{n:'Lise',opts:4,time:45},y:{n:'Yetişkin',opts:4,time:30,hard:true}};
-function usable(c,k){const L=LV[S.lv];let a=c[k].filter(x=>!reveals(x));if(L.famous)a=a.filter(x=>c[k].indexOf(x)===0);return a}
+const LV={o:{n:'Ortaokul',opts:4,time:60,famous:2},l:{n:'Lise',opts:4,time:45},y:{n:'Yetişkin',opts:4,time:30,hard:true}};
+function usable(c,k){const L=LV[S.lv];let a=c[k].filter(x=>!reveals(x));if(L.famous)a=a.filter(x=>c[k].indexOf(x)<L.famous);return a}
 const TYPES={
- hI:{c:'h',w:5},Ih:{c:'h',w:3},yI:{c:'y',w:3},Iy:{c:'y',w:2},tI:{c:'t',w:3},It:{c:'t',w:2},mI:{c:'m',w:2,minLv:'l'},Im:{c:'m',w:1,minLv:'l'},sI:{c:'s',w:2,minLv:'l'},Is:{c:'s',w:1,minLv:'l'},
- komsu:{c:'c',w:3},komsuDegil:{c:'c',w:2,minLv:'l'},kiyi:{c:'c',w:2},kiyiVY:{c:'c',w:2},doga:{c:'c',w:3},unesco:{c:'c',w:2},nehir:{c:'c',w:1,minLv:'l',genel:1},rekor:{c:'c',w:1,genel:1},genelTF:{c:'c',w:1,genel:1},
+ hI:{c:'h',w:5},Ih:{c:'h',w:3},yI:{c:'y',w:3},Iy:{c:'y',w:2},tI:{c:'t',w:3},It:{c:'t',w:2},mI:{c:'m',w:3},Im:{c:'m',w:2},yeraltiTF:{c:'m',w:2},sI:{c:'s',w:2,minLv:'l'},Is:{c:'s',w:1,minLv:'l'},
+ komsu:{c:'c',w:3},komsuDegil:{c:'c',w:2,minLv:'l'},kiyi:{c:'c',w:2},kiyiVY:{c:'c',w:2},doga:{c:'c',w:3},unesco:{c:'c',w:2},nehir:{c:'c',w:1,minLv:'l',genel:1},rekor:{c:'c',w:1,genel:1},genelTF:{c:'c',w:1,genel:1},cografyaTF:{c:'c',w:3,genel:1},liseTF:{c:'c',w:3,minLv:'l',genel:1},
  sekil:{c:'g',w:3},farkli:{c:'g',w:2},yon:{c:'c',w:2},yolculuk:{c:'c',w:2,minLv:'l'},sirala:{c:'c',w:2},eslestir:{c:'y',w:2},tarih:{c:'h',w:3},
  plate:{c:'g',w:2},plateR:{c:'g',w:1,minLv:'l'},region:{c:'g',w:2},mapPick:{c:'g',w:3},mapTap:{c:'g',w:2,minLv:'l'}
 };
@@ -575,17 +620,17 @@ function makeQ(type,pool){
     const item=rnd(usable(c,k));
     const ds=pickProvs(no-1,[c.p],d=>!conflicts(item,d.p)&&(diffReg?d.r!==c.r:(L.hard?true:true)));
     if(ds.length<no-1)return null;
-    const Q={h:`📜 <em>${item}</em> hangi ilimizdedir?`,y:`🍽️ <em>${item}</em> hangi ilimizle özdeşleşmiştir?`,t:`🌾 <em>${item}</em> denince akla gelen il hangisidir?`,m:`⛏️ <em>${item}</em> hangi ilimizin yer altı zenginliğidir?`,s:`🏭 <em>${item}</em> ile tanınan il hangisidir?`}[k];
+    const Q={h:`📜 <em>${item}</em> hangi ilimizdedir?`,y:`🍽️ <em>${item}</em> hangi ilimizle özdeşleşmiştir?`,t:`🌾 <em>${item}</em> denince akla gelen il hangisidir?`,m:`⛏️ <em>${item}</em> hangi ilimizin yer altı kaynağıdır?`,s:`🏭 <em>${item}</em> ile tanınan il hangisidir?`}[k];
     return {type,cat:k,p:c.p,text:Q,opts:shuffle([{l:c.n,ok:1},...ds.map(d=>({l:d.n}))]),key:item};
   }
   if(type==='I'+k){ // province -> item
     const item=rnd(usable(c,k));const others=[];
     for(const d of shuffle(IL)){if(d.p===c.p||(diffReg&&d.r===c.r))continue;const its=usable(d,k).filter(x=>!conflicts(x,c.p)&&!toks(x).some(tk=>toks(item).includes(tk))&&!others.some(o=>toks(o).some(tk=>toks(x).includes(tk))));if(its.length)others.push(rnd(its));if(others.length>=no-1)break}
     if(others.length<no-1)return null;
-    const Q={h:`🏛️ <em>${c.n}</em> ilinde hangisi bulunur?`,y:`🍽️ <em>${c.n}</em> hangi lezzetiyle ünlüdür?`,t:`🌾 <em>${c.n}</em> hangi ürünüyle tanınır?`,m:`⛏️ <em>${c.n}</em> ilinin yer altı zenginliği hangisidir?`,s:`🏭 <em>${c.n}</em> hangi sanayi / el sanatıyla öne çıkar?`}[k];
+    const Q={h:`🏛️ <em>${c.n}</em> ilinde hangisi bulunur?`,y:`🍽️ <em>${c.n}</em> hangi lezzetiyle ünlüdür?`,t:`🌾 <em>${c.n}</em> hangi ürünüyle tanınır?`,m:`⛏️ <em>${c.n}</em> ilinde çıkarılan / bulunan yer altı kaynağı hangisidir?`,s:`🏭 <em>${c.n}</em> hangi sanayi / el sanatıyla öne çıkar?`}[k];
     return {type,cat:k,p:c.p,text:Q,opts:shuffle([{l:item,ok:1},...others.map(o=>({l:o}))]),key:c.n+k};
   }
-  if(TYPES[type].c==='c')return makeGeo(type,pool,no);
+  if(TYPES[type].c==='c'||type==='yeraltiTF')return makeGeo(type,pool,no);
   if(type==='plate'){const ds=pickProvs(no-1,[c.p],L.hard?d=>Math.abs(d.p-c.p)<=12:null);if(ds.length<no-1)return null;
     return {type,cat:'g',p:c.p,text:`🚗 Plaka kodu <em>${String(c.p).padStart(2,'0')}</em> olan il hangisidir?`,opts:shuffle([{l:c.n,ok:1},...ds.map(d=>({l:d.n}))]),key:'pl'+c.p}}
   if(type==='plateR'){const nums=new Set([c.p]);while(nums.size<no){const d=c.p+Math.round((Math.random()-.5)*20);if(d>=1&&d<=81)nums.add(d)}
@@ -630,7 +675,10 @@ function makeGeo(type,pool,no){
     return {type,cat:'c',p:null,text:`🏞️ <em>${r}</em> nereye dökülür?`,opts:shuffle([{l:sea,ok:1},...seas.map(x=>({l:x}))]),key:'nh'+r,info:`${r}, ${sea}'e dökülür.`}}
   if(type==='rekor'){const [q,p]=rnd(REKOR),c=BYP[p];const ds=pickProvs(no-1,[p]);
     return {type,cat:'c',p,text:'🏆 '+q,opts:optsP(c,ds),key:'rk'+q}}
-  if(type==='genelTF'){const [q,a,w]=rnd(GENEL_TF);
+  if(type==='cografyaTF'||type==='liseTF'){const [q,a,w]=rnd(type==='liseTF'?LISE_TF:COG_TF);
+    return {type,cat:'c',p:null,text:'🧭 '+q,opts:shuffle([{l:a,ok:1},...shuffle(w).slice(0,no-1).map(x=>({l:x}))]),key:'cg'+q,info:`Doğru cevap: ${a}.`}}
+  if(type==='genelTF'||type==='yeraltiTF'){const yt=type==='yeraltiTF',[q,a,w]=rnd(yt?YERALTI_TF:GENEL_TF);
+    if(yt)return {type,cat:'m',p:null,text:'⛏️ '+q,opts:shuffle([{l:a,ok:1},...shuffle(w).slice(0,no-1).map(x=>({l:x}))]),key:'ya'+q,info:`Doğru cevap: ${a}.`};
     return {type,cat:'c',p:null,text:'🇹🇷 '+q,opts:shuffle([{l:a,ok:1},...shuffle(w).slice(0,no-1).map(x=>({l:x}))]),key:'gt'+q,info:`Doğru cevap: ${a}.`}}
   return null;
 }
@@ -860,7 +908,7 @@ const TITLES=[[0,'🎒 Çırak Gezgin'],[500,'🧭 Gezgin'],[1500,'🔭 Kâşif'
 function titleOf(xp){let t=TITLES[0],nx=null;for(let i=0;i<TITLES.length;i++){if(xp>=TITLES[i][0]){t=TITLES[i];nx=TITLES[i+1]||null}}return{t:t[1],from:t[0],next:nx}}
 const BADGES=[
  ...REG.map(r=>({id:'r_'+r,ic:{MAR:'🌉',EGE:'🫒',AKD:'🍊',ICA:'🌾',KAR:'🌲',DOG:'🏔️',GDA:'🏺'}[r],n:BOLGE[r]+' Rozeti',d:'Bölge Turunda 10 sorudan en az 8 doğru'})),
- ...['h','y','t','ms','c','g'].map(k=>({id:'c_'+k,ic:k==='ms'?'⛏️':CATS[k].ic,n:(k==='ms'?'Maden & Sanayi':CATS[k].n)+' Uzmanı',d:'Bu kategoride en az 8 doğru'})),
+ ...['h','y','t','m','s','c','g'].map(k=>({id:'c_'+k,ic:CATS[k].ic,n:CATS[k].n+' Uzmanı',d:'Bu kategoride en az 8 doğru'})),
  {id:'perf_o',ic:'🥉',n:'Ortaokul Şampiyonu',d:'Hızlı Yarışmada 10/10 (Ortaokul)'},{id:'perf_l',ic:'🥈',n:'Lise Şampiyonu',d:'Hızlı Yarışmada 10/10 (Lise)'},{id:'perf_y',ic:'🥇',n:'Yetişkin Şampiyonu',d:'Hızlı Yarışmada 10/10 (Yetişkin)'},
  {id:'world',ic:'🌍',n:'Dünya Gezgini',d:'Dünya Turunda en az 8 doğru'},
  {id:'mar25',ic:'🔥',n:'Maraton Koşucusu',d:'Maratonda 25 doğru'},{id:'disc81',ic:'🇹🇷',n:'81 İl Kâşifi',d:'81 ilin hepsini keşfet'}
@@ -917,10 +965,10 @@ $('mQuick').onclick=()=>startGame('quick');
 $('mMarathon').onclick=()=>startGame('marathon');
 $('mRegion').onclick=()=>{SFX.click();modal(`<h2>🗺️ Bölge seç</h2><div class="grid2">${REG.map(r=>`<button class="gbtn" style="background:${RCOL[r]};color:#1a1a1a" data-r="${r}">${S.badges['r_'+r]?'🏅 ':''}${BOLGE[r]}<small>${IL.filter(c=>c.r===r).length} il</small></button>`).join('')}</div><button class="btn gray" id="mX">Kapat</button>`);
   document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{closeModal();startGame('region',{region:b.dataset.r})});$('mX').onclick=closeModal};
-$('mCat').onclick=()=>{SFX.click();const cs=[['h','#7b2cbf'],['y','#e8590c'],['t','#2b8a3e'],['ms','#495057'],['c','#0b7285'],['g','#d6336c']];
-  modal(`<h2>📜 Kategori seç</h2><div class="grid2">${cs.map(([k,col])=>`<button class="gbtn" style="background:${col}" data-c="${k}">${S.badges['c_'+k]?'🏅 ':''}${k==='ms'?'⛏️ Maden & Sanayi':CATS[k].ic+' '+CATS[k].n}</button>`).join('')}</div>
-   ${S.lv==='o'?'<p style="font-size:12px;color:#9ec3d6;margin-top:8px">Maden & Sanayi soruları Lise ve Yetişkin seviyesinde.</p>':''}<button class="btn gray" id="mX">Kapat</button>`);
-  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(k==='ms'&&S.lv==='o'){S.lv='l';save();renderHome();toast('Seviye Lise yapıldı')}closeModal();startGame('cat',{cat:k})});$('mX').onclick=closeModal};
+$('mCat').onclick=()=>{SFX.click();const cs=[['h','#7b2cbf'],['y','#e8590c'],['t','#2b8a3e'],['m','#495057'],['s','#1971c2'],['c','#0b7285'],['g','#d6336c']];
+  modal(`<h2>📜 Kategori seç</h2><div class="grid2">${cs.map(([k,col])=>`<button class="gbtn" style="background:${col}" data-c="${k}">${S.badges['c_'+k]?'🏅 ':''}${CATS[k].ic+' '+CATS[k].n}</button>`).join('')}</div>
+   ${S.lv==='o'?'<p style="font-size:12px;color:#9ec3d6;margin-top:8px">Sanayi ve El Sanatları soruları Lise ve Yetişkin seviyesinde.</p>':''}<button class="btn gray" id="mX">Kapat</button>`);
+  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(k==='s'&&S.lv==='o'){S.lv='l';save();renderHome();toast('Seviye Lise yapıldı')}closeModal();startGame('cat',{cat:k})});$('mX').onclick=closeModal};
 $('mAtlas').onclick=()=>{SFX.click();openAtlas()};
 $('mDaily').onclick=()=>startGame('daily');
 $('mWorld').onclick=()=>startGame('world');
