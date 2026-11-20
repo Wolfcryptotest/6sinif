@@ -1,6 +1,8 @@
 // 10. sınıf konu videoları (YouTube). Her konuya, YouTube'da bulunan Türkçe bir konu anlatım videosu eşlendi.
 // Değer: YouTube video kimliği. Uygun video bulunamayan konu listede yoktur (video kutusu görünmez).
 window.VIDEO = {
+  "din10a": "qpzFLRIaoMk",  // 10. Sınıf (Yeni Müfredat) Din Kültürü 1. Ünite — İslam'da Varlık ve Bilgi
+  "din10e": "bacQJ2tXbfU",  // 10.Sınıf Din Kültürü 5.Ünite İslam Düşüncesinde Siyasi İtikadi Fıkhi Yorumlar
   "mat1k1": "24cMEdFSxfU",  // Çarpanlar Katlar, Asal Sayılar, EBOB - EKOK konu anlatımı
   "mat2k1": "sIwjiv3SSTg",  // Dik Üçgende Trigonometrik Oranlar ve Trigonometrik Özdeşlikler - 1
   "mat2k2": "ja6-QyYOFvQ",  // Sinüs ve Cosinüs Teoremleri
@@ -39,7 +41,6 @@ window.VIDEO = {
   "fel3k1": "gteHFFsEl1g",  // 10. Sınıf Felsefe 3. Ünite - Varlık Felsefesi
   "fel4k1": "c_cHvol2auA",  // 10. Sınıf Ahlak Felsefesi (Kısa ve Net Konu Anlatımı)
   "din1k1": "fhLgMx_ArEU",  // Din Kültürü 10.Sınıf 1.Ünite Allah İnsan İlişkisi
-  "din2k1": "3ajlVUyofms",  // Hac ile İlgili Kavramlar: İhram, Tavaf, Vakfe
   "din3k1": "1Br6v_BmQgI",  // Din Kültürü 10.Sınıf Ahlaki Tutum ve Davranışlar
   "din4k1": "1elKdj9m4Zc",  // Bir Genç Olarak Hz. Muhammed (10.sınıf)
   "ing1k1": "4ancoN2h-T4",  // Present Continuous Tense Konu Anlatımı
