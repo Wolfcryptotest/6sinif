@@ -333,6 +333,12 @@
       <div class="oa-graf" style="height:90px">${hafta.map((v, i) => `<div><small>${v || ""}</small><i style="height:${Math.round((v / hMax) * 100)}%;background:#7c3aed"></i><small>${["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"][new Date(Date.now() - (6 - i) * 864e5).getDay()]}</small></div>`).join("")}</div>
       <div class="vk-rozetler">${ROZETLER.map(([i, a, f]) => `<span class="${f(rd) ? "on" : ""}" title="${esc(a)}">${i}<small>${esc(a)}</small></span>`).join("")}</div>
       <div class="kt-row" style="margin:6px 0 4px"><button id="vkAlinti">💬 Alıntılarım (${vkv().alinti.length})</button></div>
+      <details class="kt-kitap"><summary><b>🏛️ Bakanlıkların ücretsiz okuma kaynakları</b></summary>
+        <p>📱 <b>e-Kitabım</b> (Kültür ve Turizm Bakanlığı): kamu ve özel yayınevlerinin binlerce e-kitabı ücretsiz; kitabı telefona indirip 15 gün okuyabilirsin. <a href="https://apps.apple.com/tr/app/ekitab%C4%B1m/id1549543546" target="_blank" rel="noopener">App Store</a> · <a href="https://play.google.com/store/search?q=e-Kitab%C4%B1m%20K%C3%BClt%C3%BCr%20ve%20Turizm%20Bakanl%C4%B1%C4%9F%C4%B1&c=apps" target="_blank" rel="noopener">Google Play'de ara</a></p>
+        <p>🏛️ <b>Halk kütüphanesi üyeliği</b>: İlindeki halk kütüphanesine ücretsiz üye olursan kâğıt kitap ödünç alabilir, e-kitap hizmetlerinden yararlanabilirsin. Okulunun kütüphanesini de unutma.</p>
+        <p>📜 <b>Türkiye Yazma Eserler Kurumu e-kitap</b>: klasik eserlerin PDF'leri ücretsiz. <a href="https://ekitap.yek.gov.tr" target="_blank" rel="noopener">ekitap.yek.gov.tr</a></p>
+        <p>📚 <b>Vikikaynak</b>: Bu uygulamadaki Kitaplık metinlerinin kaynağı; telifi serbest eserler. <a href="https://tr.wikisource.org" target="_blank" rel="noopener">tr.wikisource.org</a></p>
+        <p class="oa-not">Bu uygulamada okuduğun her eser ve kâğıt kitap, günlük hedefine ve rozetlerine sayılır.</p></details>
       <h3>📖 Elimdeki kâğıt kitaplar</h3>
       ${k.liste.filter((x) => !x.bitti).map((b) => { const i = k.liste.indexOf(b); return `<div class="kt-kitap"><b>${esc(b.ad)}</b><small>${esc(b.yazar || "")}${b.toplam ? ` · ${b.okunan || 0} / ${b.toplam} sayfa` : ` · ${b.okunan || 0} sayfa okundu`}</small>
         ${b.toplam ? `<div class="kt-bar"><i style="width:${Math.min(100, ((b.okunan || 0) / b.toplam) * 100)}%"></i></div>` : ""}
@@ -415,16 +421,8 @@
   // ---------- 📖 Uygulama içi Kitaplık: telifi serbest Türkçe eserler Vikikaynak'tan (tr.wikisource.org) okunur ----------
   // Metin, öğrencinin tarayıcısında Vikikaynak API'sinden alınır (origin=* ile CORS), bir kez açılan eser cihazda saklanır.
   const VK = "https://tr.wikisource.org";
+  function SECKI_YAZAR(y) { return SECKI.some((x) => x[1] === y); }
   const LISE = NO >= 9;
-  const RAFLAR = [
-    { id: "oyku", ad: "Ömer Seyfettin Hikâyeleri", ikon: "📕", kat: "Ömer Seyfettin hikayeleri", yazar: "Ömer Seyfettin", tur: "Hikâye", hepsi: LISE },
-    { id: "fikra", ad: "Nasreddin Hoca Fıkraları", ikon: "😄", kat: "Nasreddin Hoca fıkraları", yazar: "Nasreddin Hoca", tur: "Fıkra", hepsi: true },
-    { id: "orhan", ad: "Orhan Veli Şiirleri", ikon: "✒️", kat: "Orhan Veli şiirleri", yazar: "Orhan Veli Kanık", tur: "Şiir", hepsi: true },
-    { id: "akif", ad: "Mehmet Âkif Ersoy Şiirleri", ikon: "🇹🇷", kat: "Mehmet Âkif Ersoy şiirleri", yazar: "Mehmet Âkif Ersoy", tur: "Şiir", hepsi: true },
-    { id: "fikret", ad: "Tevfik Fikret Şiirleri", ikon: "🖋️", kat: "Tevfik Fikret şiirleri", yazar: "Tevfik Fikret", tur: "Şiir", hepsi: true },
-    { id: "gokalp", ad: "Ziya Gökalp Şiirleri", ikon: "📜", kat: "Ziya Gökalp Şiirleri", yazar: "Ziya Gökalp", tur: "Şiir", hepsi: true },
-    { id: "sabahattin", ad: "Sabahattin Ali Şiirleri", ikon: "🌙", kat: "Sabahattin Ali şiirleri", yazar: "Sabahattin Ali", tur: "Şiir", hepsi: LISE }
-  ];
   // Öne çıkanlar: [Vikikaynak sayfa adı, yazar, tür, seviye ("o": ortaokul ve lise, "l": yalnız lise)]. Yazar içindeki sıra, okullarda en çok okunanlardan başlar (öneri sırası).
   const SECKI = [
     ["Kürk Mantolu Madonna", "Sabahattin Ali", "Roman", "l"], ["Kuyucaklı Yusuf", "Sabahattin Ali", "Roman", "l"], ["Birdenbire Sönen Kandilin Hikâyesi", "Sabahattin Ali", "Hikâye", "l"],
@@ -442,6 +440,20 @@
     ["Küfe", "Mehmet Âkif Ersoy", "Şiir", "o"], ["Seyfi Baba", "Mehmet Âkif Ersoy", "Şiir", "o"], ["Küçük Asker", "Tevfik Fikret", "Şiir", "o"], ["Ağustos Böceği ile Karınca", "Tevfik Fikret", "Şiir", "o"],
     ["Han-ı Yağma", "Tevfik Fikret", "Şiir", "l"], ["Anlatamıyorum", "Orhan Veli Kanık", "Şiir", "o"], ["Bedava", "Orhan Veli Kanık", "Şiir", "o"], ["Gemilerim", "Orhan Veli Kanık", "Şiir", "o"], ["Deniz", "Orhan Veli Kanık", "Şiir", "o"]
   ].filter((x) => LISE || x[3] === "o");
+  const RAFLAR = [
+    { id: "oyku", ad: "Ömer Seyfettin Hikâyeleri", ikon: "📕", kat: "Ömer Seyfettin hikayeleri", yazar: "Ömer Seyfettin", tur: "Hikâye", hepsi: LISE },
+    { id: "fikra", ad: "Nasreddin Hoca Fıkraları", ikon: "😄", kat: "Nasreddin Hoca fıkraları", yazar: "Nasreddin Hoca", tur: "Fıkra", hepsi: true },
+    { id: "orhan", ad: "Orhan Veli Şiirleri", ikon: "✒️", kat: "Orhan Veli şiirleri", yazar: "Orhan Veli Kanık", tur: "Şiir", hepsi: true },
+    { id: "akif", ad: "Mehmet Âkif Ersoy Şiirleri", ikon: "🇹🇷", kat: "Mehmet Âkif Ersoy şiirleri", yazar: "Mehmet Âkif Ersoy", tur: "Şiir", hepsi: true },
+    { id: "fikret", ad: "Tevfik Fikret Şiirleri", ikon: "🖋️", kat: "Tevfik Fikret şiirleri", yazar: "Tevfik Fikret", tur: "Şiir", hepsi: true },
+    { id: "gokalp", ad: "Ziya Gökalp Şiirleri", ikon: "📜", kat: "Ziya Gökalp Şiirleri", yazar: "Ziya Gökalp", tur: "Şiir", hepsi: true },
+    { id: "sabahattin", ad: "Sabahattin Ali Şiirleri", ikon: "🌙", kat: "Sabahattin Ali şiirleri", yazar: "Sabahattin Ali", tur: "Şiir", hepsi: LISE },
+    { id: "turku", ad: "Türkü Hikâyeleri", ikon: "🎶", kat: "Türkü hikâyeleri", yazar: "Anonim (halk anlatısı)", tur: "Hikâye", hepsi: true },
+    { id: "efsane", ad: "Efsaneler", ikon: "🐉", kat: "Türk halk edebiyatında efsaneler", yazar: "Anonim (halk anlatısı)", tur: "Efsane", hepsi: true },
+    { id: "destan", ad: "Destanlar", ikon: "🏹", kat: "Türk halk edebiyatında destanlar", yazar: "Anonim (halk anlatısı)", tur: "Destan", hepsi: true },
+    { id: "yunus", ad: "Yunus Emre", ikon: "🌹", kat: "Yunus Emre", yazar: "Yunus Emre", tur: "Şiir", hepsi: LISE },
+    { id: "karaca", ad: "Karacaoğlan Türküleri", ikon: "🎻", kat: "Karacaoğlan türküleri", yazar: "Karacaoğlan", tur: "Şiir", hepsi: LISE }
+  ].filter((r) => r.hepsi || SECKI_YAZAR(r.yazar));
   const KELIME_SAYFA = 250; // basılı kitapta bir sayfa ≈ 250 kelime
   const PARCA = LISE ? 1800 : 1200; // bir okuma bölümü (kelime) — yaklaşık 10–12 dakikalık parça
   const trNorm = (s) => String(s || "").toLocaleLowerCase("tr").replace(/[âà]/g, "a").replace(/[îı]/g, "i").replace(/û/g, "u").replace(/ş/g, "s").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ö/g, "o").replace(/ü/g, "u");

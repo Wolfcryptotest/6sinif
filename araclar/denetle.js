@@ -41,6 +41,18 @@ const S = (m) => { sorun.push(m); console.log("✖ " + m); };
           try { const l = soruHazirla(k, 10) || []; o.soru += l.length; for (const q of l) { const sec = q.secenekler || []; if (new Set(sec.map(String)).size !== sec.length) o.hata.push(`${k.id}: aynı şık iki kez: ${q.soru.slice(0, 60)}`); if (!(q.dogru >= 0 && q.dogru < sec.length)) o.hata.push(`${k.id}: doğru cevap şıklarda yok: ${q.soru.slice(0, 60)}`); if (/undefined|NaN|\[object/.test(q.soru + sec.join(" "))) o.hata.push(`${k.id}: bozuk metin: ${q.soru.slice(0, 60)}`); } } catch (e) { o.hata.push(`${k.id}: ${e.message}`); }
         }
       }
+      // Veri bağlantıları: video anahtarı var olan bir konuya mı bağlı, kimlik biçimi doğru mu, konu kimlikleri tekil mi, elle yazılmış sorular sağlam mı
+      if (window.ICERIK) {
+        const idler = {}, tumK = [];
+        for (const [dk, d] of Object.entries(ICERIK)) for (const u of d.uniteler || []) for (const k of u.konular || []) { tumK.push(k); idler[k.id] = (idler[k.id] || 0) + 1; }
+        Object.entries(idler).forEach(([id, n]) => { if (n > 1 && !Object.values(ICERIK).some((d) => d.takma)) o.hata.push(`konu kimliği tekrar ediyor: ${id} (${n})`); });
+        if (window.VIDEO) for (const [id, v] of Object.entries(VIDEO)) { if (!idler[id]) o.hata.push(`video, olmayan konuya bağlı: ${id}`); if (!/^[A-Za-z0-9_-]{11}$/.test(v)) o.hata.push(`video kimliği bozuk: ${id} → ${v}`); }
+        for (const k of tumK) {
+          if (!k.ad || !String(k.ad).trim()) o.hata.push(`${k.id}: konu adı boş`);
+          for (const [i, q] of (k.sorular || []).entries()) { const sec = q.secenekler || []; if (!q.soru || sec.length < 2 || !(q.dogru >= 0 && q.dogru < sec.length) || sec.some((x) => x === undefined || String(x).trim() === "")) o.hata.push(`${k.id} soru ${i + 1}: biçim hatası`); }
+          if (k.video && !/^[A-Za-z0-9_-]{11}$/.test(k.video)) o.hata.push(`${k.id}: video kimliği bozuk`);
+        }
+      }
       if (typeof MUF !== "undefined" && typeof hasQ === "function") { // YKS
         MUF.forEach((m) => m.k.forEach((k) => { o.konu++; if (!hasQ(m, k)) o.hata.push(`YKS ${m.id} ${k[0]}: soru yok`); }));
         GEN.forEach((g) => { for (let i = 0; i < 100; i++) { try { const q = g.f(); if (q.o.length < 4 || new Set(q.o).size !== q.o.length || !(q.a >= 0 && q.a < q.o.length)) { o.hata.push(`YKS üretici ${g.id}: hatalı şıklar`); break; } } catch (e) { o.hata.push(`YKS üretici ${g.id}: ${e.message}`); break; } } });
