@@ -5,6 +5,10 @@ const fs = require("fs"), path = require("path");
 const KOK = path.join(__dirname, "..");
 const URL = process.env.YKS_URL || "http://localhost:8765/6sinif/";
 const esle = JSON.parse(fs.readFileSync(path.join(__dirname, "yks-esleme.json"), "utf8"));
+// Sınıf programından çıkarılan (ör. 11. sınıf Maarif düzeni, 2026-11-20) ama YKS'de hâlâ sorulan konular:
+// sayfada bulunamayan kimliklerin soruları mevcut yks/havuz.js'ten korunur, YKS alt konuları boş kalmaz.
+let ESKI = { HAVUZ: {}, HAVUZ_VIDEO: {} };
+try { const w = {}; new Function("window", fs.readFileSync(path.join(KOK, "yks", "havuz.js"), "utf8"))(w); ESKI = { HAVUZ: w.HAVUZ || {}, HAVUZ_VIDEO: w.HAVUZ_VIDEO || {} }; } catch (e) {}
 const gerek = {};
 for (const lst of Object.values(esle)) for (const k of lst) for (const ref of k) { const [g, id] = ref.split(":"); (gerek[g] = gerek[g] || new Set()).add(id); }
 (async () => {
@@ -32,8 +36,12 @@ for (const lst of Object.values(esle)) for (const k of lst) for (const ref of k)
     }, [...gerek[g]]);
     for (const [id, l] of Object.entries(r.out)) kaynak[g + ":" + id] = l;
     for (const [id, v] of Object.entries(r.vid)) video[g + ":" + id] = v;
-    eksik = eksik.concat(r.yok.map((x) => g + ":" + x));
-    console.log(g, Object.keys(r.out).length, "konu", Object.values(r.out).reduce((a, x) => a + x.length, 0), "soru", r.yok.length ? "YOK: " + r.yok : "");
+    const korunan = [];
+    for (const id of r.yok) { const ref = g + ":" + id;
+      if (ESKI.HAVUZ[ref] && ESKI.HAVUZ[ref].length) { kaynak[ref] = ESKI.HAVUZ[ref]; if (ESKI.HAVUZ_VIDEO[ref]) video[ref] = ESKI.HAVUZ_VIDEO[ref]; korunan.push(id); }
+      else eksik.push(ref); }
+    if (korunan.length) console.log(g, "sınıf sayfasında olmayan", korunan.length, "konu eski havuzdan korundu:", korunan.join(","));
+    console.log(g, Object.keys(r.out).length, "konu", Object.values(r.out).reduce((a, x) => a + x.length, 0), "soru");
   }
   await b.close();
   const js = "// Otomatik üretilir (araclar/yks-havuz-uret.js). Elle düzenlemeyin.\nwindow.HAVUZ_ESLE=" + JSON.stringify(esle) + ";\nwindow.HAVUZ_VIDEO=" + JSON.stringify(video) + ";\nwindow.HAVUZ=" + JSON.stringify(kaynak) + ";\n";
