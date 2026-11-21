@@ -1,0 +1,46 @@
+# 🤖 Ücretsiz denetim robotu (GitHub Actions, herkese açık depoda ücretsizdir)
+# Her gün ve her güncellemeden sonra bütün sayfaları gerçek tarayıcıda açar, hata/kopuk bağlantı/bozuk soru arar.
+# Sorun bulursa "🤖 Denetim" etiketli bir konu (issue) açar; haftalık bakım ajanı bu konuları okuyup düzeltir.
+name: Günlük denetim
+on:
+  schedule:
+    - cron: "17 1 * * *"   # her gün 04:17 (İstanbul)
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: denetim
+  cancel-in-progress: true
+jobs:
+  denetle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Playwright kur
+        run: |
+          npm i --no-save --no-package-lock playwright@1
+          npx playwright install --with-deps chromium
+      - name: Siteyi denetle
+        id: d
+        run: |
+          set -o pipefail
+          node araclar/denetle.js 2>&1 | tee denetim.txt
+      - name: Sorun varsa konu aç
+        if: failure() && steps.d.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const rapor = fs.existsSync('denetim.txt') ? fs.readFileSync('denetim.txt', 'utf8') : 'Rapor yok';
+            const sorunlar = rapor.split('\n').filter(l => l.startsWith('✖')).slice(0, 60).join('\n') || rapor.slice(-3000);
+            const acik = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: '🤖 Denetim' });
+            const govde = `Günlük denetim sorun buldu (${new Date().toISOString().slice(0,10)}).\n\n\`\`\`\n${sorunlar}\n\`\`\`\n\nÇalışma: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            if (acik.data.length) await github.rest.issues.createComment({ ...context.repo, issue_number: acik.data[0].number, body: govde });
+            else await github.rest.issues.create({ ...context.repo, title: '🤖 Denetim: sitede sorun bulundu', body: govde, labels: ['🤖 Denetim'] });
