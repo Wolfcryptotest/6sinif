@@ -452,7 +452,9 @@
     { id: "efsane", ad: "Efsaneler", ikon: "🐉", kat: "Türk halk edebiyatında efsaneler", yazar: "Anonim (halk anlatısı)", tur: "Efsane", hepsi: true },
     { id: "destan", ad: "Destanlar", ikon: "🏹", kat: "Türk halk edebiyatında destanlar", yazar: "Anonim (halk anlatısı)", tur: "Destan", hepsi: true },
     { id: "yunus", ad: "Yunus Emre", ikon: "🌹", kat: "Yunus Emre", yazar: "Yunus Emre", tur: "Şiir", hepsi: LISE },
-    { id: "karaca", ad: "Karacaoğlan Türküleri", ikon: "🎻", kat: "Karacaoğlan türküleri", yazar: "Karacaoğlan", tur: "Şiir", hepsi: LISE }
+    { id: "karaca", ad: "Karacaoğlan Türküleri", ikon: "🎻", kat: "Karacaoğlan türküleri", yazar: "Karacaoğlan", tur: "Şiir", hepsi: LISE },
+    { id: "masal", ad: "Masallar", ikon: "🧚", kat: "Türk halk edebiyatında masallar", yazar: "Anonim (halk anlatısı)", tur: "Masal", hepsi: true },
+    { id: "hasim", ad: "Ahmet Haşim Şiirleri", ikon: "🌅", kat: "Ahmet Haşim şiirleri", yazar: "Ahmet Haşim", tur: "Şiir", hepsi: LISE }
   ].filter((r) => r.hepsi || SECKI_YAZAR(r.yazar));
   const KELIME_SAYFA = 250; // basılı kitapta bir sayfa ≈ 250 kelime
   const PARCA = LISE ? 1800 : 1200; // bir okuma bölümü (kelime) — yaklaşık 10–12 dakikalık parça
@@ -479,7 +481,7 @@
     if (l.length) yerel.koy(an, { t: Date.now(), l });
     return l.length ? l : (c && c.l) || [];
   };
-  const rafEserleri = (raf, l) => l.filter((t) => !vkv().bos || !vkv().bos[t]).map((t) => (katalog[t] = katalog[t] || { ad: t.replace(/ \((hikâye|Nasreddin Hoca fıkrası|Orhan Veli|Sabahattin Ali|Mehmet Âkif Ersoy|şiir)\)$/, ""), yazar: raf.yazar, tur: raf.tur, raf: raf.id }, t));
+  const rafEserleri = (raf, l) => l.filter((t) => !vkv().bos || !vkv().bos[t]).map((t) => (katalog[t] = katalog[t] || { ad: t.replace(/ \((hikâye|Nasreddin Hoca fıkrası|Orhan Veli|Sabahattin Ali|Mehmet Âkif Ersoy|Ahmet Haşim|şiir)\)$/, ""), yazar: raf.yazar, tur: raf.tur, raf: raf.id }, t));
 
   // HTML → paragraflar (şiirlerde satır sonları korunur) + alt sayfa (bölüm) bağlantıları
   function vkCoz(html, baslik) {
