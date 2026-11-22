@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Çebioğlu Gold Residence – Kiralık Eşyalı 1+1 – Fotoğraflar</title>
+<title>Çebioğlu Gold Residence – Kiralık Eşyalı 1+1</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#F4F5F8;color:#14213D}
@@ -11,29 +11,56 @@ header h1{margin:6px 0 4px;font-size:28px;line-height:1.15}
 header p{margin:0;font-size:15px;color:#D9DEEA}
 .call{display:block;background:#D4A72C;color:#14213D;text-decoration:none;font-weight:800;font-size:22px;text-align:center;padding:14px;letter-spacing:.5px}
 .call:hover{background:#C79A20}
-main{max-width:1100px;margin:0 auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-figure{margin:0;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(20,33,61,.12)}
-figure img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
-figcaption{padding:10px 12px;font-size:15px;font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.ph{display:block;padding:0;border:0;background:#fff;border-radius:12px;overflow:hidden;cursor:zoom-in;box-shadow:0 1px 3px rgba(20,33,61,.12)}
+.ph img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 footer{text-align:center;padding:10px 16px 28px;font-size:14px;color:#4A5468}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.94);display:none;align-items:center;justify-content:center;z-index:10}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:100%;object-fit:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#lb button{position:absolute;background:rgba(255,255,255,.16);color:#fff;border:0;font-size:30px;width:52px;height:52px;border-radius:50%;cursor:pointer}
+#lb button:hover{background:rgba(255,255,255,.3)}
+#kapat{top:14px;right:14px} #geri{left:10px;top:50%;margin-top:-26px} #ileri{right:10px;top:50%;margin-top:-26px}
 </style></head><body>
 <header><small>ÇEBİOĞLU GOLD RESIDENCE · A BLOK</small><h1>Kiralık Eşyalı 1+1 Daire</h1><p>Havuz · Spor salonu · 24 saat güvenlik · Kapalı otopark</p></header>
 <a class="call" href="tel:+905556614931">Bilgi için ara: 0555 661 49 31</a>
 <main>
-<figure><a href="img/01.jpg"><img src="img/01.jpg" alt="Giriş, mutfak ve salon" loading="lazy"></a><figcaption>1. Giriş, mutfak ve salon</figcaption></figure>
-<figure><a href="img/02.jpg"><img src="img/02.jpg" alt="Giriş ve mutfak" loading="lazy"></a><figcaption>2. Giriş ve mutfak</figcaption></figure>
-<figure><a href="img/03.jpg"><img src="img/03.jpg" alt="Mutfak" loading="lazy"></a><figcaption>3. Mutfak</figcaption></figure>
-<figure><a href="img/04.jpg"><img src="img/04.jpg" alt="Salon" loading="lazy"></a><figcaption>4. Salon</figcaption></figure>
-<figure><a href="img/05.jpg"><img src="img/05.jpg" alt="Salon ve mutfak" loading="lazy"></a><figcaption>5. Salon ve mutfak</figcaption></figure>
-<figure><a href="img/06.jpg"><img src="img/06.jpg" alt="Salon – pencere, koltuk, masa" loading="lazy"></a><figcaption>6. Salon – pencere, koltuk, masa</figcaption></figure>
-<figure><a href="img/07.jpg"><img src="img/07.jpg" alt="Yatak odası" loading="lazy"></a><figcaption>7. Yatak odası</figcaption></figure>
-<figure><a href="img/08.jpg"><img src="img/08.jpg" alt="Yatak odası" loading="lazy"></a><figcaption>8. Yatak odası</figcaption></figure>
-<figure><a href="img/09.jpg"><img src="img/09.jpg" alt="Yatak odası – geniş açı" loading="lazy"></a><figcaption>9. Yatak odası – geniş açı</figcaption></figure>
-<figure><a href="img/10.jpg"><img src="img/10.jpg" alt="Çalışma masası ve kitaplık" loading="lazy"></a><figcaption>10. Çalışma masası ve kitaplık</figcaption></figure>
-<figure><a href="img/11.jpg"><img src="img/11.jpg" alt="Gardırop ve koridor" loading="lazy"></a><figcaption>11. Gardırop ve koridor</figcaption></figure>
-<figure><a href="img/12.jpg"><img src="img/12.jpg" alt="Çamaşır makinesi ve dolap" loading="lazy"></a><figcaption>12. Çamaşır makinesi ve dolap</figcaption></figure>
-<figure><a href="img/13.jpg"><img src="img/13.jpg" alt="Banyo" loading="lazy"></a><figcaption>13. Banyo</figcaption></figure>
-<figure><a href="img/14.jpg"><img src="img/14.jpg" alt="Banyo – duşakabin" loading="lazy"></a><figcaption>14. Banyo – duşakabin</figcaption></figure>
+<button class="ph" data-i="0" aria-label="Fotoğrafı büyüt"><img src="img/01.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="1" aria-label="Fotoğrafı büyüt"><img src="img/02.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="2" aria-label="Fotoğrafı büyüt"><img src="img/03.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="3" aria-label="Fotoğrafı büyüt"><img src="img/04.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="4" aria-label="Fotoğrafı büyüt"><img src="img/05.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="5" aria-label="Fotoğrafı büyüt"><img src="img/06.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="6" aria-label="Fotoğrafı büyüt"><img src="img/07.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="7" aria-label="Fotoğrafı büyüt"><img src="img/08.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="8" aria-label="Fotoğrafı büyüt"><img src="img/09.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="9" aria-label="Fotoğrafı büyüt"><img src="img/10.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="10" aria-label="Fotoğrafı büyüt"><img src="img/11.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="11" aria-label="Fotoğrafı büyüt"><img src="img/12.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="12" aria-label="Fotoğrafı büyüt"><img src="img/13.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
+<button class="ph" data-i="13" aria-label="Fotoğrafı büyüt"><img src="img/14.jpg" alt="Daire fotoğrafı" loading="lazy"></button>
 </main>
 <footer>Sahibinden · Komisyon yok · Fotoğrafa dokunarak büyütebilirsiniz.</footer>
+<div id="lb" role="dialog" aria-label="Fotoğraf">
+<img id="lbimg" alt="Daire fotoğrafı">
+<button id="kapat" aria-label="Kapat">×</button>
+<button id="geri" aria-label="Önceki">‹</button>
+<button id="ileri" aria-label="Sonraki">›</button>
+</div>
+<script>
+(function(){
+var srcs=[].map.call(document.querySelectorAll('.ph img'),function(i){return i.getAttribute('src')});
+var lb=document.getElementById('lb'),im=document.getElementById('lbimg'),n=0,x0=null;
+function goster(i){n=(i+srcs.length)%srcs.length;im.src=srcs[n];lb.classList.add('on');}
+function kapat(){lb.classList.remove('on');}
+[].forEach.call(document.querySelectorAll('.ph'),function(b){b.addEventListener('click',function(){goster(+b.dataset.i)})});
+document.getElementById('kapat').onclick=kapat;
+document.getElementById('geri').onclick=function(e){e.stopPropagation();goster(n-1)};
+document.getElementById('ileri').onclick=function(e){e.stopPropagation();goster(n+1)};
+lb.addEventListener('click',function(e){if(e.target===lb)kapat()});
+lb.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+lb.addEventListener('touchend',function(e){if(x0===null)return;var d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)goster(n+(d<0?1:-1));x0=null});
+document.addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;if(e.key==='Escape')kapat();if(e.key==='ArrowRight')goster(n+1);if(e.key==='ArrowLeft')goster(n-1)});
+})();
+</script>
 </body></html>
