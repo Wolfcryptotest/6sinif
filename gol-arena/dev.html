@@ -2294,6 +2294,8 @@ const MXM=[];
 function mxPrep(g,base,tag){let s=1;g.scene.traverse(x=>{if(!x.isBone&&!x.isMesh&&x.scale.x<.5)s=x.scale.x});
   const hipY=G0=>{let y=0;G0.scene.traverse(x=>{if(x.isBone&&x.name==='Hips')y=x.position.y});return y};
   const src=(base||g).animations,k=base?hipY(g)/hipY(base):1,clips={};
+  if(!base)for(const c0 of src)for(const t of c0.tracks)if(/(^|\.|\/)Hips\.position$/.test(t.name)){const T=t.times,V=t.values,n=T.length,te=T[n-1]||1;
+    for(const ax of[0,2]){const a=V[ax],b=V[(n-1)*3+ax];for(let i=0;i<n;i++)V[i*3+ax]-=(b-a)*T[i]/te;let m=0;for(let i=0;i<n;i++)m+=V[i*3+ax];m/=n;const sc=c0.name==='base'?.45:1;for(let i=0;i<n;i++)V[i*3+ax]=(V[i*3+ax]-m)*sc}}
   for(const c0 of src){const c=k===1?c0:c0.clone();if(k!==1)for(const t of c.tracks)if(/\.position$/.test(t.name))for(let i=0;i<t.values.length;i++)t.values[i]*=k;
     clips[c0.name==='base'?'idle':c0.name]=c}
   return{g,s,clips,tag,hl:tag==='R'?.5:.2,hem:tag==='R'?.45:.53,sockT:tag==='R'?.41:.475,skin:tag==='R'?[226,176,150]:[222,168,142]}}
@@ -3165,5 +3167,5 @@ startDemo();renderMain();requestAnimationFrame(frame);
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;upd();});addEventListener('appinstalled',()=>{dp=null;b.remove();});
   b.onclick=async()=>{if(dp){dp.prompt();try{await dp.userChoice;}catch(e){}dp=null;upd();}else if(ios)alert('Safari\'de Paylaş ⬆ düğmesine bas → "Ana Ekrana Ekle"');};
   document.body.appendChild(b);setInterval(upd,800);})();
-window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,MXM,glLoadHuman,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumbleP,goal,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch,TCH};
+window.__setOff=v=>{SET.offside=v};window.__GA={get G(){return G},newMatch,LEAGUES,step,startDemo,show,SET,GL,MXM,glLoadHuman,mkHuman,poseHuman,mkRig,poseRig,P1,P2,UI,teamSelect,startGame,TS,applyGfx,startSet,goalX,ownGoalX,FL,FW,DT,rumbleP,goal,renderHelp,dtEnter,DTS:RT,dtResult,showEnd,endMatch,TCH};
 </script>
