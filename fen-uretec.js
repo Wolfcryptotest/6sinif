@@ -16,9 +16,9 @@
       "Gezegenler Güneş'ten aldıkları ışığı yansıtır.", "Merkür ve Venüs'ün uydusu yoktur.", "Dünya, canlı yaşadığı bilinen tek gezegendir.",
       "Neptün, Güneş'e en uzak gezegendir.", "Dış gezegenler gaz yapılıdır."
     ], [
-      "Ay bir gezegendir.", "Satürn bir iç gezegendir.", "Merkür en büyük gezegendir.", "Gezegenler kendi ışığını üretir.",
-      "Mars bir dış gezegendir.", "Asteroit kuşağı Dünya ile Mars arasındadır.", "Güneş bir gezegendir.", "Bütün gezegenlerin uydusu vardır.",
-      "Jüpiter kayalık yapılı küçük bir gezegendir.", "Güneş sisteminde 9 gezegen vardır.", "Venüs, Güneş'e en uzak gezegendir.", "İç gezegenlerin hepsi halkalıdır."
+      Y("Ay bir gezegendir.", "k:uydu ile gezegen karıştırıldı"), Y("Satürn bir iç gezegendir.", "k:iç ve dış gezegenler karıştırıldı"), "Merkür en büyük gezegendir.", Y("Gezegenler kendi ışığını üretir.", "k:gezegenler yıldız gibi kendi ışığını üretir sanıldı"),
+      Y("Mars bir dış gezegendir.", "k:iç ve dış gezegenler karıştırıldı"), Y("Asteroit kuşağı Dünya ile Mars arasındadır.", "d:asteroit kuşağının yeri karıştırıldı (Mars ile Jüpiter arasındadır)"), Y("Güneş bir gezegendir.", "k:Güneş'in bir yıldız olduğu bilinmedi"), "Bütün gezegenlerin uydusu vardır.",
+      "Jüpiter kayalık yapılı küçük bir gezegendir.", Y("Güneş sisteminde 9 gezegen vardır.", "k:Plüton hâlâ gezegen sayıldı (bugün cüce gezegendir)"), "Venüs, Güneş'e en uzak gezegendir.", Y("İç gezegenlerin hepsi halkalıdır.", "k:iç ve dış gezegenler karıştırıldı")
     ], "Güneş sistemi")
   ]);
 
@@ -30,9 +30,9 @@
       "Galileo teleskop kullanarak gözlem yaptı.", "Kepler gezegen yörüngelerinin elips olduğunu buldu.", "Plüton günümüzde cüce gezegen olarak kabul edilir.",
       "Bilimsel bilgi yeni kanıtlarla değişebilir.", "Batlamyus yer merkezli modeli savundu."
     ], [
-      "Yer merkezli modelde Güneş merkezdedir.", "Kopernik yer merkezli modeli savundu.", "Galileo mikroskopla gezegenleri gözledi.",
-      "Kepler'e göre yörüngeler tam bir çemberdir.", "Plüton bugün hâlâ gezegen sayılır.", "Bilimsel bilgiler hiçbir zaman değişmez.",
-      "Batlamyus güneş merkezli modeli ortaya koydu.", "Güneş merkezli modelde Dünya hareket etmez."
+      Y("Yer merkezli modelde Güneş merkezdedir.", "k:yer merkezli ve güneş merkezli modeller karıştırıldı"), Y("Kopernik yer merkezli modeli savundu.", "k:yer merkezli ve güneş merkezli modeller karıştırıldı"), Y("Galileo mikroskopla gezegenleri gözledi.", "d:teleskop ile mikroskop karıştırıldı"),
+      Y("Kepler'e göre yörüngeler tam bir çemberdir.", "k:yörüngeler tam çember sanıldı (elips şeklindedir)"), Y("Plüton bugün hâlâ gezegen sayılır.", "k:Plüton hâlâ gezegen sayıldı (bugün cüce gezegendir)"), Y("Bilimsel bilgiler hiçbir zaman değişmez.", "k:bilimsel bilginin yeni kanıtlarla değişebileceği bilinmedi"),
+      Y("Batlamyus güneş merkezli modeli ortaya koydu.", "k:yer merkezli ve güneş merkezli modeller karıştırıldı"), Y("Güneş merkezli modelde Dünya hareket etmez.", "k:yer merkezli ve güneş merkezli modeller karıştırıldı")
     ], "Güneş sistemi modelleri")
   ]);
 
@@ -41,8 +41,8 @@
     "Ay tutulması": ["Dünya, Güneş ile Ay'ın arasına girer.", "Dolunay evresinde gerçekleşir.", "Gece gözlenir.", "Dünya'nın gölgesi Ay'a düşer.", "Sıralama Güneş – Dünya – Ay şeklindedir.", "Çıplak gözle güvenle izlenebilir."]
   };
   U.f1k3 = tiplerden([
-    () => { const g = pick(Object.keys(TUT)), d = pick(TUT[g]), o = Object.keys(TUT).find((x) => x !== g); return soru(`Aşağıdakilerden hangisi ${g.toLocaleLowerCase("tr")} için doğrudur?`, d, TUT[o], `${g}: ${d}`); },
-    () => { const g = pick(Object.keys(TUT)), d = pick(TUT[g]); return soru(`"${d}" ifadesi hangi olayı anlatır?`, g, ["Ay'ın evreleri", "Mevsimlerin oluşumu", "Gece ve gündüz", ...Object.keys(TUT).filter((x) => x !== g)], `Bu ifade ${g.toLocaleLowerCase("tr")}nı anlatır.`); }
+    () => { const g = pick(Object.keys(TUT)), d = pick(TUT[g]), o = Object.keys(TUT).find((x) => x !== g); return soru(`Aşağıdakilerden hangisi ${g.toLocaleLowerCase("tr")} için doğrudur?`, d, TUT[o].map((x) => Y(x, "k:Güneş tutulması ile Ay tutulması karıştırıldı")), `${g}: ${d}`); },
+    () => { const g = pick(Object.keys(TUT)), d = pick(TUT[g]); return soru(`"${d}" ifadesi hangi olayı anlatır?`, g, ["Ay'ın evreleri", "Mevsimlerin oluşumu", "Gece ve gündüz", ...Object.keys(TUT).filter((x) => x !== g).map((x) => Y(x, "k:Güneş tutulması ile Ay tutulması karıştırıldı"))], `Bu ifade ${g.toLocaleLowerCase("tr")}nı anlatır.`); }
   ]);
 
   // ---------- Kuvvet ve hareket ----------
@@ -57,15 +57,15 @@
 
   U.f2k2 = tiplerden([
     siniflandir({
-      "dengelenmiş": ["Masanın üzerinde duran kitap", "Tavandan sarkan lamba", "Sabit süratle düz yolda giden araba", "Eşit kuvvetle çekilen ve kıpırdamayan halat", "Rafta duran vazo", "Sabit süratle inen paraşütçü"],
-      "dengelenmemiş": ["Kalkış yapan otobüs", "Frene basılınca yavaşlayan bisiklet", "Tekmeyle harekete geçen top", "Virajı dönen araba", "Yere düşen elma", "Yokuş aşağı hızlanan kızak"]
+      "dengelenmiş": ["Masanın üzerinde duran kitap", "Tavandan sarkan lamba", Y("Sabit süratle düz yolda giden araba", "k:hareket eden her cisme dengelenmemiş kuvvet etki eder sanıldı (sabit süratle düz giden cisimde kuvvetler dengelenmiştir)"), "Eşit kuvvetle çekilen ve kıpırdamayan halat", "Rafta duran vazo", Y("Sabit süratle inen paraşütçü", "k:hareket eden her cisme dengelenmemiş kuvvet etki eder sanıldı (sabit süratle düz giden cisimde kuvvetler dengelenmiştir)")],
+      "dengelenmemiş": ["Kalkış yapan otobüs", "Frene basılınca yavaşlayan bisiklet", "Tekmeyle harekete geçen top", Y("Virajı dönen araba", "k:yön değişikliğinin de hareket değişikliği olduğu gözden kaçtı"), "Yere düşen elma", "Yokuş aşağı hızlanan kızak"]
     }, (g) => `Hangisinde cisme etki eden kuvvetler ${g}tir?`, (d, g) => `${d}: kuvvetler ${g}tir. ${g === "dengelenmiş" ? "Cismin hareket durumu değişmiyor." : "Cismin hareket durumu (sürat ya da yön) değişiyor."}`),
     ifadeler([
       "Dengelenmiş kuvvetlerin bileşkesi sıfırdır.", "Dengelenmiş kuvvetler etkisindeki duran cisim durmaya devam eder.", "Dengelenmemiş kuvvetler cismin süratini değiştirebilir.",
       "Dengelenmemiş kuvvetler cismin yönünü değiştirebilir.", "Sabit süratle düz giden cisme etki eden kuvvetler dengelenmiştir.", "Duran bir cismi harekete geçirmek için dengelenmemiş kuvvet gerekir."
     ], [
-      "Dengelenmiş kuvvetlerin bileşkesi sıfırdan büyüktür.", "Dengelenmiş kuvvetler duran cismi harekete geçirir.", "Dengelenmemiş kuvvetler cismin hareketini hiç değiştirmez.",
-      "Yavaşlayan bir araca etki eden kuvvetler dengelenmiştir.", "Masada duran kitaba hiç kuvvet etki etmez.", "Virajı dönen bir araca etki eden kuvvetler dengelenmiştir."
+      Y("Dengelenmiş kuvvetlerin bileşkesi sıfırdan büyüktür.", "k:dengelenmiş kuvvetlerin bileşkesinin sıfır olduğu bilinmedi"), Y("Dengelenmiş kuvvetler duran cismi harekete geçirir.", "k:dengelenmiş ve dengelenmemiş kuvvetler karıştırıldı"), Y("Dengelenmemiş kuvvetler cismin hareketini hiç değiştirmez.", "k:dengelenmiş ve dengelenmemiş kuvvetler karıştırıldı"),
+      Y("Yavaşlayan bir araca etki eden kuvvetler dengelenmiştir.", "k:yavaşlamanın da dengelenmemiş kuvvetle olduğu bilinmedi"), Y("Masada duran kitaba hiç kuvvet etki etmez.", "k:duran cisme hiç kuvvet etki etmez sanıldı (kuvvetler dengelenmiştir)"), Y("Virajı dönen bir araca etki eden kuvvetler dengelenmiştir.", "k:yön değişikliğinin de hareket değişikliği olduğu gözden kaçtı")
     ], "Kuvvetler")
   ]);
 
@@ -86,14 +86,14 @@
       "sporla üreme": ["şapkalı mantar", "eğrelti otu", "küf mantarı", "kara yosunu"],
       "vejetatif üreme": ["patates yumrusu", "çilek", "söğüt çeliği", "soğan", "menekşe yaprağı"]
     }, (g) => `Hangisi ${g} ile çoğalır?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g} ile çoğalır.`, (d) => `"${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}" hangi yolla çoğalır?`),
-    siniflandir({ "dış döllenme": ["alabalık", "kurbağa", "hamsi", "kurbağa ve balıklar"], "iç döllenme": ["kedi", "tavuk", "kertenkele", "yılan", "inek", "güvercin"] },
+    siniflandir({ "dış döllenme": ["alabalık", "kurbağa", "hamsi", "kurbağa ve balıklar"], "iç döllenme": ["kedi", Y("tavuk", "k:yumurtayla çoğalan hayvanlarda döllenme dışarıda olur sanıldı"), Y("kertenkele", "k:yumurtayla çoğalan hayvanlarda döllenme dışarıda olur sanıldı"), Y("yılan", "k:yumurtayla çoğalan hayvanlarda döllenme dışarıda olur sanıldı"), "inek", Y("güvercin", "k:yumurtayla çoğalan hayvanlarda döllenme dışarıda olur sanıldı")] },
       (g) => `Hangisinde ${g} görülür?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}: ${g}.`),
     ifadeler([
       "Eşeysiz üremede tek ata vardır.", "Eşeyli üremede iki ata vardır.", "Eşeyli üremede döllenme olur.", "Eşeyli üreme çeşitliliği sağlar.",
       "Eşeysiz üremede yavrular atasıyla aynı özelliktedir.", "Tozlaşmada arılar ve rüzgâr rol oynar.", "Döllenmeden sonra çiçekli bitkilerde tohum oluşur.", "Yumurta ve sperm üreme hücreleridir."
     ], [
-      "Eşeysiz üremede döllenme olur.", "Eşeyli üremede yavrular tıpatıp atasının aynısıdır.", "Eşeysiz üremede iki ata gerekir.", "Deniz yıldızı sporla ürer.",
-      "Bütün hayvanlarda dış döllenme görülür.", "Tozlaşma eşeysiz üremedir.", "Kedilerde dış döllenme görülür.", "Bira mayası rejenerasyonla ürer."
+      Y("Eşeysiz üremede döllenme olur.", "k:eşeyli ve eşeysiz üreme karıştırıldı"), Y("Eşeyli üremede yavrular tıpatıp atasının aynısıdır.", "k:eşeyli ve eşeysiz üreme karıştırıldı"), Y("Eşeysiz üremede iki ata gerekir.", "k:eşeyli ve eşeysiz üreme karıştırıldı"), "Deniz yıldızı sporla ürer.",
+      Y("Bütün hayvanlarda dış döllenme görülür.", "k:iç ve dış döllenme karıştırıldı"), Y("Tozlaşma eşeysiz üremedir.", "k:tozlaşmanın eşeyli üremenin bir aşaması olduğu bilinmedi"), Y("Kedilerde dış döllenme görülür.", "k:iç ve dış döllenme karıştırıldı"), "Bira mayası rejenerasyonla ürer."
     ], "Üreme")
   ]);
 
@@ -105,8 +105,8 @@
       "Çimlenme için su gerekir.", "Çimlenme için uygun sıcaklık gerekir.", "Çimlenme için oksijen gerekir.", "İribaş solungaçla solunum yapar.",
       "Kelebekte tam başkalaşım görülür.", "Nimf evresi çekirgede görülür.", "Tırtıl, kelebeğin larva evresidir.", "Tohum çimlenmenin başında kendi besinini kullanır."
     ], [
-      "Çimlenme için mutlaka toprak gerekir.", "Kelebekte nimf evresi vardır.", "Kedi başkalaşım geçirir.", "Kurbağa yumurtadan ergin olarak çıkar.",
-      "Çekirgede pupa evresi vardır.", "Çimlenmenin başında güneş ışığı mutlaka gerekir.", "İribaş karada yaşar.", "Tavukta tam başkalaşım görülür."
+      Y("Çimlenme için mutlaka toprak gerekir.", "k:çimlenme için toprak gerekir sanıldı (su, oksijen ve uygun sıcaklık yeterlidir)"), Y("Kelebekte nimf evresi vardır.", "k:tam ve eksik başkalaşım karıştırıldı"), Y("Kedi başkalaşım geçirir.", "k:her hayvan başkalaşım geçirir sanıldı"), "Kurbağa yumurtadan ergin olarak çıkar.",
+      Y("Çekirgede pupa evresi vardır.", "k:tam ve eksik başkalaşım karıştırıldı"), Y("Çimlenmenin başında güneş ışığı mutlaka gerekir.", "k:tohumun çimlenmenin başında kendi besinini kullandığı bilinmedi"), "İribaş karada yaşar.", Y("Tavukta tam başkalaşım görülür.", "k:her hayvan başkalaşım geçirir sanıldı")
     ], "Büyüme ve gelişme")
   ]);
 
@@ -124,8 +124,8 @@
     "Ergenlikte duygusal değişimler yaşanması normaldir.", "Ergenlik herkeste aynı yaşta başlamayabilir.", "Dengeli beslenme sağlıklı büyümeye yardım eder.", "Yeterli uyku büyüme için önemlidir.",
     "Düzenli spor kasları ve kemikleri güçlendirir.", "Sigara sinir sistemine zarar verir."
   ], [
-    "Ergenlik herkeste tam olarak aynı yaşta başlar.", "Ergenlik değişimleri hastalık belirtisidir.", "Ergenlikte boy kısalır.", "Ergenlik dönemi yetişkinlikten sonra gelir.",
-    "Ergenlik değişimlerini kaslar başlatır.", "Uyku süresinin büyümeye hiçbir etkisi yoktur.", "Ergenlikte kişisel temizliğe gerek yoktur.", "Sağlıklı yaşam için sadece tatlı yemek yeterlidir.",
+    Y("Ergenlik herkeste tam olarak aynı yaşta başlar.", "k:ergenliğin herkeste farklı yaşta başlayabileceği bilinmedi"), Y("Ergenlik değişimleri hastalık belirtisidir.", "k:ergenlik değişimlerinin doğal olduğu bilinmedi"), "Ergenlikte boy kısalır.", "Ergenlik dönemi yetişkinlikten sonra gelir.",
+    Y("Ergenlik değişimlerini kaslar başlatır.", "k:ergenlik değişimlerini hormonların başlattığı bilinmedi"), "Uyku süresinin büyümeye hiçbir etkisi yoktur.", "Ergenlikte kişisel temizliğe gerek yoktur.", "Sağlıklı yaşam için sadece tatlı yemek yeterlidir.",
     "Duygusal değişimler sadece yetişkinlerde görülür.", "Spor yapmak büyümeyi durdurur."
   ], "Ergenlik ve sağlıklı yaşam");
 
@@ -139,14 +139,14 @@
   ]);
 
   U.f4k2 = tiplerden([
-    siniflandir({ "çukur ayna": ["el feneri", "araba farı", "güneş ocağı", "diş hekimi aynası", "makyaj aynası", "projektör"], "tümsek ayna": ["araç yan aynası", "kör kavşak aynası", "market güvenlik aynası", "otopark çıkış aynası"], "düz ayna": ["banyo aynası", "boy aynası", "periskop", "dolap aynası"] },
+    siniflandir({ "çukur ayna": [Y("el feneri", "k:ışığı toplayan ya da paralel yansıtan aynanın çukur ayna olduğu bilinmedi"), Y("araba farı", "k:ışığı toplayan ya da paralel yansıtan aynanın çukur ayna olduğu bilinmedi"), Y("güneş ocağı", "k:ışığı toplayan ya da paralel yansıtan aynanın çukur ayna olduğu bilinmedi"), "diş hekimi aynası", "makyaj aynası", Y("projektör", "k:ışığı toplayan ya da paralel yansıtan aynanın çukur ayna olduğu bilinmedi")], "tümsek ayna": [Y("araç yan aynası", "k:tümsek aynanın geniş görüş alanı sağladığı bilinmedi"), Y("kör kavşak aynası", "k:tümsek aynanın geniş görüş alanı sağladığı bilinmedi"), Y("market güvenlik aynası", "k:tümsek aynanın geniş görüş alanı sağladığı bilinmedi"), "otopark çıkış aynası"], "düz ayna": ["banyo aynası", "boy aynası", "periskop", "dolap aynası"] },
       (g) => `Hangisinde ${g} kullanılır?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}: ${g}.`, (d) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} için hangi ayna kullanılır?`),
     ifadeler([
       "Düz aynada görüntü cisimle aynı boydadır.", "Düz aynada sağ ve sol yer değiştirir.", "Çukur ayna ışığı toplar.", "Tümsek ayna ışığı dağıtır.",
       "Tümsek aynanın görüş alanı geniştir.", "Tümsek aynada görüntü cisimden küçüktür.", "Çukur ayna yakındaki cismi büyük gösterebilir.", "Düz aynada görüntü düzdür."
     ], [
-      "Düz aynada görüntü cisimden büyüktür.", "Tümsek ayna ışığı bir noktada toplar.", "Çukur aynanın görüş alanı tümsek aynadan geniştir.", "Düz aynada görüntü baş aşağıdır.",
-      "Araba farlarında tümsek ayna kullanılır.", "Tümsek ayna görüntüyü büyütür.", "Kavşak aynaları çukur aynadır.", "Güneş ocağında tümsek ayna kullanılır."
+      Y("Düz aynada görüntü cisimden büyüktür.", "k:düz aynada görüntünün cisimle aynı boyda olduğu bilinmedi"), Y("Tümsek ayna ışığı bir noktada toplar.", "k:çukur ve tümsek ayna karıştırıldı"), Y("Çukur aynanın görüş alanı tümsek aynadan geniştir.", "k:çukur ve tümsek ayna karıştırıldı"), Y("Düz aynada görüntü baş aşağıdır.", "k:düz aynada görüntünün düz olduğu bilinmedi"),
+      Y("Araba farlarında tümsek ayna kullanılır.", "k:çukur ve tümsek ayna karıştırıldı"), Y("Tümsek ayna görüntüyü büyütür.", "k:çukur ve tümsek ayna karıştırıldı"), Y("Kavşak aynaları çukur aynadır.", "k:çukur ve tümsek ayna karıştırıldı"), Y("Güneş ocağında tümsek ayna kullanılır.", "k:çukur ve tümsek ayna karıştırıldı")
     ], "Aynalar")
   ]);
 
@@ -169,8 +169,8 @@
       "Beyaz ışık birçok rengin birleşimidir.", "Prizma beyaz ışığı renklerine ayırır.", "Beyaz cisim bütün renkleri yansıtır.", "Siyah cisim bütün renkleri soğurur.",
       "Cisim yansıttığı ışığın renginde görünür.", "Gökkuşağı su damlalarının ışığı ayırmasıyla oluşur.", "Yeşil yaprak beyaz ışığın yeşil kısmını yansıtır."
     ], [
-      "Beyaz ışık tek renktir.", "Siyah cisim bütün renkleri yansıtır.", "Beyaz cisim bütün renkleri soğurur.", "Cisim soğurduğu ışığın renginde görünür.",
-      "Prizma beyaz ışığı tek renge dönüştürür.", "Gökkuşağı ayın ışığıyla oluşur.", "Kırmızı elma kırmızı ışığı soğurur."
+      Y("Beyaz ışık tek renktir.", "k:beyaz ışığın birçok rengin birleşimi olduğu bilinmedi"), Y("Siyah cisim bütün renkleri yansıtır.", "k:beyaz ve siyah cisimlerde yansıtma ile soğurma karıştırıldı"), Y("Beyaz cisim bütün renkleri soğurur.", "k:beyaz ve siyah cisimlerde yansıtma ile soğurma karıştırıldı"), Y("Cisim soğurduğu ışığın renginde görünür.", "k:cisim soğurduğu ışığın renginde görünür sanıldı (yansıttığı ışığın renginde görünür)"),
+      Y("Prizma beyaz ışığı tek renge dönüştürür.", "k:beyaz ışığın birçok rengin birleşimi olduğu bilinmedi"), "Gökkuşağı ayın ışığıyla oluşur.", Y("Kırmızı elma kırmızı ışığı soğurur.", "k:cisim soğurduğu ışığın renginde görünür sanıldı (yansıttığı ışığın renginde görünür)")
     ], "Işık ve renkler")
   ]);
 
@@ -181,23 +181,23 @@
       "Koyu renkli cisimler ışığı daha çok soğurur.", "Açık renkli cisimler ışığı daha çok yansıtır.", "Güneş enerjisi yenilenebilir bir enerji kaynağıdır.",
       "Yazın açık renkli giysiler daha serin tutar.", "Güneş kolektörlerinin içi siyaha boyanır.", "Güneş enerjisi çevreyi kirletmez."
     ], [
-      "Açık renkli cisimler ışığı daha çok soğurur.", "Güneş enerjisi tükenen bir kaynaktır.", "Siyah giysiler yazın en serin giysilerdir.",
-      "Güneş paneli suyu ısıtmak için kullanılır.", "Güneş enerjisi havayı çok kirletir.", "Güneş kolektörlerinin içi beyaza boyanır."
+      Y("Açık renkli cisimler ışığı daha çok soğurur.", "k:koyu renklerin ışığı daha çok soğurduğu bilinmedi"), Y("Güneş enerjisi tükenen bir kaynaktır.", "k:güneş enerjisinin yenilenebilir olduğu bilinmedi"), Y("Siyah giysiler yazın en serin giysilerdir.", "k:koyu renklerin ışığı daha çok soğurduğu bilinmedi"),
+      Y("Güneş paneli suyu ısıtmak için kullanılır.", "k:güneş paneli ile güneş kolektörü karıştırıldı"), "Güneş enerjisi havayı çok kirletir.", Y("Güneş kolektörlerinin içi beyaza boyanır.", "k:koyu renklerin ışığı daha çok soğurduğu bilinmedi")
     ], "Güneş enerjisi")
   ]);
 
   // ---------- Madde ----------
   U.f5k1 = tiplerden([
     siniflandir({
-      "genleşme": ["Yazın elektrik tellerinin sarkması", "Sıcak suya tutulan kapağın gevşemesi", "Termometredeki sıvının yükselmesi", "Güneşte kalan balonun şişmesi", "Yazın raylar arasındaki boşluğun daralması"],
+      "genleşme": ["Yazın elektrik tellerinin sarkması", "Sıcak suya tutulan kapağın gevşemesi", "Termometredeki sıvının yükselmesi", "Güneşte kalan balonun şişmesi", Y("Yazın raylar arasındaki boşluğun daralması", "k:boşluğun daralması büzülme sanıldı (raylar genleştiği için aradaki boşluk daralır)")],
       "büzülme": ["Kışın elektrik tellerinin gerilmesi", "Buzdolabına konan şişirilmiş balonun küçülmesi", "Soğuk havada araba lastiğinin inmesi", "Soğuk havada termometredeki sıvının alçalması"]
     }, (g) => `Hangisi ${g} örneğidir?`, (d, g) => `${d}: ${g}. ${g === "genleşme" ? "Isı alan madde genleşir." : "Isı veren madde büzülür."}`),
     ifadeler([
       "Isı alan maddeler genleşir.", "Isı veren maddeler büzülür.", "Gazlar katılardan daha çok genleşir.", "Köprülerde genleşme aralığı bırakılır.",
       "Farklı katılar farklı miktarda genleşir.", "Buz suyun üzerinde yüzer.", "Genleşmede maddenin tanecikleri birbirinden uzaklaşır."
     ], [
-      "Isı alan maddeler büzülür.", "Katılar gazlardan daha çok genleşir.", "Genleşmede maddenin kütlesi artar.", "Bütün katılar aynı miktarda genleşir.",
-      "Buz suyun dibine batar.", "Genleşmede tanecikler birbirine yaklaşır.", "Elektrik telleri kışın sarkar."
+      Y("Isı alan maddeler büzülür.", "k:genleşme ve büzülme karıştırıldı"), Y("Katılar gazlardan daha çok genleşir.", "k:gazların katılardan daha çok genleştiği bilinmedi"), Y("Genleşmede maddenin kütlesi artar.", "k:genleşmede kütle artar sanıldı (yalnızca hacim artar)"), "Bütün katılar aynı miktarda genleşir.",
+      Y("Buz suyun dibine batar.", "k:buzun yoğunluğunun sudan küçük olduğu bilinmedi"), Y("Genleşmede tanecikler birbirine yaklaşır.", "k:genleşme ve büzülme karıştırıldı"), Y("Elektrik telleri kışın sarkar.", "k:genleşme ve büzülme karıştırıldı (teller yazın genleşip sarkar)")
     ], "Genleşme ve büzülme")
   ]);
 
@@ -214,8 +214,8 @@
       "Saf suyun donma noktası 0 °C'dir.", "Saf su deniz seviyesinde 100 °C'de kaynar.", "Hal değişimi sırasında sıcaklık sabit kalır.", "Erime noktası saf maddeler için ayırt edicidir.",
       "Saf maddede erime ve donma noktası aynıdır.", "Yükseklere çıkıldıkça suyun kaynama noktası düşer.", "Kaynama noktası saf maddeler için ayırt edicidir."
     ], [
-      "Kaynama süresince suyun sıcaklığı artmaya devam eder.", "Saf suyun donma noktası 100 °C'dir.", "Erime noktası donma noktasından her zaman büyüktür.", "Bütün maddeler 100 °C'de kaynar.",
-      "Dağın tepesinde su daha yüksek sıcaklıkta kaynar.", "Kütle saf maddeler için ayırt edici bir özelliktir.", "Erime sırasında sıcaklık sürekli artar."
+      Y("Kaynama süresince suyun sıcaklığı artmaya devam eder.", "k:hâl değişimi sırasında sıcaklığın sabit kaldığı bilinmedi"), Y("Saf suyun donma noktası 100 °C'dir.", "d:donma ve kaynama noktası karıştırıldı"), Y("Erime noktası donma noktasından her zaman büyüktür.", "k:saf maddede erime ve donma noktasının eşit olduğu bilinmedi"), Y("Bütün maddeler 100 °C'de kaynar.", "k:her maddenin kaynama noktası suyunki gibi 100 °C sanıldı"),
+      Y("Dağın tepesinde su daha yüksek sıcaklıkta kaynar.", "k:yükseklere çıkıldıkça kaynama noktasının düştüğü bilinmedi"), Y("Kütle saf maddeler için ayırt edici bir özelliktir.", "k:kütle ayırt edici özellik sanıldı (madde miktarına bağlıdır)"), Y("Erime sırasında sıcaklık sürekli artar.", "k:hâl değişimi sırasında sıcaklığın sabit kaldığı bilinmedi")
     ], "Erime ve kaynama")
   ]);
 
@@ -232,49 +232,49 @@
     "Buzun yoğunluğu suyun yoğunluğundan küçüktür.", "Göller kışın yüzeyden donar.", "Yüzeydeki buz tabakası alttaki suyun donmasını engeller.", "Balıklar yüzme kesesiyle suda yükselip alçalır.",
     "Tuzlu suyun yoğunluğu tatlı sudan büyüktür.", "Isınan havanın yoğunluğu azalır.", "Denizaltılar tanklarına su alarak dalar.", "Lut Gölü'nde insanlar kolayca yüzebilir."
   ], [
-    "Buzun yoğunluğu sudan büyüktür.", "Göller kışın dipten donmaya başlar.", "Balıklar solungaçlarıyla suda yükselip alçalır.", "Tatlı suyun yoğunluğu tuzlu sudan büyüktür.",
-    "Isınan havanın yoğunluğu artar.", "Denizaltılar tanklarındaki suyu boşaltarak dalar.", "Denizde yüzmek havuzda yüzmekten zordur.", "Sıcak hava balonu soğuk hava sayesinde yükselir."
+    Y("Buzun yoğunluğu sudan büyüktür.", "k:buzun yoğunluğunun sudan küçük olduğu bilinmedi"), Y("Göller kışın dipten donmaya başlar.", "k:buz yüzeyde kaldığı için göllerin yüzeyden donduğu bilinmedi"), Y("Balıklar solungaçlarıyla suda yükselip alçalır.", "d:solungaç ile yüzme kesesi karıştırıldı"), Y("Tatlı suyun yoğunluğu tuzlu sudan büyüktür.", "k:tuzlu suyun yoğunluğunun tatlı sudan büyük olduğu bilinmedi"),
+    Y("Isınan havanın yoğunluğu artar.", "k:ısınan havanın yoğunluğunun azaldığı bilinmedi"), Y("Denizaltılar tanklarındaki suyu boşaltarak dalar.", "k:denizaltının tanklarına su alarak daldığı bilinmedi"), Y("Denizde yüzmek havuzda yüzmekten zordur.", "k:tuzlu suyun yoğunluğunun tatlı sudan büyük olduğu bilinmedi"), Y("Sıcak hava balonu soğuk hava sayesinde yükselir.", "k:ısınan havanın yoğunluğunun azaldığı bilinmedi")
   ], "Yoğunluğun canlılar için önemi");
 
   // ---------- Elektrik ----------
   U.f6k1 = siniflandir({
-    "iletken": ["bakır tel", "alüminyum folyo", "demir çivi", "grafit (kalem ucu)", "tuzlu su", "gümüş kaşık", "altın yüzük", "çelik makas"],
+    "iletken": ["bakır tel", "alüminyum folyo", "demir çivi", Y("grafit (kalem ucu)", "k:metal olmayan maddeler elektriği iletmez sanıldı (grafit ve tuzlu su iletkendir)"), Y("tuzlu su", "k:metal olmayan maddeler elektriği iletmez sanıldı (grafit ve tuzlu su iletkendir)"), "gümüş kaşık", "altın yüzük", "çelik makas"],
     "yalıtkan": ["plastik cetvel", "cam bardak", "kuru tahta", "lastik silgi", "porselen tabak", "kâğıt", "yün kazak", "karton"]
   }, (g) => `Hangisi ${g} bir maddedir?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g === "iletken" ? "iletkendir" : "yalıtkandır"}. ${g === "iletken" ? "Devreye bağlanınca ampul yanar." : "Devreye bağlanınca ampul yanmaz."}`);
 
   U.f6k2 = tiplerden([
-    () => { const d = pick([["telin uzunluğu artırılırsa", "artar"], ["telin uzunluğu azaltılırsa", "azalır"], ["telin kalınlığı artırılırsa", "azalır"], ["telin kalınlığı azaltılırsa", "artar"]]); return soru(`Bir devrede ${d[0]} telin direnci nasıl değişir?`, `${d[1].charAt(0).toLocaleUpperCase("tr") + d[1].slice(1)}.`, ["Artar.", "Azalır.", "Değişmez.", "Sıfır olur."].filter((x) => x !== `${d[1].charAt(0).toLocaleUpperCase("tr") + d[1].slice(1)}.`), "Direnç uzunlukla artar, kalınlıkla azalır."); },
-    () => { const d = pick([["devreye seri bağlı pil sayısı artırılırsa", "Artar."], ["devreye seri bağlı ampul sayısı artırılırsa", "Azalır."], ["devredeki direnç artırılırsa", "Azalır."], ["devredeki direnç azaltılırsa", "Artar."], ["devredeki telin uzunluğu artırılırsa", "Azalır."], ["devredeki tel daha kalın bir telle değiştirilirse", "Artar."]]); return soru(`Bir elektrik devresinde ${d[0]} ampulün parlaklığı nasıl değişir?`, d[1], ["Artar.", "Azalır.", "Değişmez.", "Ampul patlar."].filter((x) => x !== d[1]), "Direnç artınca parlaklık azalır; pil sayısı artınca parlaklık artar."); }
+    () => { const d = pick([["telin uzunluğu artırılırsa", "artar", "k:uzun telin direncinin daha büyük olduğu bilinmedi"], ["telin uzunluğu azaltılırsa", "azalır", "k:uzun telin direncinin daha büyük olduğu bilinmedi"], ["telin kalınlığı artırılırsa", "azalır", "k:kalın telin direncinin daha küçük olduğu bilinmedi"], ["telin kalınlığı azaltılırsa", "artar", "k:kalın telin direncinin daha küçük olduğu bilinmedi"]]); return soru(`Bir devrede ${d[0]} telin direnci nasıl değişir?`, `${d[1].charAt(0).toLocaleUpperCase("tr") + d[1].slice(1)}.`, ["Artar.", "Azalır.", "Değişmez.", "Sıfır olur."].filter((x) => x !== `${d[1].charAt(0).toLocaleUpperCase("tr") + d[1].slice(1)}.`).map((x) => x === "Artar." || x === "Azalır." ? Y(x, d[2]) : x), "Direnç uzunlukla artar, kalınlıkla azalır."); },
+    () => { const d = pick([["devreye seri bağlı pil sayısı artırılırsa", "Artar.", "k:pil sayısı artınca parlaklığın arttığı bilinmedi"], ["devreye seri bağlı ampul sayısı artırılırsa", "Azalır.", "k:seri bağlı ampul eklemenin devrenin direncini artırdığı bilinmedi"], ["devredeki direnç artırılırsa", "Azalır.", "k:direnç ile parlaklık arasındaki ters ilişki gözden kaçtı"], ["devredeki direnç azaltılırsa", "Artar.", "k:direnç ile parlaklık arasındaki ters ilişki gözden kaçtı"], ["devredeki telin uzunluğu artırılırsa", "Azalır.", "k:uzun telin direncinin daha büyük olduğu bilinmedi"], ["devredeki tel daha kalın bir telle değiştirilirse", "Artar.", "k:kalın telin direncinin daha küçük olduğu bilinmedi"]]); return soru(`Bir elektrik devresinde ${d[0]} ampulün parlaklığı nasıl değişir?`, d[1], ["Artar.", "Azalır.", "Değişmez.", "Ampul patlar."].filter((x) => x !== d[1]).map((x) => x === "Artar." || x === "Azalır." ? Y(x, d[2]) : x), "Direnç artınca parlaklık azalır; pil sayısı artınca parlaklık artar."); }
   ]);
 
   U.f6k3 = tiplerden([
     siniflandir({ "ayarlanabilir direnç kullanılır": ["radyonun ses ayar düğmesi", "odadaki ışığın şiddetini ayarlayan düğme", "vantilatörün hız ayarı", "uzaktan kumandalı arabanın hız kontrolü"], "ayarlanabilir direnç kullanılmaz": ["plastik cetvel", "cam bardak", "ahşap sandalye", "yün atkı"] },
       (g) => `Hangisinde ${g}?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)}: ${g}.`),
-    () => { const d = pick([["kısalacak", "Daha parlak"], ["uzayacak", "Daha sönük"]]); return soru(`Bir reostanın sürgüsü, akımın geçtiği tel ${d[0]} şekilde kaydırılırsa ampul nasıl yanar?`, d[1], ["Daha parlak", "Daha sönük", "Aynı parlaklıkta", "Hiç yanmaz"].filter((x) => x !== d[1]), d[0] === "kısalacak" ? "Tel kısalınca direnç azalır, ampul parlaklaşır." : "Tel uzayınca direnç artar, ampul sönükleşir."); },
+    () => { const d = pick([["kısalacak", "Daha parlak", "k:tel kısalınca direncin azaldığı bilinmedi"], ["uzayacak", "Daha sönük", "k:tel uzayınca direncin arttığı bilinmedi"]]); return soru(`Bir reostanın sürgüsü, akımın geçtiği tel ${d[0]} şekilde kaydırılırsa ampul nasıl yanar?`, d[1], ["Daha parlak", "Daha sönük", "Aynı parlaklıkta", "Hiç yanmaz"].filter((x) => x !== d[1]).map((x) => x === "Daha parlak" || x === "Daha sönük" ? Y(x, d[2]) : x), d[0] === "kısalacak" ? "Tel kısalınca direnç azalır, ampul parlaklaşır." : "Tel uzayınca direnç artar, ampul sönükleşir."); },
     ifadeler([
       "Reosta, direnci değiştirilebilen bir devre elemanıdır.", "Reostada sürgü hareket ettirilerek telin uzunluğu değiştirilir.", "Reostanın direnci artarsa ampul sönükleşir.",
       "Reostanın direnci azalırsa ampul parlaklaşır.", "Ses ayar düğmeleri ayarlanabilir dirençle çalışır.", "Dimmer düğmesi ışığın şiddetini ayarlar.", "Vantilatörün hız ayarında ayarlanabilir direnç kullanılabilir."
     ], [
-      "Reostanın direnci hiç değişmez.", "Reosta elektrik üreten bir devre elemanıdır.", "Reostanın direnci artarsa ampul daha parlak yanar.",
-      "Reostada telin uzunluğu direnci etkilemez.", "Reosta yalnızca ampulü açıp kapatmaya yarar.", "Ayarlanabilir direnç sadece pillerde bulunur.", "Reosta yalıtkan bir maddeden yapılır."
+      "Reostanın direnci hiç değişmez.", Y("Reosta elektrik üreten bir devre elemanıdır.", "k:reosta ile pil (üreteç) karıştırıldı"), Y("Reostanın direnci artarsa ampul daha parlak yanar.", "k:direnç ile parlaklık arasındaki ters ilişki gözden kaçtı"),
+      Y("Reostada telin uzunluğu direnci etkilemez.", "k:telin uzunluğunun direnci etkilediği bilinmedi"), "Reosta yalnızca ampulü açıp kapatmaya yarar.", "Ayarlanabilir direnç sadece pillerde bulunur.", "Reosta yalıtkan bir maddeden yapılır."
     ], "Ayarlanabilir direnç")
   ]);
 
   // ---------- Sürdürülebilir yaşam ----------
   U.f7k1 = tiplerden([
-    siniflandir({ "biyoçeşitliliği tehdit eder": ["orman yangınları", "kaçak avlanma", "sulak alanların kurutulması", "çevre kirliliği", "istilacı türlerin yayılması", "yaşam alanlarına yol ve bina yapılması"], "biyoçeşitliliği korur": ["milli park kurulması", "av yasakları", "tohum gen bankası", "ağaçlandırma", "koruma altına alınan sulak alanlar", "nesli tehlikedeki türlerin üretilmesi"] },
+    siniflandir({ "biyoçeşitliliği tehdit eder": ["orman yangınları", "kaçak avlanma", "sulak alanların kurutulması", "çevre kirliliği", Y("istilacı türlerin yayılması", "k:yeni türlerin gelmesi biyoçeşitliliği artırır sanıldı"), "yaşam alanlarına yol ve bina yapılması"], "biyoçeşitliliği korur": ["milli park kurulması", "av yasakları", "tohum gen bankası", "ağaçlandırma", "koruma altına alınan sulak alanlar", "nesli tehlikedeki türlerin üretilmesi"] },
       (g) => `Hangisi ${g}?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g}.`),
     ifadeler([
       "Endemik türler yalnızca belli bir bölgede yaşar.", "Ters lale Türkiye'ye özgü bir bitkidir.", "Türkiye biyoçeşitlilik bakımından zengindir.", "Bir türün yok olması besin zincirini etkiler.",
       "Milli parklar canlıları korumak için kurulur.", "Aşırı avlanma biyoçeşitliliği azaltır."
     ], [
-      "Endemik türler bütün dünyada yaşar.", "Biyoçeşitlilik doğa için önemsizdir.", "Orman yangınları biyoçeşitliliği artırır.", "Bir türün yok olması diğer canlıları hiç etkilemez.",
+      Y("Endemik türler bütün dünyada yaşar.", "k:endemik türün yalnızca belli bir bölgede yaşadığı bilinmedi"), "Biyoçeşitlilik doğa için önemsizdir.", "Orman yangınları biyoçeşitliliği artırır.", Y("Bir türün yok olması diğer canlıları hiç etkilemez.", "k:canlıların besin zinciriyle birbirine bağlı olduğu bilinmedi"),
       "Van kedisi Avustralya'ya özgüdür.", "Kaçak avlanma canlıları korur."
     ], "Biyoçeşitlilik")
   ]);
 
   U.f7k2 = tiplerden([
-    siniflandir({ "yenilenebilir": ["güneş enerjisi", "rüzgâr enerjisi", "hidroelektrik (akarsu) enerjisi", "jeotermal enerji", "dalga enerjisi"], "yenilenemez": ["kömür", "petrol", "doğal gaz", "benzin"] },
+    siniflandir({ "yenilenebilir": ["güneş enerjisi", "rüzgâr enerjisi", "hidroelektrik (akarsu) enerjisi", "jeotermal enerji", "dalga enerjisi"], "yenilenemez": ["kömür", "petrol", Y("doğal gaz", "k:adı 'doğal' olan kaynak yenilenebilir sanıldı (doğal gaz fosil yakıttır)"), "benzin"] },
       (g) => `Hangisi ${g} bir enerji kaynağıdır?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g} bir enerji kaynağıdır.`),
     siniflandir({ "çevreyi korur": ["atıkları ayrıştırıp geri dönüşüme vermek", "toplu taşıma kullanmak", "dişlerini fırçalarken musluğu kapatmak", "boş odada ışığı kapatmak", "bez çanta kullanmak", "ağaç dikmek", "damla sulama yapmak"], "çevreye zarar verir": ["çöpleri doğaya atmak", "gereksiz yere ışıkları açık bırakmak", "atık yağı lavaboya dökmek", "kısa mesafede bile araba kullanmak", "anızları yakmak", "ormanları kesmek"] },
       (g) => `Hangi davranış ${g}?`, (d, g) => `${d.charAt(0).toLocaleUpperCase("tr") + d.slice(1)} ${g}.`)

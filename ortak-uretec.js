@@ -9,6 +9,11 @@ window.UR = (function () {
   // doğru şık + yanlış şık havuzundan 3 benzersiz yanlış seçer
   // Yanılgı etiketli yanlış şık (A4): Y(değer, "d:...") dikkat hatası, Y(değer, "k:...") kavram yanılgısı
   const Y = (v, e) => ({ v, e });
+  // Bankalardaki öğe düz metin ya da Y(metin, etiket) olabilir: yv metni verir, yb baş harfi büyütüp etiketi korur.
+  // siniflandir'da Y ile işaretlenen öğe başka grubun sorusunda çeldirici olunca etiketiyle gelir;
+  // ifadeler'de Y ile işaretlenen yanlış ifade "Hangisi doğrudur?" sorusunda etiketiyle gelir.
+  const yv = (x) => (x && typeof x === "object" ? x.v : x);
+  const yb = (x) => (x && typeof x === "object" ? Y(buyuk(x.v), x.e) : buyuk(x));
   function soru(metin, dogru, havuz, cozum) {
     const s = [String(dogru)], yan = {};
     for (const x of karistir(havuz)) {
@@ -38,12 +43,12 @@ window.UR = (function () {
   function siniflandir(gruplar, sorF, cozumF, grupSorF) {
     const adlar = Object.keys(gruplar);
     const tip = [() => {
-      const g = pick(adlar), d = pick(gruplar[g]);
+      const g = pick(adlar), d = yv(pick(gruplar[g]));
       const diger = adlar.filter((x) => x !== g).flatMap((x) => gruplar[x]);
-      return soru(sorF(g), buyuk(d), diger.map(buyuk), cozumF(d, g));
+      return soru(sorF(g), buyuk(d), diger.map(yb), cozumF(d, g));
     }];
     if (grupSorF && adlar.length >= 4) tip.push(() => {
-      const g = pick(adlar), d = pick(gruplar[g]);
+      const g = pick(adlar), d = yv(pick(gruplar[g]));
       return soru(grupSorF(d), buyuk(g), adlar.filter((x) => x !== g).map(buyuk), cozumF(d, g));
     });
     return tiplerden(tip);
@@ -53,8 +58,8 @@ window.UR = (function () {
   function ifadeler(dogrular, yanlislar, konu) {
     const k = konu ? konu + " ile ilgili " : "";
     return tiplerden([
-      () => { const d = pick(dogrular); return soru(`${buyuk(k)}hangisi doğrudur?`, d, yanlislar, `Doğru ifade: "${d}"`); },
-      () => { const y = pick(yanlislar); return soru(`${buyuk(k)}hangisi yanlıştır?`, y, dogrular, `"${y}" ifadesi yanlıştır.`); }
+      () => { const d = yv(pick(dogrular)); return soru(`${buyuk(k)}hangisi doğrudur?`, d, yanlislar, `Doğru ifade: "${d}"`); },
+      () => { const y = yv(pick(yanlislar)); return soru(`${buyuk(k)}hangisi yanlıştır?`, y, dogrular, `"${y}" ifadesi yanlıştır.`); }
     ]);
   }
 
