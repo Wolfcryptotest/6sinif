@@ -146,7 +146,7 @@
             if (!ok) { secilen = s.secenekler[asil]; teshis = window.USTALIK && USTALIK.hataKaydet ? USTALIK.hataKaydet({ ...s, konuId: k.id }, secilen) : null; yanlisaEkle(); }
           }
           if (ok) {
-            if (deneme === 1) dogru++;
+            if (deneme === 1 && !s.benzer) dogru++; // benzer sorular ek alıştırmadır; d/n yalnızca ana sorulardan sayılır
             btns.forEach((x) => (x.disabled = true)); b.classList.add("dogru");
             $("odAlt").innerHTML = `<div class="cozum"><b>${deneme === 1 ? ["✅ Doğru!", "✅ Harika!", "✅ Aferin!"][i % 3] : "✅ İpucuyla buldun, aferin! Bu tür soruyu bir dahaki sefere ilk denemede yaparsın."}</b><div style="margin-top:6px">${esc(s.cozum || "")}</div>${s.ceviri ? `<div class="ek-satir"><b>Türkçesi:</b> ${esc(s.ceviri)}</div>` : ""}</div>
               <button class="btn od-ileri" id="odIleri">${i + 1 < liste.length ? "Sonraki soru →" : "Dersi bitir →"}</button>`;

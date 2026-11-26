@@ -109,7 +109,7 @@
       html: `📋 <b>Bugünkü çalışma planın</b>:<br>${plan.map((p, i) => `${i + 1}. <b>${esc(p.ad)}</b> <small>(${esc(p.neden)})</small>`).join("<br>")}` +
         `<br><br>🎯 Günlük hedefin <b>${S.goal}</b> soru; bugün ${bugun} çözdün${kalan ? `, <b>${kalan}</b> soru kaldı` : ", hedefe ulaştın! 🎉"}.` +
         `<br><small>Yeni konuda önce videoyu izle, “İzledim”e dokun, sonra Soru çöz. 25 dakika çalış, 5 dakika ara ver (Araçlar › Pomodoro). 🦉</small>`,
-      btn: plan.map((p) => p.btn)
+      btn: [...(window.YKS_OZEL && YKS_OZEL.bugunku() ? [["🎓 Bugünkü dersim", "YKS_OZEL.ac()"]] : []), ...plan.map((p) => p.btn)]
     };
   }
 
