@@ -13,7 +13,12 @@ window.UR = (function () {
   // siniflandir'da Y ile işaretlenen öğe başka grubun sorusunda çeldirici olunca etiketiyle gelir;
   // ifadeler'de Y ile işaretlenen yanlış ifade "Hangisi doğrudur?" sorusunda etiketiyle gelir.
   const yv = (x) => (x && typeof x === "object" ? x.v : x);
-  const yb = (x) => (x && typeof x === "object" ? Y(buyuk(x.v), x.e) : buyuk(x));
+  // Etiket bir fonksiyon da olabilir (siniflandir): e(sorulanGrup) → o soruya özgü etiket ya da null.
+  const yb = (x, g) => {
+    if (!(x && typeof x === "object")) return buyuk(x);
+    const e = typeof x.e === "function" ? x.e(g) : x.e;
+    return e ? Y(buyuk(x.v), e) : buyuk(x.v);
+  };
   function soru(metin, dogru, havuz, cozum) {
     const s = [String(dogru)], yan = {};
     for (const x of karistir(havuz)) {
@@ -45,7 +50,7 @@ window.UR = (function () {
     const tip = [() => {
       const g = pick(adlar), d = yv(pick(gruplar[g]));
       const diger = adlar.filter((x) => x !== g).flatMap((x) => gruplar[x]);
-      return soru(sorF(g), buyuk(d), diger.map(yb), cozumF(d, g));
+      return soru(sorF(g), buyuk(d), diger.map((x) => yb(x, g)), cozumF(d, g));
     }];
     if (grupSorF && adlar.length >= 4) tip.push(() => {
       const g = pick(adlar), d = yv(pick(gruplar[g]));

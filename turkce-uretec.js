@@ -1,6 +1,13 @@
 // 6. sınıf Türkçe soru üreteçleri (ortak-uretec.js'ten sonra yüklenir)
 (function () {
-  const U = window.URETEC, { r, pick, karistir, buyuk, soru, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
+  const U = window.URETEC, { r, pick, karistir, buyuk, soru, Y, tiplerden, eslestir, siniflandir, ifadeler } = window.UR;
+
+  // ---------- Yanılgı etiketleri (A4) ----------
+  // KAR("edat", "bağlaç") → "k:bağlaç ile edat karıştırıldı" (sıra sabit, karnede aynı yanılgı tek satırda toplanır)
+  const KAR = (a, b) => `k:${[a, b].sort((p, q) => p.localeCompare(q, "tr")).join(" ile ")} karıştırıldı`;
+  // siniflandir bankasındaki her öğeye, sorulan gruba göre "<sorulan> ile <kendi grubu> karıştırıldı" etiketi
+  const grupla = (gruplar, ad = (g) => g) => Object.fromEntries(Object.entries(gruplar).map(([g, l]) => [g, l.map((v) => Y(v, (sorulan) => KAR(ad(sorulan), ad(g))))]));
+  const tumu = (liste, e) => liste.map((v) => Y(v, e));
 
   // ---------- Gerçek / mecaz / terim ----------
   // [cümle, sözcük, tür]
@@ -23,8 +30,8 @@
   ];
   const ANLAM_AD = { gerçek: "gerçek anlamda", mecaz: "mecaz anlamda", terim: "terim anlamda" };
   U.tr1k1 = tiplerden([
-    () => { const [c, s, t] = pick(ANLAM); return soru(`"${c}" cümlesinde "${s}" sözcüğü hangi anlamda kullanılmıştır?`, buyuk(ANLAM_AD[t].replace("anlamda", "anlam")), ["Gerçek anlam", "Mecaz anlam", "Terim anlam", "Zıt anlam", "Eş anlam"], `"${s}" sözcüğü bu cümlede ${ANLAM_AD[t]} kullanılmıştır.`); },
-    () => { const isaretle = (c, s) => c.replace(new RegExp(s, "i"), '"$&"'); const t = pick(["gerçek", "mecaz", "terim"]), [c, s] = pick(ANLAM.filter((x) => x[2] === t)); return soru(`Hangi cümlede tırnak içindeki sözcük ${ANLAM_AD[t]} kullanılmıştır?`, isaretle(c, s), ANLAM.filter((x) => x[2] !== t).map(([c2, s2]) => isaretle(c2, s2)), `"${s}" sözcüğü bu cümlede ${ANLAM_AD[t]} kullanılmıştır.`); }
+    () => { const [c, s, t] = pick(ANLAM); return soru(`"${c}" cümlesinde "${s}" sözcüğü hangi anlamda kullanılmıştır?`, buyuk(ANLAM_AD[t].replace("anlamda", "anlam")), [...["gerçek", "mecaz", "terim"].filter((x) => x !== t).map((x) => Y(buyuk(x) + " anlam", KAR(t + " anlam", x + " anlam"))), ...tumu(["Zıt anlam", "Eş anlam"], "k:sözcüğün cümledeki anlamı ile sözcükler arası anlam ilişkisi (eş/zıt anlam) karıştırıldı")], `"${s}" sözcüğü bu cümlede ${ANLAM_AD[t]} kullanılmıştır.`); },
+    () => { const isaretle = (c, s) => c.replace(new RegExp(s, "i"), '"$&"'); const t = pick(["gerçek", "mecaz", "terim"]), [c, s] = pick(ANLAM.filter((x) => x[2] === t)); return soru(`Hangi cümlede tırnak içindeki sözcük ${ANLAM_AD[t]} kullanılmıştır?`, isaretle(c, s), ANLAM.filter((x) => x[2] !== t).map(([c2, s2, t2]) => Y(isaretle(c2, s2), KAR(t + " anlam", t2 + " anlam"))), `"${s}" sözcüğü bu cümlede ${ANLAM_AD[t]} kullanılmıştır.`); }
   ]);
 
   // ---------- Eş / zıt / eş sesli ----------
@@ -41,14 +48,18 @@
     ["ekmek", [["yiyecek", "Fırından taze ekmek aldım."], ["toprağa tohum atmak", "Dedem tarlaya buğday ekmek istiyor."]]],
     ["ben", [["kişi zamiri", "Bu resmi ben çizdim."], ["deride bulunan leke", "Yanağında küçük bir ben var."]]]
   ];
+  const ES_ZIT = "k:eş anlam ile zıt anlam karıştırıldı";
+  // x'in öbür bankadaki eşi (ör. eş anlam sorusunda "yaşlı"nın zıt anlamlısı "genç") etiketli çeldirici olarak öne alınır
+  const es = (banka, x) => banka.filter((p) => p.includes(x)).map((p) => p[0] === x ? p[1] : p[0]);
+  const esHavuz = (x, y, oteki) => { const t = es(oteki, x).filter((w) => w !== y); return [...t.map((w) => Y(w, ES_ZIT)), ...karistir([...ZIT.flat(), ...ES.flat()].filter((w) => w !== x && w !== y && !t.includes(w))).slice(0, 5 - t.length)]; };
   U.tr1k2 = tiplerden([
-    () => { const [a, b] = pick(ES), [x, y] = karistir([a, b]); return soru(`"${x}" sözcüğünün eş anlamlısı hangisidir?`, y, [...ZIT.flat(), ...ES.flat()].filter((w) => w !== x && w !== y), `${x} – ${y} eş anlamlıdır.`); },
-    () => { const [a, b] = pick(ZIT), [x, y] = karistir([a, b]); return soru(`"${x}" sözcüğünün zıt anlamlısı hangisidir?`, y, [...ES.flat(), ...ZIT.flat()].filter((w) => w !== x && w !== y), `${x} – ${y} zıt anlamlıdır.`); },
-    () => { const d = pick(ES); return soru("Hangisinde eş anlamlı sözcükler bir arada verilmiştir?", d.join(" – "), karistir(ZIT).slice(0, 5).map((z) => z.join(" – ")), `${d.join(" – ")} aynı anlama gelir.`); },
-    () => { const d = pick(ZIT); return soru("Hangisinde zıt anlamlı sözcükler bir arada verilmiştir?", d.join(" – "), karistir(ES).slice(0, 5).map((z) => z.join(" – ")), `${d.join(" – ")} anlamca birbirinin karşıtıdır.`); },
+    () => { const [a, b] = pick(ES), [x, y] = karistir([a, b]); return soru(`"${x}" sözcüğünün eş anlamlısı hangisidir?`, y, esHavuz(x, y, ZIT), `${x} – ${y} eş anlamlıdır.`); },
+    () => { const [a, b] = pick(ZIT), [x, y] = karistir([a, b]); return soru(`"${x}" sözcüğünün zıt anlamlısı hangisidir?`, y, esHavuz(x, y, ES), `${x} – ${y} zıt anlamlıdır.`); },
+    () => { const d = pick(ES); return soru("Hangisinde eş anlamlı sözcükler bir arada verilmiştir?", d.join(" – "), karistir(ZIT).slice(0, 5).map((z) => Y(z.join(" – "), ES_ZIT)), `${d.join(" – ")} aynı anlama gelir.`); },
+    () => { const d = pick(ZIT); return soru("Hangisinde zıt anlamlı sözcükler bir arada verilmiştir?", d.join(" – "), karistir(ES).slice(0, 5).map((z) => Y(z.join(" – "), ES_ZIT)), `${d.join(" – ")} anlamca birbirinin karşıtıdır.`); },
     () => {
       const [k, an] = pick(ESSES), [anlam, cumle] = pick(an);
-      const yan = [...an.filter((x) => x[0] !== anlam).map((x) => x[0]), ...karistir(ESSES.filter((x) => x[0] !== k)).flatMap((x) => x[1].map((y) => y[0]))];
+      const yan = [...an.filter((x) => x[0] !== anlam).map((x) => Y(x[0], "k:eş sesli sözcüğün bu cümledeki anlamına bakılmadı")), ...karistir(ESSES.filter((x) => x[0] !== k)).flatMap((x) => x[1].map((y) => y[0]))];
       return soru(`"${cumle}" cümlesinde "${k}" sözcüğü hangi anlamda kullanılmıştır?`, anlam, yan.slice(0, 5), `Bu cümlede "${k}": ${anlam}. "${k}" eş sesli bir sözcüktür; başka cümlelerde ${an.filter((x) => x[0] !== anlam).map((x) => x[0]).join(", ")} anlamına da gelir.`);
     }
   ]);
@@ -59,15 +70,15 @@
   U.tr1k3 = tiplerden([
     eslestir(DEYIM, (a) => `"${buyuk(a)}" deyiminin anlamı hangisidir?`, (b) => `"${buyuk(b)}" anlamına gelen deyim hangisidir?`, (a, b) => `${buyuk(a)}: ${b}.`),
     () => { const [a, b] = pick(ATA); return soru(`"${a}" atasözünün anlamı hangisidir?`, b, ATA.map((x) => x[1]).filter((x) => x !== b), `${a} → ${b}`); },
-    () => { const [a] = pick(ATA); return soru("Hangisi bir atasözüdür?", a, DEYIM.map((x) => buyuk(x[0])), "Atasözleri öğüt verir ya da genel bir yargı bildirir; deyimler ise bir durumu anlatır."); },
-    () => { const [a] = pick(DEYIM); return soru("Hangisi bir deyimdir?", buyuk(a), ATA.map((x) => x[0]), "Deyimler bir durumu anlatır, öğüt vermez."); }
+    () => { const [a] = pick(ATA); return soru("Hangisi bir atasözüdür?", a, DEYIM.map((x) => Y(buyuk(x[0]), "k:deyim ile atasözü karıştırıldı")), "Atasözleri öğüt verir ya da genel bir yargı bildirir; deyimler ise bir durumu anlatır."); },
+    () => { const [a] = pick(DEYIM); return soru("Hangisi bir deyimdir?", buyuk(a), ATA.map((x) => Y(x[0], "k:deyim ile atasözü karıştırıldı")), "Deyimler bir durumu anlatır, öğüt vermez."); }
   ]);
 
   // ---------- İsimler ----------
   U.tr2k1 = tiplerden([
-    siniflandir({ "soyut": ["sevgi", "korku", "umut", "mutluluk", "akıl", "özlem", "cesaret", "düşünce", "merak", "hayal"], "somut": ["masa", "su", "ses", "koku", "kalem", "hava", "rüzgâr", "ağaç", "ekmek", "duman"] }, (g) => `Hangisi ${g} bir isimdir?`, (d, g) => `${buyuk(d)} ${g === "soyut" ? "duyularla algılanamaz, soyut" : "duyularla algılanabilir, somut"} bir isimdir.`),
-    siniflandir({ "özel": ["Ankara", "Elif", "Karadeniz", "Türkçe", "Fırat", "Ağrı Dağı", "Van Gölü", "Atatürk"], "cins": ["şehir", "kız", "deniz", "dil", "nehir", "dağ", "göl", "öğretmen"] }, (g) => `Hangisi ${g} isimdir?`, (d, g) => `${buyuk(d)} ${g === "özel" ? "tek olan bir varlığın adıdır; özel isimdir" : "aynı türden varlıkların ortak adıdır; cins isimdir"}.`),
-    siniflandir({ "topluluk": ["ordu", "sürü", "takım", "aile", "koro", "millet", "kurul", "deste"], "topluluk olmayan": ["asker", "koyun", "oyuncu", "anne", "şarkıcı", "kalemler", "çocuklar", "ağaç"] }, (g) => g === "topluluk" ? "Hangisi bir topluluk ismidir?" : "Hangisi topluluk ismi değildir?", (d, g) => `${buyuk(d)} ${g === "topluluk" ? "birçok varlığı anlatır ama tekildir; topluluk ismidir" : "topluluk ismi değildir"}.`)
+    siniflandir({ "soyut": tumu(["sevgi", "korku", "umut", "mutluluk", "akıl", "özlem", "cesaret", "düşünce", "merak", "hayal"], "k:soyut ve somut isimler karıştırıldı"), "somut": [...tumu(["masa", "su", "kalem", "ağaç", "ekmek"], "k:soyut ve somut isimler karıştırıldı"), ...tumu(["ses", "koku", "hava", "rüzgâr", "duman"], "k:görülmese de duyularla algılanan (ses, koku, hava) varlıkların somut olduğu bilinmedi")] }, (g) => `Hangisi ${g} bir isimdir?`, (d, g) => `${buyuk(d)} ${g === "soyut" ? "duyularla algılanamaz, soyut" : "duyularla algılanabilir, somut"} bir isimdir.`),
+    siniflandir(grupla({ "özel": ["Ankara", "Elif", "Karadeniz", "Türkçe", "Fırat", "Ağrı Dağı", "Van Gölü", "Atatürk"], "cins": ["şehir", "kız", "deniz", "dil", "nehir", "dağ", "göl", "öğretmen"] }, (g) => g + " isim"), (g) => `Hangisi ${g} isimdir?`, (d, g) => `${buyuk(d)} ${g === "özel" ? "tek olan bir varlığın adıdır; özel isimdir" : "aynı türden varlıkların ortak adıdır; cins isimdir"}.`),
+    siniflandir({ "topluluk": tumu(["ordu", "sürü", "takım", "aile", "koro", "millet", "kurul", "deste"], "k:topluluk isminin tekil hâlde de bir topluluğu anlattığı bilinmedi"), "topluluk olmayan": [...tumu(["asker", "koyun", "oyuncu", "anne", "şarkıcı", "ağaç"], "k:topluluğu oluşturan tek varlığın adı topluluk ismi sanıldı"), ...tumu(["kalemler", "çocuklar"], "k:çoğul isim ile topluluk ismi karıştırıldı")] }, (g) => g === "topluluk" ? "Hangisi bir topluluk ismidir?" : "Hangisi topluluk ismi değildir?", (d, g) => `${buyuk(d)} ${g === "topluluk" ? "birçok varlığı anlatır ama tekildir; topluluk ismidir" : "topluluk ismi değildir"}.`)
   ]);
 
   // ---------- Sıfatlar ----------
@@ -81,9 +92,12 @@
   };
   const SIFATLAR = Object.entries(SIFAT).flatMap(([t, l]) => l.map((x) => [...x, t]));
   U.tr2k2 = tiplerden([
-    () => { const [c, s, diger] = pick(SIFATLAR); return soru(`"${c}" cümlesindeki sıfat hangisidir?`, s.toLocaleLowerCase("tr"), diger.map((x) => x.toLocaleLowerCase("tr")), `"${s.toLocaleLowerCase("tr")}" sözcüğü kendinden sonraki ismi belirtiyor; sıfattır.`); },
-    () => { const [c, s, , t] = pick(SIFATLAR); return soru(`"${c}" cümlesindeki "${s.toLocaleLowerCase("tr")}" sözcüğü hangi tür sıfattır?`, buyuk(t), Object.keys(SIFAT).map(buyuk), `"${s.toLocaleLowerCase("tr")}" ${t === "belgisiz sıfat" ? "belgisiz sıfattır" : t + "dır"}.`); },
-    () => { const t = pick(Object.keys(SIFAT)), [c] = pick(SIFAT[t]); return soru(`Hangi cümlede ${t} vardır?`, c, SIFATLAR.filter((x) => x[3] !== t).map((x) => x[0]), `"${c}" cümlesinde ${t} kullanılmıştır.`); }
+    () => {
+      const [c, s, diger] = pick(SIFATLAR), kel = c.replace(/[.,?!]/g, "").split(" "), i = kel.indexOf(s.split(" ").pop()), isim = (kel[i + 1] || "").toLocaleLowerCase("tr");
+      return soru(`"${c}" cümlesindeki sıfat hangisidir?`, s.toLocaleLowerCase("tr"), diger.map((x) => x.toLocaleLowerCase("tr")).map((x) => (x === isim ? Y(x, "k:sıfat ile nitelediği (belirttiği) isim karıştırıldı") : x)), `"${s.toLocaleLowerCase("tr")}" sözcüğü kendinden sonraki ismi belirtiyor; sıfattır.`);
+    },
+    () => { const [c, s, , t] = pick(SIFATLAR); return soru(`"${c}" cümlesindeki "${s.toLocaleLowerCase("tr")}" sözcüğü hangi tür sıfattır?`, buyuk(t), Object.keys(SIFAT).filter((x) => x !== t).map((x) => Y(buyuk(x), KAR(t, x))), `"${s.toLocaleLowerCase("tr")}" ${t === "belgisiz sıfat" ? "belgisiz sıfattır" : t + "dır"}.`); },
+    () => { const t = pick(Object.keys(SIFAT)), [c] = pick(SIFAT[t]); return soru(`Hangi cümlede ${t} vardır?`, c, SIFATLAR.filter((x) => x[3] !== t).map((x) => Y(x[0], KAR(t, x[3]))), `"${c}" cümlesinde ${t} kullanılmıştır.`); }
   ]);
 
   // ---------- Zamirler ----------
@@ -94,40 +108,45 @@
     "soru zamiri": ["Kim kapıyı çaldı?", "Kimi arıyorsun?", "Neyi unuttun?", "Hangisini seçtin?", "Kaçını okudun?"]
   };
   const ISARET_SIFAT = ["Bu kitap çok güzel.", "Şu ağacın altında dinlenelim.", "O çocuk sınıfımıza yeni geldi.", "Bu sokak çok sessiz.", "Şu kalemi bana verir misin?"];
+  const ISZ = "k:işaret sıfatı ile işaret zamiri karıştırıldı (ismin önündeyse sıfat, ismin yerindeyse zamirdir)";
   U.tr2k3 = tiplerden([
-    () => { const t = pick(Object.keys(ZAMIR)), c = pick(ZAMIR[t]); return soru(`Hangi cümlede ${t} vardır?`, c, Object.keys(ZAMIR).filter((x) => x !== t).flatMap((x) => ZAMIR[x]), `"${c}" cümlesinde ${t} kullanılmıştır.`); },
-    () => { const t = pick(Object.keys(ZAMIR)), c = pick(ZAMIR[t]); return soru(`"${c}" cümlesindeki zamir hangi türdendir?`, buyuk(t), Object.keys(ZAMIR).map(buyuk), `Bu cümlede ${t} vardır.`); },
-    () => { const c = pick(ZAMIR["işaret zamiri"]); return soru("Hangi cümlede işaret sözcüğü zamir olarak kullanılmıştır?", c, ISARET_SIFAT, "'Bu, şu, o' bir ismin önünde ise sıfat, ismin yerine tek başına kullanılmışsa zamirdir."); },
-    () => { const c = pick(ISARET_SIFAT); return soru("Hangi cümlede işaret sözcüğü sıfat olarak kullanılmıştır?", c, ZAMIR["işaret zamiri"], "'Bu, şu, o' bir ismin önünde kullanılırsa işaret sıfatı olur."); }
+    () => { const t = pick(Object.keys(ZAMIR)), c = pick(ZAMIR[t]); return soru(`Hangi cümlede ${t} vardır?`, c, Object.keys(ZAMIR).filter((x) => x !== t).flatMap((x) => ZAMIR[x].map((y) => Y(y, KAR(t, x)))), `"${c}" cümlesinde ${t} kullanılmıştır.`); },
+    () => { const t = pick(Object.keys(ZAMIR)), c = pick(ZAMIR[t]); return soru(`"${c}" cümlesindeki zamir hangi türdendir?`, buyuk(t), Object.keys(ZAMIR).filter((x) => x !== t).map((x) => Y(buyuk(x), KAR(t, x))), `Bu cümlede ${t} vardır.`); },
+    () => { const c = pick(ZAMIR["işaret zamiri"]); return soru("Hangi cümlede işaret sözcüğü zamir olarak kullanılmıştır?", c, tumu(ISARET_SIFAT, ISZ), "'Bu, şu, o' bir ismin önünde ise sıfat, ismin yerine tek başına kullanılmışsa zamirdir."); },
+    () => { const c = pick(ISARET_SIFAT); return soru("Hangi cümlede işaret sözcüğü sıfat olarak kullanılmıştır?", c, tumu(ZAMIR["işaret zamiri"], ISZ), "'Bu, şu, o' bir ismin önünde kullanılırsa işaret sıfatı olur."); }
   ]);
 
   // ---------- Edat, bağlaç, ünlem ----------
   U.tr2k4 = tiplerden([
-    siniflandir({ "edat": ["gibi", "için", "kadar", "göre", "beri", "doğru", "üzere", "karşı"], "bağlaç": ["ve", "ama", "fakat", "çünkü", "veya", "ya da", "ancak", "yoksa"], "ünlem": ["Eyvah", "Yaşasın", "Ah", "Of", "Hey", "Aferin", "Vay"] },
+    siniflandir(grupla({ "edat": ["gibi", "için", "kadar", "göre", "beri", "doğru", "üzere", "karşı"], "bağlaç": ["ve", "ama", "fakat", "çünkü", "veya", "ya da", "ancak", "yoksa"], "ünlem": ["Eyvah", "Yaşasın", "Ah", "Of", "Hey", "Aferin", "Vay"] }),
       (g) => `Hangisi ${g === "edat" ? "bir edattır" : g === "bağlaç" ? "bir bağlaçtır" : "bir ünlemdir"}?`, (d, g) => `"${d}" bir ${g}${g === "edat" ? "tır" : g === "bağlaç" ? "tır" : "dir"}.`),
-    siniflandir({ "edat": ["Aslan gibi güçlüydü.", "Senin için çiçek aldım.", "Akşama kadar ders çalıştık.", "Sabahtan beri yağmur yağıyor.", "Bana göre en güzel mevsim bahar."], "bağlaç": ["Elma ve armut aldım.", "Çok çalıştı ama kazanamadı.", "Çay veya kahve içebilirsin.", "Gelemedim çünkü hastaydım.", "Ali de bizimle gelecek."], "ünlem": ["Eyvah, otobüsü kaçırdık!", "Yaşasın, tatil başladı!", "Of, bu sıcak çok bunalttı!", "Hey, buraya bak!"] },
+    siniflandir(grupla({ "edat": ["Aslan gibi güçlüydü.", "Senin için çiçek aldım.", "Akşama kadar ders çalıştık.", "Sabahtan beri yağmur yağıyor.", "Bana göre en güzel mevsim bahar."], "bağlaç": ["Elma ve armut aldım.", "Çok çalıştı ama kazanamadı.", "Çay veya kahve içebilirsin.", "Gelemedim çünkü hastaydım.", "Ali de bizimle gelecek."], "ünlem": ["Eyvah, otobüsü kaçırdık!", "Yaşasın, tatil başladı!", "Of, bu sıcak çok bunalttı!", "Hey, buraya bak!"] }),
       (g) => `Hangi cümlede ${g} kullanılmıştır?`, (d, g) => `"${d}" cümlesinde ${g} vardır.`)
   ]);
 
   // ---------- Yapı ----------
   const KOK = [["gözlükçü", "göz", ["gözlük", "gö"]], ["kitaplık", "kitap", ["kita", "kitapl"]], ["simitçi", "simit", ["simi", "sim"]], ["tuzluk", "tuz", ["tuzlu", "tu"]], ["balıkçı", "balık", ["bal", "balıkç"]], ["yolcu", "yol", ["yo", "yolc"]], ["sevgi", "sev", ["se", "sevg"]], ["çiçekçi", "çiçek", ["çiçe", "çi"]], ["güneşli", "güneş", ["gün", "güne"]], ["kalemlik", "kalem", ["kale", "kal"]], ["arabacı", "araba", ["ara", "arab"]], ["dişçi", "diş", ["di", "dişç"]], ["sulu", "su", ["sul", "s"]], ["bilgi", "bil", ["bi", "bilg"]], ["temizlik", "temiz", ["tem", "temizl"]]];
   U.tr3k1 = tiplerden([
-    () => { const [w, k, yan] = pick(KOK); return soru(`"${w}" sözcüğünün kökü hangisidir?`, k, [...yan, w], `Parçalanamayan, anlamlı en küçük kısım "${k}"dir. Diğer seçenekler ya anlamsızdır ya da gövdedir.`); },
-    siniflandir({ "yapım eki": ["kitaplık", "gözlük", "tuzsuz", "simitçi", "sulu", "balıkçı", "yolcu", "bilgi", "sevgi", "çiçekçi", "güneşli", "kalemlik"], "çekim eki": ["kitaplar", "evde", "okuldan", "kalemim", "geldi", "kapının", "arabam", "bahçeye", "ağaçlar", "gördüm", "masada", "elmayı"] },
+    () => { const [w, k, yan] = pick(KOK); return soru(`"${w}" sözcüğünün kökü hangisidir?`, k, [...yan, Y(w, "k:gövde (ek almış sözcük) ile kök karıştırıldı")], `Parçalanamayan, anlamlı en küçük kısım "${k}"dir. Diğer seçenekler ya anlamsızdır ya da gövdedir.`); },
+    siniflandir(grupla({ "yapım eki": ["kitaplık", "gözlük", "tuzsuz", "simitçi", "sulu", "balıkçı", "yolcu", "bilgi", "sevgi", "çiçekçi", "güneşli", "kalemlik"], "çekim eki": ["kitaplar", "evde", "okuldan", "kalemim", "geldi", "kapının", "arabam", "bahçeye", "ağaçlar", "gördüm", "masada", "elmayı"] }),
       (g) => `Hangi sözcük ${g} almıştır?`, (d, g) => `"${d}" sözcüğündeki ek ${g === "yapım eki" ? "yeni bir sözcük türetmiştir; yapım ekidir" : "anlamı değiştirmemiştir; çekim ekidir"}.`)
   ]);
 
   // ---------- Cümlede anlam ----------
-  U.tr4k1 = siniflandir({
+  const ILISKI = {
     "sebep-sonuç": ["Yağmur yağdığı için maç ertelendi.", "Çok çalıştığından sınavı kazandı.", "Hasta olduğu için okula gelmedi.", "Yol buzlu olduğundan kaza oldu.", "Geç kaldığı için otobüsü kaçırdı.", "Gürültüden uyuyamadım."],
     "amaç-sonuç": ["Sınavı kazanmak için çok çalıştı.", "Sağlıklı olmak için spor yapıyor.", "Otobüse yetişmek için koştu.", "Kitap almak için kütüphaneye gitti.", "Erken uyanmak için alarm kurdu.", "Kardeşine hediye almak üzere çarşıya çıktı."],
     "koşul": ["Çalışırsan başarılı olursun.", "Yağmur yağarsa pikniğe gitmeyiz.", "Erken kalkarsan kahvaltıya yetişirsin.", "Ödevini bitirirsen oyun oynayabilirsin.", "Kitabı okursan konuyu anlarsın."],
     "karşılaştırma": ["Ali, kardeşinden daha uzun.", "Bu yıl kış geçen yıldan daha soğuk geçti.", "Kedi, köpekten daha sessizdir.", "Matematik sınavı Türkçe sınavından daha zordu.", "Sınıfın en hızlı koşucusu Elif'tir."]
-  }, (g) => `Hangi cümlede ${g} ilişkisi vardır?`, (d, g) => `"${d}" cümlesinde ${g} ilişkisi vardır.`, (d) => `"${d}" cümlesinde hangi anlam ilişkisi vardır?`);
+  };
+  U.tr4k1 = tiplerden([
+    siniflandir(grupla(ILISKI), (g) => `Hangi cümlede ${g} ilişkisi vardır?`, (d, g) => `"${d}" cümlesinde ${g} ilişkisi vardır.`),
+    () => { const g = pick(Object.keys(ILISKI)), d = pick(ILISKI[g]); return soru(`"${d}" cümlesinde hangi anlam ilişkisi vardır?`, buyuk(g), Object.keys(ILISKI).filter((x) => x !== g).map((x) => Y(buyuk(x), KAR(g, x))), `"${d}" cümlesinde ${g} ilişkisi vardır.`); }
+  ]);
 
   U.tr4k2 = siniflandir({
-    "nesnel": ["Türkiye'nin başkenti Ankara'dır.", "Su deniz seviyesinde 100 °C'de kaynar.", "Kitap 120 sayfadan oluşuyor.", "Bir yılda 12 ay vardır.", "Van Gölü Türkiye'nin en büyük gölüdür.", "Okulumuzda 24 sınıf var.", "Atatürk 1881 yılında doğdu.", "Bir hafta yedi gündür."],
-    "öznel": ["Bu kitap okuduğum en güzel kitap.", "Kış mevsimi yazdan daha eğlencelidir.", "Bu film çok sıkıcıydı.", "Matematik en zevkli derstir.", "Ankara çok güzel bir şehir.", "Kırmızı en güzel renktir.", "Bu yemek harika olmuş.", "Bence en iyi spor futboldur."]
+    "nesnel": tumu(["Türkiye'nin başkenti Ankara'dır.", "Su deniz seviyesinde 100 °C'de kaynar.", "Kitap 120 sayfadan oluşuyor.", "Bir yılda 12 ay vardır.", "Van Gölü Türkiye'nin en büyük gölüdür.", "Okulumuzda 24 sınıf var.", "Atatürk 1881 yılında doğdu.", "Bir hafta yedi gündür."], "k:kanıtlanabilen (nesnel) yargı kişisel görüş sanıldı"),
+    "öznel": tumu(["Bu kitap okuduğum en güzel kitap.", "Kış mevsimi yazdan daha eğlencelidir.", "Bu film çok sıkıcıydı.", "Matematik en zevkli derstir.", "Ankara çok güzel bir şehir.", "Kırmızı en güzel renktir.", "Bu yemek harika olmuş.", "Bence en iyi spor futboldur."], "k:kişisel görüş bildiren (öznel) yargı kanıtlanabilir sanıldı")
   }, (g) => `Hangisi ${g} bir yargıdır?`, (d, g) => `"${d}" ${g === "nesnel" ? "kanıtlanabilir; nesnel yargıdır" : "kişisel görüş bildirir; öznel yargıdır"}.`);
 
   // ---------- Paragraf ----------
@@ -175,18 +194,19 @@
     "abartma": ["Sana bin kere söyledim.", "Öyle acıktım ki bir fil yiyebilirim.", "Gözyaşları sel olup aktı.", "Kahkahası dağları inletti.", "Bu çanta bir ton ağırlığında.", "Bir saattir değil, bir asırdır seni bekliyorum."]
   };
   const KONUSTURMA = ["\"Beni neden kopardın?\" dedi gül.", "Kedi, \"Bana biraz süt verir misin?\" diye sordu.", "Ağaç, \"Gölgemde dinlen.\" dedi yolcuya.", "Kalem, \"Bugün çok yoruldum.\" diye söylendi.", "Ay, yıldızlara \"Haydi uyuyalım.\" dedi."];
-  const ucSanat = siniflandir(SANAT, (g) => `Hangi cümlede ${g} sanatı vardır?`, (d, g) => `"${d}" cümlesinde ${g} vardır.`);
+  const ucSanat = siniflandir(grupla(SANAT), (g) => `Hangi cümlede ${g} sanatı vardır?`, (d, g) => `"${d}" cümlesinde ${g} vardır.`);
   U.tr5k1 = tiplerden([
     ucSanat, ucSanat,
-    () => { const c = pick(KONUSTURMA); return soru("Hangi cümlede konuşturma sanatı vardır?", c, [...SANAT.benzetme, ...SANAT.abartma], `"${c}" cümlesinde insan dışındaki bir varlık konuşturulmuştur.`); },
-    () => { const g = pick(Object.keys(SANAT)), c = pick(SANAT[g]); return soru(`"${c}" cümlesinde hangi söz sanatı vardır?`, buyuk(g), ["Benzetme", "Kişileştirme", "Abartma", "Konuşturma"].filter((x) => x !== buyuk(g) && !(g === "kişileştirme" && x === "Konuşturma")).concat(g === "kişileştirme" ? ["Tezat (karşıtlık)"] : []), `"${c}" cümlesinde ${g} vardır.`); }
+    () => { const c = pick(KONUSTURMA); return soru("Hangi cümlede konuşturma sanatı vardır?", c, [...SANAT.benzetme.map((x) => Y(x, KAR("konuşturma", "benzetme"))), ...SANAT.abartma.map((x) => Y(x, KAR("konuşturma", "abartma")))], `"${c}" cümlesinde insan dışındaki bir varlık konuşturulmuştur.`); },
+    () => { const g = pick(Object.keys(SANAT)), c = pick(SANAT[g]); return soru(`"${c}" cümlesinde hangi söz sanatı vardır?`, buyuk(g), ["Benzetme", "Kişileştirme", "Abartma", "Konuşturma"].filter((x) => x !== buyuk(g) && !(g === "kişileştirme" && x === "Konuşturma")).map((x) => Y(x, KAR(g, x.toLocaleLowerCase("tr")))).concat(g === "kişileştirme" ? ["Tezat (karşıtlık)"] : []), `"${c}" cümlesinde ${g} vardır.`); }
   ]);
 
   // ---------- Yazım ----------
+  const DE = "k:bağlaç olan \"de/da\" ayrı yazılır", KI = "k:sıfat yapan \"-ki\" eki bitişik yazılır (okuldaki, yarınki)", MI = "k:soru eki \"mi\" ayrı yazılır";
   U.tr6k1 = tiplerden([
     ifadeler(
       ["Ben de bu yaz Bursa'ya gideceğim.", "Okuldaki etkinlik çok güzeldi.", "Duydum ki yarın tatil olacakmış.", "Sen de mi geliyorsun?", "Bu kitabı bir kez okudum.", "Herkes sınıfa girdi.", "Yarınki maçı izleyeceğiz.", "Bize de anlatır mısın?", "Yarın Ankara'ya gideceğiz.", "Yalnız kalmak istemiyorum.", "Kitabı okudun mu?", "Ali de bizimle gelecek.", "Hiçbir şey olmamış gibi davrandı.", "Birkaç gün sonra döneceğim."],
-      ["Bende seninle geleceğim.", "Okulda ki kitaplar yenilendi.", "Sende mi geliyorsun?", "Annem bana kitapmı aldı?", "Yarın ankara'ya gideceğiz.", "Herkez sınıfa girdi.", "Yanlız kalmak istemiyorum.", "Bu kitabı birkez okudum.", "Ali'de bizimle gelecek.", "Yarın ki maçı izleyeceğiz.", "Kitabı okudunmu?", "Hiç bir şey olmamış gibi davrandı.", "Bir kaç gün sonra döneceğim.", "Bizde onlara katıldık."],
+      [Y("Bende seninle geleceğim.", DE), Y("Okulda ki kitaplar yenilendi.", KI), Y("Sende mi geliyorsun?", DE), Y("Annem bana kitapmı aldı?", MI), Y("Yarın ankara'ya gideceğiz.", "k:özel isimlerin büyük harfle başladığı bilinmedi"), Y("Herkez sınıfa girdi.", "k:sık yanlış yazılan sözcük: herkes"), Y("Yanlız kalmak istemiyorum.", "k:sık yanlış yazılan sözcük: yalnız"), Y("Bu kitabı birkez okudum.", "k:\"bir kez\" ayrı yazılır"), Y("Ali'de bizimle gelecek.", DE), Y("Yarın ki maçı izleyeceğiz.", KI), Y("Kitabı okudunmu?", MI), Y("Hiç bir şey olmamış gibi davrandı.", "k:\"hiçbir\" bitişik yazılır"), Y("Bir kaç gün sonra döneceğim.", "k:\"birkaç\" bitişik yazılır"), Y("Bizde onlara katıldık.", DE)],
       ""
     )
   ]);
@@ -208,9 +228,12 @@
     ["Neden geç kaldın( )", "?"], ["Yaşasın( ) Tatil başladı!", "!"], ["Çantama şunları koydum( ) kalem, defter, silgi.", ":"], ["Arkadaşlar( ) yarın geziye gidiyoruz.", ","],
     ["Bu yaz hangi şehre gideceksiniz( )", "?"], ["Bahçede kediler( ) köpekler ve kuşlar vardı.", ","], ["Dedem bize şunu söyledi( ) \"Hiç pes etmeyin.\"", ":"], ["Kitabımı bitirdim( )", "."]
   ];
+  const N_SORU = "k:soru cümlesinin sonuna soru işareti konduğu bilinmedi", N_VIRGUL = "k:eş görevli sözcüklerin virgülle ayrıldığı bilinmedi", N_IKI = "k:açıklama, örnek ve alıntıdan önce iki nokta konduğu bilinmedi";
+  // doğru işaret + seçilen işaret → yanılgı
+  const NOKTA_ET = { "?.": N_SORU, ",.": N_VIRGUL, ":,": N_IKI, ":.": N_IKI, "!,": "d:sonraki sözcüğün büyük harfle başladığına dikkat edilmedi" };
   U.tr6k2 = tiplerden([
-    () => { const [c, i] = pick(NOKTA); return soru(`"${c}" cümlesinde ayraç içine hangi noktalama işareti gelmelidir?`, ISARET[i], Object.values(ISARET), `Ayraç içine ${ISARET[i]} gelmelidir.`); },
+    () => { const [c, i] = pick(NOKTA); return soru(`"${c}" cümlesinde ayraç içine hangi noktalama işareti gelmelidir?`, ISARET[i], Object.keys(ISARET).filter((x) => x !== i).map((x) => { const e = i + x === ",." && !c.includes(" ve ") ? null : NOKTA_ET[i + x]; return e ? Y(ISARET[x], e) : ISARET[x]; }), `Ayraç içine ${ISARET[i]} gelmelidir.`); },
     ifadeler(["Soru cümlelerinin sonuna soru işareti konur.", "Eş görevli sözcükler virgülle ayrılır.", "Kısaltmalardan sonra nokta konabilir.", "Saat ve dakika arasına nokta konur.", "Özel isimlere gelen ekler kesme işaretiyle ayrılır.", "Açıklama yapılacak cümlenin sonuna iki nokta konur.", "Sevinç bildiren cümlelerin sonuna ünlem işareti konur."],
-      ["Soru cümlelerinin sonuna nokta konur.", "Saat ve dakika arasına virgül konur.", "Cins isimlere gelen ekler kesme işaretiyle ayrılır.", "Eş görevli sözcükler noktayla ayrılır.", "Her cümlenin sonuna ünlem işareti konur.", "İki nokta yalnızca soru cümlelerinde kullanılır.", "Kesme işareti cümle sonuna konur."], "Noktalama işaretleri")
+      [Y("Soru cümlelerinin sonuna nokta konur.", N_SORU), Y("Saat ve dakika arasına virgül konur.", "k:saat ile dakika arasına nokta konduğu bilinmedi"), Y("Cins isimlere gelen ekler kesme işaretiyle ayrılır.", "k:kesme işaretinin özel isimlere gelen ekleri ayırdığı bilinmedi"), Y("Eş görevli sözcükler noktayla ayrılır.", N_VIRGUL), Y("Her cümlenin sonuna ünlem işareti konur.", "k:ünlem işaretinin yalnızca duygu ve seslenme bildiren cümlelerde kullanıldığı bilinmedi"), Y("İki nokta yalnızca soru cümlelerinde kullanılır.", N_IKI), Y("Kesme işareti cümle sonuna konur.", "k:kesme işaretinin görevi bilinmedi")], "Noktalama işaretleri")
   ]);
 })();
